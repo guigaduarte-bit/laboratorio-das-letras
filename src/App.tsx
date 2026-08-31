@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig } from 'motion/react';
 import { gameAudio } from './audio/GameAudio';
 import { PhaserGame } from './PhaserGame';
@@ -37,6 +37,7 @@ export default function App()
     const [collectedCount, setCollectedCount] = useState(0);
     const [mission, setMission] = useState(INITIAL_MISSION);
     const [announcement, setAnnouncement] = useState('');
+    const startInProgress = useRef(false);
 
     useEffect(() => {
         const handleMenuReady = (): void => setMenuReady(true);
@@ -82,7 +83,11 @@ export default function App()
             gameAudio.completeWord(word);
         };
 
-        const handleCelebrationReady = (): void => setPhase('celebrating');
+        const handleCelebrationReady = (): void =>
+        {
+            gameAudio.finishCelebration();
+            setPhase('celebrating');
+        };
 
         EventBus.on('level-started', handleLevelStarted);
         EventBus.on('menu-ready', handleMenuReady);
@@ -103,19 +108,25 @@ export default function App()
         };
     }, []);
 
-    const startGame = (): void =>
+    const startGame = async (): Promise<void> =>
     {
-        if (!menuReady)
+        if (!menuReady || startInProgress.current)
         {
             return;
         }
 
-        gameAudio.unlock();
+        startInProgress.current = true;
         setMenuReady(false);
+        const audioReady = await gameAudio.unlock();
+
         setDisplay(INITIAL_DISPLAY);
         setCollectedCount(0);
         setMission(INITIAL_MISSION);
-        setAnnouncement('Palavra: S, espaço, espaço, espaço.');
+        setAnnouncement(
+            audioReady
+                ? 'Palavra: S, espaço, espaço, espaço.'
+                : 'Áudio indisponível. Palavra: S, espaço, espaço, espaço.'
+        );
         setPhase('playing');
         EventBus.emit('start-game');
     };

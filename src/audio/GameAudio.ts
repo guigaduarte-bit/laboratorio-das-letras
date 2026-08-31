@@ -4,11 +4,15 @@ import { EventBus } from '../game/EventBus';
 type Letter = 'S' | 'A' | 'P' | 'O';
 
 type AudioQueueItem = {
+    before?: () => void;
     sound: Howl;
     after?: () => void;
 };
 
 const AUDIO_ROOT = '/assets/audio';
+const AUDIO_LOAD_TIMEOUT_MS = 6000;
+const AUDIO_UNLOCK_TIMEOUT_MS = 2000;
+const MIN_PLAYBACK_TIMEOUT_MS = 1800;
 
 const createSound = (path: string, volume: number): Howl => new Howl({
     src: [`${AUDIO_ROOT}/${path}`],
@@ -47,20 +51,83 @@ class GameAudio
     });
 
     private unlocked = false;
+    private unlockAttempt?: Promise<boolean>;
     private audioQueue: AudioQueueItem[] = [];
-    private activeSound?: Howl;
+    private cancelActiveAudio?: () => void;
     private queueRunning = false;
-    private fallbackTimer?: ReturnType<typeof setTimeout>;
 
-    unlock(): void
+    unlock(): Promise<boolean>
     {
-        Howler.autoUnlock = true;
-        this.unlocked = true;
-
-        if (Howler.ctx?.state === 'suspended')
+        if (this.unlocked)
         {
-            void Howler.ctx.resume().catch(() => undefined);
+            return Promise.resolve(true);
         }
+
+        if (this.unlockAttempt)
+        {
+            return this.unlockAttempt;
+        }
+
+        Howler.autoUnlock = true;
+        const attempt = this.confirmAudioUnlock();
+
+        this.unlockAttempt = attempt.then((confirmed) => {
+            if (confirmed)
+            {
+                this.unlocked = true;
+            }
+
+            return confirmed;
+        }).catch(() => false).finally(() => {
+            this.unlockAttempt = undefined;
+        });
+
+        return this.unlockAttempt;
+    }
+
+    private async confirmAudioUnlock(): Promise<boolean>
+    {
+        if (Howler.noAudio)
+        {
+            return false;
+        }
+
+        if (!Howler.usingWebAudio)
+        {
+            return false;
+        }
+
+        const context = Howler.ctx;
+        if (context.state === 'running')
+        {
+            return true;
+        }
+
+        if (context.state === 'closed')
+        {
+            return false;
+        }
+
+        return new Promise<boolean>((resolve) => {
+            let settled = false;
+            const finish = (confirmed: boolean): void =>
+            {
+                if (settled)
+                {
+                    return;
+                }
+
+                settled = true;
+                clearTimeout(timeout);
+                resolve(confirmed);
+            };
+            const timeout = setTimeout(() => finish(false), AUDIO_UNLOCK_TIMEOUT_MS);
+
+            void context.resume().then(
+                () => finish(Howler.ctx.state === 'running'),
+                () => finish(false)
+            );
+        });
     }
 
     startLevel(): void
@@ -114,22 +181,30 @@ class GameAudio
     {
         if (!this.unlocked)
         {
-            EventBus.emit('word-audio-completed', { word });
+            queueMicrotask(() => EventBus.emit('word-audio-completed', { word }));
             return;
         }
 
-        if (this.music.playing())
-        {
-            this.music.fade(this.music.volume(), 0.04, 450);
-        }
-
-        this.enqueueAudio({ sound: this.wordSapo });
+        this.enqueueAudio({
+            sound: this.wordSapo,
+            before: () => {
+                if (this.music.playing())
+                {
+                    this.music.fade(this.music.volume(), 0.04, 450);
+                }
+            }
+        });
         this.enqueueAudio({
             sound: this.sfx.complete,
             after: () => {
                 EventBus.emit('word-audio-completed', { word });
             }
         });
+    }
+
+    finishCelebration(): void
+    {
+        this.clearAudioQueue();
     }
 
     stopAll(): void
@@ -159,14 +234,8 @@ class GameAudio
 
     private clearAudioQueue(): void
     {
-        if (this.fallbackTimer)
-        {
-            clearTimeout(this.fallbackTimer);
-            this.fallbackTimer = undefined;
-        }
-
-        this.activeSound?.stop();
-        this.activeSound = undefined;
+        this.cancelActiveAudio?.();
+        this.cancelActiveAudio = undefined;
         this.audioQueue = [];
         this.queueRunning = false;
     }
@@ -185,45 +254,113 @@ class GameAudio
         }
 
         this.queueRunning = true;
-        this.activeSound = next.sound;
         let finished = false;
+        let cancelled = false;
+        let soundId: number | undefined;
+        let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
 
-        const finish = (): void =>
+        const clearFallback = (): void =>
         {
-            if (finished)
+            if (fallbackTimer)
+            {
+                clearTimeout(fallbackTimer);
+                fallbackTimer = undefined;
+            }
+        };
+
+        const handleLoad = (): void => startPlayback();
+        const handleLoadError = (): void => finish();
+        const handleEnd = (): void => finish();
+        const handlePlayError = (): void => finish(true);
+
+        const removeListeners = (): void =>
+        {
+            next.sound.off('load', handleLoad);
+            next.sound.off('loaderror', handleLoadError);
+
+            if (soundId !== undefined)
+            {
+                next.sound.off('end', handleEnd, soundId);
+                next.sound.off('playerror', handlePlayError, soundId);
+            }
+        };
+
+        const finish = (stopSound = false): void =>
+        {
+            if (finished || cancelled)
             {
                 return;
             }
 
             finished = true;
-            next.sound.off('end', finish, soundId);
-            next.sound.off('loaderror', finish, soundId);
-            next.sound.off('playerror', finish, soundId);
-            if (this.fallbackTimer)
+            clearFallback();
+            removeListeners();
+
+            if (stopSound)
             {
-                clearTimeout(this.fallbackTimer);
-                this.fallbackTimer = undefined;
+                soundId === undefined
+                    ? next.sound.stop()
+                    : next.sound.stop(soundId);
             }
 
-            next.after?.();
-            this.activeSound = undefined;
+            this.cancelActiveAudio = undefined;
             this.queueRunning = false;
+            next.after?.();
             this.playNextAudio();
         };
 
-        const soundId = next.sound.play();
-        next.sound.once('end', finish, soundId);
-        next.sound.once('loaderror', finish, soundId);
-        next.sound.once('playerror', finish, soundId);
-
-        const durationMs = Math.max(1800, next.sound.duration() * 1000 + 900);
-        this.fallbackTimer = setTimeout(() => {
-            if (next.sound.playing(soundId))
+        const startPlayback = (): void =>
+        {
+            if (finished || cancelled)
             {
-                next.sound.stop(soundId);
+                return;
             }
-            finish();
-        }, durationMs);
+
+            clearFallback();
+            next.sound.off('load', handleLoad);
+            next.sound.off('loaderror', handleLoadError);
+            next.before?.();
+
+            soundId = next.sound.play();
+            next.sound.once('end', handleEnd, soundId);
+            next.sound.once('playerror', handlePlayError, soundId);
+
+            const durationMs = Math.max(
+                MIN_PLAYBACK_TIMEOUT_MS,
+                next.sound.duration() * 1000 + 900
+            );
+            fallbackTimer = setTimeout(() => finish(true), durationMs);
+        };
+
+        this.cancelActiveAudio = (): void =>
+        {
+            if (finished || cancelled)
+            {
+                return;
+            }
+
+            cancelled = true;
+            clearFallback();
+            removeListeners();
+            soundId === undefined
+                ? next.sound.stop()
+                : next.sound.stop(soundId);
+        };
+
+        if (next.sound.state() === 'loaded')
+        {
+            startPlayback();
+            return;
+        }
+
+        next.sound.once('load', handleLoad);
+        next.sound.once('loaderror', handleLoadError);
+        fallbackTimer = setTimeout(() => finish(true), AUDIO_LOAD_TIMEOUT_MS);
+
+        if (next.sound.state() === 'unloaded')
+        {
+            next.sound.load();
+        }
     }
 }
 

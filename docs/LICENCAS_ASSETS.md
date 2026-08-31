@@ -17,15 +17,21 @@ Para cada asset, registrar antes do uso:
 
 ## Marco 2 — áudio provisório
 
-Os arquivos abaixo são placeholders originais gerados localmente para validar o fluxo técnico. Nenhum material de terceiros foi baixado ou incorporado. Efeitos e música foram sintetizados com FFmpeg; as vozes provisórias foram geradas com o sintetizador Flite disponível no ambiente de desenvolvimento.
+Os arquivos abaixo são placeholders produzidos localmente para validar o fluxo técnico. Não incorporam gravações, músicas ou efeitos baixados de terceiros. As vozes foram sintetizadas com Flite e codificadas em MP3 com FFmpeg; os efeitos e a música foram criados por síntese de tons e ruído com FFmpeg.
 
-| Grupo | Arquivos | Autor/organização | Origem | Licença | Verificação | Uso |
+O Flite e as vozes distribuídas no pacote usado são do Language Technologies Institute da Carnegie Mellon University e colaboradores. A licença permissiva do projeto autoriza uso e distribuição, inclusive de versões modificadas, desde que os avisos e condições sejam preservados. Este registro mantém a atribuição e aponta para o [repositório oficial do Flite](https://github.com/festvox/flite) e o [texto integral da licença](https://github.com/festvox/flite/blob/master/COPYING). O perfil exato da voz incluída no Flite não foi anotado durante a síntese; por isso, ela continua sendo um placeholder e não deve ser tratada como voz final em português brasileiro.
+
+Os MP3 gerados para o projeto estão autorizados para versionamento no repositório e exibição no preview técnico do Laboratório das Letras. Essa autorização não transforma os arquivos em assets finais: antes de produção ou teste com crianças, as vozes devem ser substituídas e a trilha provisória deve passar por validação editorial e pedagógica.
+
+Registro de incorporação: commit [`741f6a7`](https://github.com/guigaduarte-bit/laboratorio-das-letras/commit/741f6a79e10b89cadad14d26d59b649912973cd5), de 2026-08-31.
+
+| Grupo | Arquivos | Autor/organização | Proveniência e origem | Licença e escopo | Verificação | Uso |
 | --- | --- | --- | --- | --- | --- | --- |
-| Instruções | `voice/instructions/encontre-s.mp3`, `voice/instructions/forme-sapo.mp3` | Equipe do projeto | Geração local com Flite; sem URL de mídia externa | Placeholder interno, não aprovado para produção | 2026-08-31 | Orientação da missão |
-| Letras | `voice/letters/s.mp3`, `a.mp3`, `p.mp3`, `o.mp3` | Equipe do projeto | Geração local com Flite; sem URL de mídia externa | Placeholder interno, não aprovado para produção | 2026-08-31 | Nome ou som da letra coletada |
-| Palavra | `voice/words/sapo.mp3` | Equipe do projeto | Geração local com Flite; sem URL de mídia externa | Placeholder interno, não aprovado para produção | 2026-08-31 | Leitura da palavra completa |
-| Efeitos | `sfx/collect.mp3`, `correct.mp3`, `hint.mp3`, `complete.mp3` | Equipe do projeto | Síntese original local com FFmpeg; sem URL de mídia externa | Asset original do projeto | 2026-08-31 | Feedback sonoro curto |
-| Música | `music/forest-loop.mp3` | Equipe do projeto | Síntese original local com FFmpeg; sem URL de mídia externa | Asset original do projeto | 2026-08-31 | Fundo musical em loop |
+| Instruções | `voice/instructions/encontre-s.mp3`, `voice/instructions/forme-sapo.mp3` | Laboratório das Letras; síntese baseada no Flite da Carnegie Mellon University e colaboradores | Produção local com Flite e FFmpeg; sem gravação externa; incorporação no commit acima | Componentes do Flite sob licença permissiva CMU; MP3 autorizado para repositório e preview técnico | 2026-08-31 | Orientação da missão |
+| Letras | `voice/letters/s.mp3`, `a.mp3`, `p.mp3`, `o.mp3` | Laboratório das Letras; síntese baseada no Flite da Carnegie Mellon University e colaboradores | Produção local com Flite e FFmpeg; sem gravação externa; incorporação no commit acima | Componentes do Flite sob licença permissiva CMU; MP3 autorizado para repositório e preview técnico | 2026-08-31 | Nome ou som da letra coletada |
+| Palavra | `voice/words/sapo.mp3` | Laboratório das Letras; síntese baseada no Flite da Carnegie Mellon University e colaboradores | Produção local com Flite e FFmpeg; sem gravação externa; incorporação no commit acima | Componentes do Flite sob licença permissiva CMU; MP3 autorizado para repositório e preview técnico | 2026-08-31 | Leitura da palavra completa |
+| Efeitos | `sfx/collect.mp3`, `correct.mp3`, `hint.mp3`, `complete.mp3` | Laboratório das Letras | Síntese local de tons e ruído com FFmpeg; sem mídia externa; incorporação no commit acima | Asset técnico do projeto, autorizado para repositório e preview; ainda não aprovado como asset final de produção | 2026-08-31 | Feedback sonoro curto |
+| Música | `music/forest-loop.mp3` | Laboratório das Letras | Síntese local de tons com FFmpeg; sem mídia externa; incorporação no commit acima | Asset técnico do projeto, autorizado para repositório e preview; ainda não aprovado como asset final de produção | 2026-08-31 | Fundo musical em loop |
 
 As vozes atuais não têm pronúncia pedagógica validada em português brasileiro. Devem ser substituídas por gravações humanas licenciadas e revisadas antes de uma sessão de teste com crianças ou de qualquer publicação em produção.
 
@@ -33,4 +39,4 @@ As vozes atuais não têm pronúncia pedagógica validada em português brasilei
 
 | Asset | Autor/organização | Origem | Licença | Verificação | Uso |
 | --- | --- | --- | --- | --- | --- |
-| Lexend Variable, pacote `@fontsource-variable/lexend` | Google Inc.; distribuição Fontsource | `https://fontsource.org/fonts/lexend` e licença incluída no pacote | SIL Open Font License 1.1 (`https://openfontlicense.org`) | 2026-08-31 | Tipografia da interface React |
+| Lexend Variable, pacote `@fontsource-variable/lexend` versão `5.3.0` | Copyright 2019 The Lexend Project Authors; pacote distribuído por Fontsource | [Página oficial da Lexend no Fontsource](https://fontsource.org/fonts/lexend); [pacote publicado no npm](https://www.npmjs.com/package/@fontsource-variable/lexend/v/5.3.0); licença também incluída em `node_modules/@fontsource-variable/lexend/LICENSE` | SIL Open Font License 1.1 (`OFL-1.1`); [texto oficial no repositório da Lexend](https://github.com/googlefonts/lexend/blob/main/OFL.txt) | 2026-08-31 | Tipografia da interface React |
