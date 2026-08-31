@@ -100,12 +100,14 @@ Também foram ajustados `src/App.tsx`, `src/pages/_app.tsx`, `src/styles/globals
 - O `npm audit --omit=dev` ainda aponta alertas transitivos no PostCSS fixado pelo Next 15; a correção automática disponível migraria para Next 16 e foi adiada por ser uma atualização principal fora deste marco.
 - Continua existindo apenas a fase e a palavra `SAPO`.
 - O primeiro deployment automático do commit `741f6a7` falhou enquanto usava o Next 15.3.1 vulnerável. A correção está isolada na branch `preview/marco-2-security-fix` e ainda precisa ser validada no preview da Vercel.
+- O deployment do commit `a1655e8` concluiu o build, mas a URL retornou `404: NOT_FOUND`; o repositório ainda não declarava à Vercel que o site estático é gerado em `dist`.
 
 ### Arquivos ajustados na preparação do preview
 
 - `package.json` e `package-lock.json`: atualização de segurança compatível do Next.js e dependências transitivas.
 - `src/audio/GameAudio.ts`: desbloqueio confirmado, carregamento defensivo e fila sonora sem sobreposição.
 - `src/App.tsx`: início assíncrono seguro e proteção contra toques repetidos.
+- `vercel.json`: preset Next.js, comando de build e diretório estático `dist` declarados explicitamente para a Vercel.
 - `docs/LICENCAS_ASSETS.md`: registros verificáveis da Lexend, do Flite e do escopo dos áudios provisórios no preview técnico.
 - `docs/ROADMAP.md`: registro desta correção, das validações e das limitações restantes.
 
