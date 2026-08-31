@@ -1,48 +1,294 @@
-body {
+:root {
+    font-family: "Lexend Variable", "Trebuchet MS", Arial, sans-serif;
+    color: #24344a;
+    background: #dff2dc;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#__next {
+    min-width: 320px;
+    min-height: 100%;
     margin: 0;
-    padding: 0;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #000000; 
-    font-family: Arial, Helvetica, sans-serif;
 }
 
-#app {
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: linear-gradient(155deg, #bce4dc 0%, #eef5d7 100%);
+}
+
+button {
+    font: inherit;
+}
+
+button:focus-visible {
+    outline: 5px solid #24344a;
+    outline-offset: 5px;
+}
+
+.lab-shell {
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
+    padding: clamp(12px, 3vw, 34px);
+    display: grid;
+    place-items: center;
+}
+
+.game-stage {
+    width: min(1120px, 100%);
+}
+
+.game-frame {
+    width: 100%;
+    position: relative;
     overflow: hidden;
+    background: #7ec8d9;
+    border: clamp(4px, 0.8vw, 8px) solid #385b46;
+    border-radius: clamp(16px, 3vw, 30px);
+    box-shadow: 0 16px 0 rgb(36 52 74 / 16%);
+}
+
+#game-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+
+#game-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+.menu-overlay {
+    position: absolute;
+    inset: 0;
+    padding: 24px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: clamp(28px, 7vw, 64px);
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: rgb(126 200 217 / 12%);
+    z-index: 10;
 }
 
-.spritePosition {
-    margin: 10px 0 0 10px;
-    font-size: 0.8em;
+.menu-overlay h1 {
+    max-width: 780px;
+    margin: 0;
+    color: #24344a;
+    font-size: clamp(2rem, 6.4vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+    text-wrap: balance;
 }
 
-.button {
-    width: 140px;
-    margin: 10px;
-    padding: 10px;
-    background-color: #000000;
-    color: rgba(255, 255, 255, 0.87);
-    border: 1px solid rgba(255, 255, 255, 0.87);
+.menu-overlay button {
+    min-width: min(290px, 78vw);
+    min-height: 76px;
+    padding: 16px 34px;
+    color: #24344a;
+    background: #fff7dd;
+    border: 4px solid #24344a;
+    border-radius: 22px;
+    box-shadow: 0 8px 0 #385b46;
     cursor: pointer;
-    transition: all 0.3s;
+    font-size: clamp(1.15rem, 3vw, 1.55rem);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    transition: box-shadow 120ms ease, background-color 120ms ease;
+}
 
-    &:hover {
-        border: 1px solid #0ec3c9;
-        color: #0ec3c9;
+.menu-overlay button:hover {
+    box-shadow: 0 10px 0 #385b46;
+}
+
+.menu-overlay button:active {
+    box-shadow: 0 2px 0 #385b46;
+}
+
+.menu-overlay button:disabled {
+    opacity: 0.68;
+    cursor: wait;
+    box-shadow: 0 5px 0 #617080;
+}
+
+.game-hud {
+    width: min(430px, 70%);
+    position: absolute;
+    inset-block-start: clamp(10px, 2.4vw, 24px);
+    inset-inline: 0;
+    margin-inline: auto;
+    display: grid;
+    gap: clamp(8px, 1.4vw, 14px);
+    pointer-events: none;
+    z-index: 8;
+}
+
+.word-bar {
+    min-height: clamp(58px, 8vw, 82px);
+    padding: clamp(7px, 1.3vw, 12px);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(6px, 1.2vw, 12px);
+    color: #24344a;
+    background: rgb(255 247 221 / 94%);
+    border: clamp(3px, 0.45vw, 5px) solid #385b46;
+    border-radius: clamp(14px, 2vw, 22px);
+    box-shadow: 0 clamp(4px, 0.8vw, 8px) 0 rgb(36 52 74 / 18%);
+}
+
+.word-bar span {
+    min-width: 0;
+    display: grid;
+    place-items: center;
+    color: #617080;
+    background: rgb(255 255 255 / 58%);
+    border: 2px solid rgb(56 91 70 / 20%);
+    border-radius: clamp(9px, 1.4vw, 15px);
+    font-size: clamp(1.35rem, 4.2vw, 2.55rem);
+    font-weight: 760;
+    line-height: 1;
+}
+
+.word-bar span.is-cue {
+    color: #24344a;
+    background: #ffe49a;
+    border-color: #385b46;
+}
+
+.word-bar span.is-collected {
+    color: #173a2a;
+    background: #a8d8c0;
+    border-color: #385b46;
+}
+
+.mission-card {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: clamp(7px, 1.2vw, 11px) clamp(13px, 2vw, 22px);
+    color: #24344a;
+    background: rgb(255 255 255 / 94%);
+    border: 3px solid #385b46;
+    border-radius: 999px;
+    box-shadow: 0 4px 0 rgb(36 52 74 / 16%);
+    font-size: clamp(0.72rem, 1.8vw, 1rem);
+    font-weight: 680;
+    line-height: 1.25;
+    text-align: center;
+}
+
+.touch-controls {
+    width: min(760px, 100%);
+    margin: clamp(18px, 3vw, 28px) auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(10px, 2vw, 18px);
+}
+
+.touch-controls button {
+    min-height: 82px;
+    padding: 10px;
+    display: grid;
+    gap: 2px;
+    place-items: center;
+    color: #24344a;
+    background: #fff7dd;
+    border: 4px solid #385b46;
+    border-radius: 22px;
+    cursor: pointer;
+    font-size: clamp(0.74rem, 1.8vw, 1rem);
+    font-weight: 900;
+    touch-action: none;
+    user-select: none;
+}
+
+.touch-controls button span {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    line-height: 1;
+}
+
+.touch-controls .jump-button {
+    background: #ffe49a;
+}
+
+.touch-controls button:active {
+    background: #a8d8c0;
+}
+
+.sr-only {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (max-width: 680px) {
+    .lab-shell {
+        padding: 10px;
+        align-items: start;
     }
 
-    &:active {
-        background-color: #0ec3c9;
+    .game-frame {
+        border-radius: 16px;
+        box-shadow: 0 9px 0 rgb(36 52 74 / 16%);
     }
 
-    /* Disabled styles */
-    &:disabled {
-        cursor: not-allowed;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: rgba(255, 255, 255, 0.3);
+    .menu-overlay {
+        gap: 20px;
+        padding: 14px;
+    }
+
+    .menu-overlay button {
+        min-width: 210px;
+        min-height: 58px;
+    }
+
+    .game-hud {
+        width: min(360px, 80%);
+        inset-block-start: 7px;
+        gap: 6px;
+    }
+
+    .word-bar {
+        min-height: 48px;
+        padding: 5px;
+        gap: 5px;
+        border-width: 3px;
+    }
+
+    .mission-card {
+        padding: 5px 11px;
+        border-width: 2px;
+    }
+
+    .touch-controls button {
+        min-height: 76px;
+        padding-inline: 4px;
+        border-width: 3px;
+        border-radius: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

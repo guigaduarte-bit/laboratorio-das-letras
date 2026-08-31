@@ -1,4 +1,4 @@
 import { Events } from 'phaser';
 
-// Used to emit events between components, HTML and Phaser scenes
+/** Comunicação entre a interface React e o mundo Phaser. */
 export const EventBus = new Events.EventEmitter();

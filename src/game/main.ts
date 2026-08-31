@@ -1,31 +1,40 @@
-import { Boot } from './scenes/Boot';
-import { GameOver } from './scenes/GameOver';
-import { Game as MainGame } from './scenes/Game';
-import { MainMenu } from './scenes/MainMenu';
-import { AUTO, Game } from 'phaser';
-import { Preloader } from './scenes/Preloader';
+import { AUTO, Game, Scale } from 'phaser';
+import { BootScene } from './scenes/BootScene';
+import { CelebrationScene } from './scenes/CelebrationScene';
+import { LevelSapoScene } from './scenes/LevelSapoScene';
+import { MenuScene } from './scenes/MenuScene';
+import { PreloadScene } from './scenes/PreloadScene';
 
-//  Find out more information about the Game Config at:
-//  https://newdocs.phaser.io/docs/3.70.0/Phaser.Types.Core.GameConfig
 const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
-    width: 1024,
-    height: 768,
     parent: 'game-container',
-    backgroundColor: '#028af8',
-    scene: [
-        Boot,
-        Preloader,
-        MainMenu,
-        MainGame,
-        GameOver
-    ]
+    backgroundColor: '#7EC8D9',
+    scale: {
+        mode: Scale.FIT,
+        autoCenter: Scale.CENTER_BOTH,
+        width: 960,
+        height: 540
+    },
+    input: {
+        keyboard: true,
+        mouse: true,
+        touch: true,
+        activePointers: 3
+    },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { x: 0, y: 1100 },
+            debug: false
+        }
+    },
+    render: {
+        antialias: true,
+        roundPixels: true
+    },
+    scene: [BootScene, PreloadScene, MenuScene, LevelSapoScene, CelebrationScene]
 };
 
-const StartGame = (parent: string) => {
-
-    return new Game({ ...config, parent });
-
-}
+const StartGame = (parent: string) => new Game({ ...config, parent });
 
 export default StartGame;

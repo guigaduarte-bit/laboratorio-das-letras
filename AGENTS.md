@@ -10,9 +10,14 @@ Antes de realizar qualquer alteração, leia:
 
 ## Arquitetura
 
-- Usar Phaser 4 para o mundo jogável.
+- Usar Phaser 4 para personagem, mundo, plataformas, letras, partículas, câmera e colisões.
 - Usar React para menus, configurações e elementos externos ao canvas.
 - Usar o EventBus do template para comunicação entre React e Phaser.
+- Usar Motion somente em menus, botões, barra da palavra, transições React e cartões de missão.
+- Nunca usar Motion para animar elementos dentro do canvas; usar tweens, sprites e partículas do Phaser.
+- Usar Howler para voz, fonemas, efeitos sonoros e música ambiente.
+- Liberar o áudio somente após uma interação explícita, atualmente o botão `COMEÇAR`.
+- Usar a fonte Lexend, via Fontsource, na interface React.
 - Usar TypeScript.
 - Manter cada nível separado do conteúdo das palavras.
 - Evitar duplicação de cenas e de lógica.
@@ -36,9 +41,11 @@ Antes de realizar qualquer alteração, leia:
 - Permitir toque, teclado e controles grandes.
 - Priorizar sessões curtas.
 - Não reproduzir automaticamente sons antes da interação inicial do usuário.
+- Manter voz, fonemas, efeitos e música em volumes confortáveis e sem sobreposição confusa.
 
 ## Assets
 
 - Registrar todo asset em docs/LICENCAS_ASSETS.md.
 - Não utilizar imagens, músicas ou personagens sem licença verificável.
 - Usar placeholders até a mecânica ser validada.
+- Tratar vozes sintetizadas como placeholders; validar pronúncia em português brasileiro antes de teste pedagógico ou produção.
