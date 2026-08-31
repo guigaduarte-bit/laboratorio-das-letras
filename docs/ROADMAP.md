@@ -101,13 +101,14 @@ Também foram ajustados `src/App.tsx`, `src/pages/_app.tsx`, `src/styles/globals
 - Continua existindo apenas a fase e a palavra `SAPO`.
 - O primeiro deployment automático do commit `741f6a7` falhou enquanto usava o Next 15.3.1 vulnerável. A correção está isolada na branch `preview/marco-2-security-fix` e ainda precisa ser validada no preview da Vercel.
 - O deployment do commit `a1655e8` concluiu o build, mas a URL retornou `404: NOT_FOUND`; o repositório ainda não declarava à Vercel que o site estático é gerado em `dist`.
+- O deployment do commit `d0bbdd9` confirmou que o preset Next.js interpreta `dist` como diretório interno e procura `routes-manifest.json`; como `dist` é o export estático final, o preset foi alterado para `Other`.
 
 ### Arquivos ajustados na preparação do preview
 
 - `package.json` e `package-lock.json`: atualização de segurança compatível do Next.js e dependências transitivas.
 - `src/audio/GameAudio.ts`: desbloqueio confirmado, carregamento defensivo e fila sonora sem sobreposição.
 - `src/App.tsx`: início assíncrono seguro e proteção contra toques repetidos.
-- `vercel.json`: preset Next.js, comando de build e diretório estático `dist` declarados explicitamente para a Vercel.
+- `vercel.json`: preset estático `Other`, comando de build e diretório `dist` declarados explicitamente para a Vercel.
 - `docs/LICENCAS_ASSETS.md`: registros verificáveis da Lexend, do Flite e do escopo dos áudios provisórios no preview técnico.
 - `docs/ROADMAP.md`: registro desta correção, das validações e das limitações restantes.
 
