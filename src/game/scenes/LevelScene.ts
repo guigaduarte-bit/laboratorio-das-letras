@@ -1,16 +1,25 @@
 import { Display, Scene } from 'phaser';
-import { LEVEL_SAPO } from '../content/levels';
+import {
+    getInitialWordDisplay,
+    getLevelById,
+    type LevelDefinition
+} from '../content/levels';
 import { EventBus } from '../EventBus';
 import { LetterCollector } from '../systems/LetterCollector';
 import { PlayerController } from '../systems/PlayerController';
 import { WordProgress } from '../systems/WordProgress';
 
+type LevelSceneData = {
+    levelId?: string;
+};
+
 type WordCompletedEvent = {
     word: string;
 };
 
-export class LevelSapoScene extends Scene
+export class LevelScene extends Scene
 {
+    private level: LevelDefinition = getLevelById();
     private player!: Phaser.Physics.Arcade.Sprite;
     private playerController!: PlayerController;
     private letterCollector!: LetterCollector;
@@ -19,11 +28,12 @@ export class LevelSapoScene extends Scene
 
     constructor()
     {
-        super('LevelSapoScene');
+        super('LevelScene');
     }
 
-    init(): void
+    init(data: LevelSceneData): void
     {
+        this.level = getLevelById(data.levelId);
         this.completed = false;
         this.celebrationTimer = undefined;
     }
@@ -33,17 +43,21 @@ export class LevelSapoScene extends Scene
         this.drawBackground();
 
         const platforms = this.physics.add.staticGroup();
-        LEVEL_SAPO.platforms.forEach((placement, index) => {
+        this.level.platforms.forEach((placement, index) => {
             const texture = index === 0 ? 'ground' : 'platform';
-            const platform = platforms.create(placement.x, placement.y, texture) as Phaser.Physics.Arcade.Image;
+            const platform = platforms.create(
+                placement.x,
+                placement.y,
+                texture
+            ) as Phaser.Physics.Arcade.Image;
             platform
                 .setDisplaySize(placement.width, placement.height)
                 .refreshBody();
         });
 
         this.player = this.physics.add.sprite(
-            LEVEL_SAPO.playerStart.x,
-            LEVEL_SAPO.playerStart.y,
+            this.level.playerStart.x,
+            this.level.playerStart.y,
             'player'
         )
             .setCollideWorldBounds(true);
@@ -54,11 +68,11 @@ export class LevelSapoScene extends Scene
 
         this.physics.add.collider(this.player, platforms);
 
-        const progress = new WordProgress(LEVEL_SAPO.word);
+        const progress = new WordProgress(this.level.word);
         this.letterCollector = new LetterCollector(
             this,
             this.player,
-            LEVEL_SAPO.letters,
+            this.level.letters,
             progress
         );
         this.playerController = new PlayerController(this, this.player);
@@ -66,7 +80,12 @@ export class LevelSapoScene extends Scene
         EventBus.on('word-completed', this.handleWordCompleted);
         EventBus.on('word-audio-completed', this.handleWordAudioCompleted);
         this.events.once('shutdown', this.cleanup, this);
-        EventBus.emit('level-started', { word: LEVEL_SAPO.word });
+        EventBus.emit('level-started', {
+            levelId: this.level.id,
+            word: this.level.word,
+            displayName: this.level.displayName,
+            display: getInitialWordDisplay(this.level.word)
+        });
     }
 
     update(): void
@@ -76,7 +95,7 @@ export class LevelSapoScene extends Scene
 
     private readonly handleWordCompleted = ({ word }: WordCompletedEvent): void =>
     {
-        if (this.completed)
+        if (this.completed || word !== this.level.word)
         {
             return;
         }
@@ -85,23 +104,23 @@ export class LevelSapoScene extends Scene
         this.playerController.setEnabled(false);
         this.celebrationTimer = this.time.delayedCall(
             4200,
-            () => this.startCelebration(word)
+            () => this.startCelebration()
         );
     };
 
     private readonly handleWordAudioCompleted = ({ word }: WordCompletedEvent): void =>
     {
-        if (this.completed)
+        if (this.completed && word === this.level.word)
         {
-            this.startCelebration(word);
+            this.startCelebration();
         }
     };
 
-    private startCelebration(word: string): void
+    private startCelebration(): void
     {
         this.celebrationTimer?.remove(false);
         this.celebrationTimer = undefined;
-        this.scene.start('CelebrationScene', { word });
+        this.scene.start('CelebrationScene', { levelId: this.level.id });
     }
 
     private cleanup(): void
@@ -120,7 +139,12 @@ export class LevelSapoScene extends Scene
 
         for (let index = 0; index < bands; index += 1)
         {
-            const color = Display.Color.Interpolate.ColorWithColor(top, bottom, bands - 1, index);
+            const color = Display.Color.Interpolate.ColorWithColor(
+                top,
+                bottom,
+                bands - 1,
+                index
+            );
             this.add.rectangle(
                 480,
                 (480 / bands) * index + 480 / bands / 2,

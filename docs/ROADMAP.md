@@ -53,7 +53,7 @@ Também foram ajustados `src/App.tsx`, `src/PhaserGame.tsx`, `src/game/EventBus.
 
 ## Marco 2 — interface guiada e camada de áudio
 
-Status: **restaurado e validado localmente; aguardando preview remoto e validação das vozes**.
+Status: **concluído para preview remoto; aguardando validação das vozes em português brasileiro**.
 
 Objetivo: tornar a vertical slice de `SAPO` mais guiada e agradável sem ampliar a quantidade de fases ou palavras.
 
@@ -78,7 +78,7 @@ Objetivo: tornar a vertical slice de `SAPO` mais guiada e agradável sem ampliar
 - [x] Situação de licença, proveniência e escopo de uso da Lexend e dos MP3 provisórios registrada.
 - [x] Lint, verificação de tipos e build executados novamente com sucesso após as correções.
 - [x] Implementação dos Marcos 1 e 2 preparada para versionamento no GitHub.
-- [ ] Novo preview do código restaurado apresentado antes de qualquer publicação em produção.
+- [x] Novo preview do código restaurado apresentado antes de qualquer publicação em produção.
 - [ ] Vozes humanas em português brasileiro gravadas, licenciadas e validadas.
 
 ### Arquivos criados no Marco 2
@@ -112,6 +112,46 @@ Também foram ajustados `src/App.tsx`, `src/pages/_app.tsx`, `src/styles/globals
 - `docs/LICENCAS_ASSETS.md`: registros verificáveis da Lexend, do Flite e do escopo dos áudios provisórios no preview técnico.
 - `docs/ROADMAP.md`: registro desta correção, das validações e das limitações restantes.
 
+## Marco 3 — níveis orientados por dados
+
+Status: **implementado e validado localmente; aguardando preview remoto e validação pedagógica**.
+
+Objetivo: permitir que uma única cena jogável carregue palavras diferentes a partir de conteúdo tipado, sem copiar a lógica de movimento, plataformas, coleta, HUD, áudio ou celebração.
+
+### Funcionalidades concluídas
+
+- [x] `LevelDefinition` criado com `id`, palavra, nome, `imageKey`, áudios, letras, posições, ponto inicial e plataformas.
+- [x] Catálogo `levels` criado com `forest-sapo` e `forest-pato`.
+- [x] `LevelSapoScene` substituída por `LevelScene`, que recebe `levelId` e carrega qualquer definição válida.
+- [x] `LetterCollector` generalizado para usar `value` e posições do conteúdo ativo.
+- [x] HUD, missão inicial e acessibilidade calculados a partir da palavra ativa.
+- [x] Howler desacoplado de SAPO e do conjunto fixo S/A/P/O; instrução, letra e palavra agora vêm da definição do nível.
+- [x] Celebração orientada por `imageKey`, com placeholders geométricos distintos para sapo e pato.
+- [x] `PATO` disponível como teste técnico por `?level=forest-pato`, sem criar uma tela de seleção definitiva.
+- [x] Sinais locais não verbais adicionados para os caminhos ainda sem gravação de PATO/T, evitando arquivos ausentes no preview.
+- [x] Lint, verificação de tipos e build executados com sucesso.
+- [x] Export estático verificado por HTTP para SAPO, PATO e os três áudios técnicos, todos com resposta `200`.
+- [ ] Preview remoto do Marco 3 apresentado antes de qualquer integração em produção.
+- [ ] Segunda palavra definida a partir do trabalho pedagógico atual do Ben.
+
+### Arquivos principais do Marco 3
+
+- `src/game/content/levels.ts`: modelo e catálogo das palavras.
+- `src/game/scenes/LevelScene.ts`: cena genérica criada no lugar de `LevelSapoScene.ts`.
+- `src/game/scenes/CelebrationScene.ts`: placeholder final escolhido por `imageKey`.
+- `src/game/systems/LetterCollector.ts`: coleta baseada em `LetterDefinition`.
+- `src/audio/GameAudio.ts`: carregamento de áudio baseado na definição ativa.
+- `src/App.tsx`, `src/PhaserGame.tsx`, `src/game/scenes/MenuScene.ts` e `src/game/main.ts`: seleção e propagação de `levelId`.
+- `public/assets/audio/voice/instructions/forme-pato.mp3`, `voice/letters/t.mp3` e `voice/words/pato.mp3`: sinais técnicos provisórios.
+
+### Limitações atuais
+
+- `PATO` prova a arquitetura, mas ainda não foi escolhido nem ordenado pedagogicamente para o Ben.
+- Os três áudios novos de PATO/T são sinais não verbais, não voz, fonema ou leitura válida.
+- SAPO e PATO compartilham o mesmo cenário e as mesmas plataformas; apenas conteúdo, letras, áudio e ilustração final variam.
+- A seleção da segunda definição é feita por parâmetro de preview; ainda não existe seletor de palavras na interface.
+- O navegador remoto disponível não acessa o servidor local, portanto a confirmação visual depende do próximo deployment de preview.
+
 ## Próximo marco recomendado
 
-**Validação do Marco 2.** Validar o preview da branch `preview/marco-2-security-fix` no projeto Vercel existente `laboratorio-das-letras-marco-2` e testar uma sessão curta em desktop, tablet e Safari móvel. Somente após essa aprovação, integrar a correção à branch principal. Substituir as vozes por gravações humanas licenciadas em português brasileiro e ajustar volumes, clareza da missão e ritmo da coleta antes de iniciar outra palavra.
+**Preview e validação do Marco 3.** Publicar somente a branch de preview e conferir SAPO e `?level=forest-pato` em desktop e tablet. Depois, decidir a segunda palavra real a partir do conteúdo trabalhado com o Ben, substituir os sinais técnicos por gravações licenciadas em português brasileiro e somente então integrar o marco à branch principal.

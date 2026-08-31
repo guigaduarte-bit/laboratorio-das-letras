@@ -1,7 +1,6 @@
 import { Howl, Howler } from 'howler';
+import type { LevelDefinition } from '../game/content/levels';
 import { EventBus } from '../game/EventBus';
-
-type Letter = 'S' | 'A' | 'P' | 'O';
 
 type AudioQueueItem = {
     before?: () => void;
@@ -15,32 +14,18 @@ const AUDIO_UNLOCK_TIMEOUT_MS = 2000;
 const MIN_PLAYBACK_TIMEOUT_MS = 1800;
 
 const createSound = (path: string, volume: number): Howl => new Howl({
-    src: [`${AUDIO_ROOT}/${path}`],
+    src: [path],
     preload: true,
     volume
 });
 
 class GameAudio
 {
-    private readonly instructions = {
-        findS: createSound('voice/instructions/encontre-s.mp3', 0.88),
-        formSapo: createSound('voice/instructions/forme-sapo.mp3', 0.88)
-    };
-
-    private readonly letters: Record<Letter, Howl> = {
-        S: createSound('voice/letters/s.mp3', 0.92),
-        A: createSound('voice/letters/a.mp3', 0.92),
-        P: createSound('voice/letters/p.mp3', 0.92),
-        O: createSound('voice/letters/o.mp3', 0.92)
-    };
-
-    private readonly wordSapo = createSound('voice/words/sapo.mp3', 0.94);
-
     private readonly sfx = {
-        collect: createSound('sfx/collect.mp3', 0.45),
-        correct: createSound('sfx/correct.mp3', 0.3),
-        hint: createSound('sfx/hint.mp3', 0.36),
-        complete: createSound('sfx/complete.mp3', 0.42)
+        collect: createSound(`${AUDIO_ROOT}/sfx/collect.mp3`, 0.45),
+        correct: createSound(`${AUDIO_ROOT}/sfx/correct.mp3`, 0.3),
+        hint: createSound(`${AUDIO_ROOT}/sfx/hint.mp3`, 0.36),
+        complete: createSound(`${AUDIO_ROOT}/sfx/complete.mp3`, 0.42)
     };
 
     private readonly music = new Howl({
@@ -50,6 +35,8 @@ class GameAudio
         volume: 0.13
     });
 
+    private readonly levelSounds = new Map<string, Howl>();
+    private activeLevel?: LevelDefinition;
     private unlocked = false;
     private unlockAttempt?: Promise<boolean>;
     private audioQueue: AudioQueueItem[] = [];
@@ -130,8 +117,10 @@ class GameAudio
         });
     }
 
-    startLevel(): void
+    startLevel(level: LevelDefinition): void
     {
+        this.activeLevel = level;
+
         if (!this.unlocked)
         {
             return;
@@ -144,25 +133,25 @@ class GameAudio
         }
 
         this.replaceAudioQueue([
-            { sound: this.instructions.formSapo },
-            { sound: this.instructions.findS }
+            { sound: this.getLevelSound(level.instructionAudio, 0.88) }
         ]);
     }
 
     playLetter(letter: string): void
     {
-        if (!this.unlocked || !this.isLetter(letter))
+        const definition = this.activeLevel?.letters.find(({ value }) => value === letter);
+        if (!this.unlocked || !definition)
         {
             return;
         }
 
         this.replaceAudioQueue([
-            { sound: this.letters[letter] },
+            { sound: this.getLevelSound(definition.audio, 0.92) },
             { sound: this.sfx.collect }
         ]);
     }
 
-    playHint(expected: string): void
+    playHint(): void
     {
         if (!this.unlocked)
         {
@@ -170,23 +159,19 @@ class GameAudio
         }
 
         this.sfx.hint.play();
-
-        if (expected === 'S' && !this.queueRunning)
-        {
-            this.enqueueAudio({ sound: this.instructions.findS });
-        }
     }
 
     completeWord(word: string): void
     {
-        if (!this.unlocked)
+        const level = this.activeLevel?.word === word ? this.activeLevel : undefined;
+        if (!this.unlocked || !level)
         {
             queueMicrotask(() => EventBus.emit('word-audio-completed', { word }));
             return;
         }
 
         this.enqueueAudio({
-            sound: this.wordSapo,
+            sound: this.getLevelSound(level.wordAudio, 0.94),
             before: () => {
                 if (this.music.playing())
                 {
@@ -210,13 +195,23 @@ class GameAudio
     stopAll(): void
     {
         this.clearAudioQueue();
+        this.activeLevel = undefined;
         this.music.stop();
         Howler.stop();
     }
 
-    private isLetter(letter: string): letter is Letter
+    private getLevelSound(path: string, volume: number): Howl
     {
-        return letter === 'S' || letter === 'A' || letter === 'P' || letter === 'O';
+        const cacheKey = `${path}:${volume}`;
+        const cached = this.levelSounds.get(cacheKey);
+        if (cached)
+        {
+            return cached;
+        }
+
+        const sound = createSound(path, volume);
+        this.levelSounds.set(cacheKey, sound);
+        return sound;
     }
 
     private replaceAudioQueue(items: AudioQueueItem[]): void

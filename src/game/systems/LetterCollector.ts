@@ -1,5 +1,5 @@
 import type { GameObjects, Physics, Scene } from 'phaser';
-import type { LetterPlacement } from '../content/levels';
+import type { LetterDefinition } from '../content/levels';
 import { EventBus } from '../EventBus';
 import type { WordProgress } from './WordProgress';
 
@@ -18,7 +18,7 @@ export class LetterCollector
     constructor(
         private readonly scene: Scene,
         player: Physics.Arcade.Sprite,
-        placements: LetterPlacement[],
+        placements: LetterDefinition[],
         private readonly progress: WordProgress
     )
     {
@@ -27,9 +27,9 @@ export class LetterCollector
                 .setDisplaySize(64, 70)
                 .setDepth(8)
                 .refreshBody();
-            card.setData('letter', placement.letter);
+            card.setData('letter', placement.value);
 
-            const label = scene.add.text(placement.x, placement.y, placement.letter, {
+            const label = scene.add.text(placement.x, placement.y, placement.value, {
                 color: '#24344A',
                 fontFamily: 'Trebuchet MS, sans-serif',
                 fontSize: '38px',
@@ -41,7 +41,7 @@ export class LetterCollector
             const entry: LetterCard = {
                 card,
                 label,
-                letter: placement.letter,
+                letter: placement.value,
                 lastWrongAt: -1000
             };
             const overlap = scene.physics.add.overlap(player, card, () => this.tryCollect(entry));

@@ -1,7 +1,7 @@
 import { AUTO, Game, Scale } from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { CelebrationScene } from './scenes/CelebrationScene';
-import { LevelSapoScene } from './scenes/LevelSapoScene';
+import { LevelScene } from './scenes/LevelScene';
 import { MenuScene } from './scenes/MenuScene';
 import { PreloadScene } from './scenes/PreloadScene';
 
@@ -32,7 +32,7 @@ const config: Phaser.Types.Core.GameConfig = {
         antialias: true,
         roundPixels: true
     },
-    scene: [BootScene, PreloadScene, MenuScene, LevelSapoScene, CelebrationScene]
+    scene: [BootScene, PreloadScene, MenuScene, LevelScene, CelebrationScene]
 };
 
 const StartGame = (parent: string) => new Game({ ...config, parent });

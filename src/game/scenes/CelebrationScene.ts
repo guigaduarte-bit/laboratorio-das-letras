@@ -1,18 +1,19 @@
 import { Scene } from 'phaser';
+import { getLevelById, type LevelDefinition } from '../content/levels';
 import { EventBus } from '../EventBus';
 
 export class CelebrationScene extends Scene
 {
-    private word = 'SAPO';
+    private level: LevelDefinition = getLevelById();
 
     constructor()
     {
         super('CelebrationScene');
     }
 
-    init(data: { word?: string }): void
+    init(data: { levelId?: string }): void
     {
-        this.word = data.word ?? 'SAPO';
+        this.level = getLevelById(data.levelId);
     }
 
     create(): void
@@ -31,7 +32,7 @@ export class CelebrationScene extends Scene
             fontSize: '29px',
             fontStyle: 'bold'
         }).setOrigin(0.5);
-        const word = this.add.text(480, 222, this.word, {
+        const word = this.add.text(480, 222, this.level.word, {
             color: '#24344A',
             fontFamily: 'Trebuchet MS, sans-serif',
             fontSize: '72px',
@@ -39,7 +40,7 @@ export class CelebrationScene extends Scene
             letterSpacing: 10
         }).setOrigin(0.5);
 
-        this.drawFrog(480, 355);
+        this.drawWordImage(480, 355);
         this.drawConfetti();
 
         this.tweens.add({
@@ -57,7 +58,28 @@ export class CelebrationScene extends Scene
             repeat: -1
         });
 
-        EventBus.emit('celebration-ready', { word: this.word });
+        EventBus.emit('celebration-ready', {
+            levelId: this.level.id,
+            word: this.level.word,
+            displayName: this.level.displayName
+        });
+    }
+
+    private drawWordImage(x: number, y: number): void
+    {
+        if (this.level.imageKey === 'sapo')
+        {
+            this.drawFrog(x, y);
+            return;
+        }
+
+        if (this.level.imageKey === 'pato')
+        {
+            this.drawDuck(x, y);
+            return;
+        }
+
+        this.add.circle(x, y, 48, 0x76b88a);
     }
 
     private drawFrog(x: number, y: number): void
@@ -70,6 +92,15 @@ export class CelebrationScene extends Scene
         this.add.circle(x - 38, y - 20, 4, 0x24344a);
         this.add.circle(x + 38, y - 20, 4, 0x24344a);
         this.add.ellipse(x, y + 21, 42, 8, 0x385b46);
+    }
+
+    private drawDuck(x: number, y: number): void
+    {
+        this.add.ellipse(x - 8, y + 14, 128, 78, 0xffd166);
+        this.add.circle(x + 44, y - 23, 38, 0xffd166);
+        this.add.ellipse(x + 80, y - 16, 48, 18, 0xf4a261);
+        this.add.circle(x + 55, y - 32, 5, 0x24344a);
+        this.add.ellipse(x - 18, y + 15, 58, 32, 0xf4b942, 0.86);
     }
 
     private drawConfetti(): void

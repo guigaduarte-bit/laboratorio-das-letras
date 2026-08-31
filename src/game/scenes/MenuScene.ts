@@ -1,5 +1,10 @@
 import { Display, Scene } from 'phaser';
+import { DEFAULT_LEVEL_ID } from '../content/levels';
 import { EventBus } from '../EventBus';
+
+type StartGameEvent = {
+    levelId?: string;
+};
 
 export class MenuScene extends Scene
 {
@@ -17,11 +22,11 @@ export class MenuScene extends Scene
         EventBus.emit('menu-ready');
     }
 
-    private readonly handleStart = (): void =>
+    private readonly handleStart = ({ levelId }: StartGameEvent = {}): void =>
     {
         EventBus.off('start-game', this.handleStart);
         EventBus.off('request-menu-ready', this.handleReadyRequest);
-        this.scene.start('LevelSapoScene');
+        this.scene.start('LevelScene', { levelId: levelId ?? DEFAULT_LEVEL_ID });
     };
 
     private readonly handleReadyRequest = (): void =>

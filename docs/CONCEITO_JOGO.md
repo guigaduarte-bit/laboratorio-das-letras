@@ -34,3 +34,9 @@ A primeira palavra de validação é **SAPO**.
 - Cadastro, perfis, progresso persistente ou ranking.
 - Assets definitivos, loja, moedas ou itens colecionáveis adicionais.
 - Reprodução de áudio antes da interação inicial do usuário.
+
+## Evolução arquitetural do Marco 3
+
+Após a validação da vertical slice, a lógica jogável passa a receber uma definição de nível separada da cena. `SAPO` continua sendo a palavra principal; `PATO` entra somente como segundo conteúdo técnico para provar que outra palavra pode usar a mesma cena, os mesmos sistemas e o mesmo HUD.
+
+A presença de uma palavra no catálogo técnico não equivale à sua aprovação pedagógica. A sequência apresentada ao Ben será definida conforme o trabalho de alfabetização realizado no período.

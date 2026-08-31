@@ -1,7 +1,11 @@
 import { useLayoutEffect, useRef } from 'react';
 import StartGame from './game/main';
 
-export function PhaserGame()
+type PhaserGameProps = {
+    word: string;
+};
+
+export function PhaserGame({ word }: PhaserGameProps)
 {
     const game = useRef<Phaser.Game | null>(null);
 
@@ -21,7 +25,7 @@ export function PhaserGame()
         <div
             id="game-container"
             role="application"
-            aria-label="Cenário do jogo. Mova o personagem para encontrar as letras S, A, P e O."
+            aria-label={`Cenário do jogo. Mova o personagem para encontrar as letras de ${word}.`}
         />
     );
 }

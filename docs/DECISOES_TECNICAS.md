@@ -13,9 +13,19 @@
 - O React inicia a experiência e controla a camada de interface externa.
 - O Phaser controla cenário, personagem, movimento, letras e celebração.
 - A comunicação entre React e Phaser ocorre pelo EventBus do template.
-- O Marco 1 usa o fluxo `BootScene` → `PreloadScene` → `MenuScene` → `LevelSapoScene` → `CelebrationScene`.
+- O Marco 1 nasceu com o fluxo `BootScene` → `PreloadScene` → `MenuScene` → `LevelSapoScene` → `CelebrationScene`.
+- A partir do Marco 3, `LevelScene` substitui `LevelSapoScene` e recebe um `levelId`; a cena consulta `src/game/content/levels.ts` e não conhece uma palavra específica.
 - `PlayerController`, `LetterCollector` e `WordProgress` concentram as lógicas reutilizáveis do ciclo jogável.
 - O conteúdo da palavra fica em arquivo separado da lógica da cena.
+
+## Conteúdo orientado por dados no Marco 3
+
+- Cada `LevelDefinition` possui `id`, `word`, `displayName`, `imageKey`, áudios, letras, posições, ponto inicial e plataformas.
+- `LetterCollector` recebe `letters` da definição ativa; não mantém um alfabeto fixo.
+- O Howler resolve instrução, fonema e palavra pelos caminhos declarados no nível e mantém apenas efeitos e música compartilhados.
+- `CelebrationScene` recebe `levelId` e usa `imageKey` para escolher um placeholder geométrico.
+- `forest-sapo` é o nível padrão. `forest-pato` é um teste técnico acessível no preview com `?level=forest-pato`, sem tela de seleção definitiva.
+- Novas palavras devem entrar como dados. Uma nova cena só se justifica quando houver mecânica realmente diferente.
 
 ## Exibição e entrada
 

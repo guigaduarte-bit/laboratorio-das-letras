@@ -33,6 +33,14 @@ Registro de incorporação: commit [`741f6a7`](https://github.com/guigaduarte-bi
 | Efeitos | `sfx/collect.mp3`, `correct.mp3`, `hint.mp3`, `complete.mp3` | Laboratório das Letras | Síntese local de tons e ruído com FFmpeg; sem mídia externa; incorporação no commit acima | Asset técnico do projeto, autorizado para repositório e preview; ainda não aprovado como asset final de produção | 2026-08-31 | Feedback sonoro curto |
 | Música | `music/forest-loop.mp3` | Laboratório das Letras | Síntese local de tons com FFmpeg; sem mídia externa; incorporação no commit acima | Asset técnico do projeto, autorizado para repositório e preview; ainda não aprovado como asset final de produção | 2026-08-31 | Fundo musical em loop |
 
+## Marco 3 — sinais técnicos de PATO
+
+Os arquivos `voice/instructions/forme-pato.mp3`, `voice/letters/t.mp3` e `voice/words/pato.mp3` foram gerados localmente com o filtro `sine` do FFmpeg. Não contêm voz, gravação ou mídia de terceiros. São sinais não verbais destinados exclusivamente a confirmar que os caminhos de áudio de uma segunda `LevelDefinition` carregam corretamente no preview.
+
+| Grupo | Arquivos | Autor/organização | Proveniência e origem | Licença e escopo | Verificação | Uso |
+| --- | --- | --- | --- | --- | --- | --- |
+| PATO técnico | `voice/instructions/forme-pato.mp3`, `voice/letters/t.mp3`, `voice/words/pato.mp3` | Laboratório das Letras | Síntese local de senoides com FFmpeg; sem mídia externa | Asset técnico próprio, autorizado apenas para repositório e preview; não aprovado como voz ou fonema | 2026-08-31 | Validar carregamento dinâmico do Marco 3 |
+
 As vozes atuais não têm pronúncia pedagógica validada em português brasileiro. Devem ser substituídas por gravações humanas licenciadas e revisadas antes de uma sessão de teste com crianças ou de qualquer publicação em produção.
 
 ## Marco 2 — tipografia

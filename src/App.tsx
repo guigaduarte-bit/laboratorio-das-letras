@@ -2,6 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig } from 'motion/react';
 import { gameAudio } from './audio/GameAudio';
 import { PhaserGame } from './PhaserGame';
+import {
+    DEFAULT_LEVEL_ID,
+    getInitialWordDisplay,
+    getLevelById
+} from './game/content/levels';
 import { EventBus } from './game/EventBus';
 import { GameHud } from './ui/GameHud';
 import { StartMenu } from './ui/StartMenu';
@@ -26,28 +31,54 @@ type WordCompletedEvent = {
     word: string;
 };
 
-const INITIAL_DISPLAY = 'S _ _ _';
-const INITIAL_MISSION = 'Procure a letra S.';
+type LevelStartedEvent = {
+    display: string;
+    levelId: string;
+    word: string;
+};
+
+const DEFAULT_LEVEL = getLevelById(DEFAULT_LEVEL_ID);
+const getMission = (word: string): string => `Procure a letra ${word[0]}.`;
+const getSpokenDisplay = (display: string): string => display
+    .split(' ')
+    .map((slot) => slot === '_' ? 'espaço' : slot)
+    .join(', ');
+
+const getRequestedLevel = () =>
+{
+    if (typeof window === 'undefined')
+    {
+        return DEFAULT_LEVEL;
+    }
+
+    const levelId = new URLSearchParams(window.location.search).get('level');
+    return getLevelById(levelId);
+};
 
 export default function App()
 {
     const [phase, setPhase] = useState<GamePhase>('menu');
     const [menuReady, setMenuReady] = useState(false);
-    const [display, setDisplay] = useState(INITIAL_DISPLAY);
+    const [activeLevelId, setActiveLevelId] = useState(DEFAULT_LEVEL_ID);
+    const [display, setDisplay] = useState(getInitialWordDisplay(DEFAULT_LEVEL.word));
     const [collectedCount, setCollectedCount] = useState(0);
-    const [mission, setMission] = useState(INITIAL_MISSION);
+    const [mission, setMission] = useState(getMission(DEFAULT_LEVEL.word));
     const [announcement, setAnnouncement] = useState('');
     const startInProgress = useRef(false);
 
     useEffect(() => {
         const handleMenuReady = (): void => setMenuReady(true);
 
-        const handleLevelStarted = (): void =>
+        const handleLevelStarted = ({ display: initialDisplay, levelId, word }: LevelStartedEvent): void =>
         {
+            const level = getLevelById(levelId);
             setMenuReady(false);
+            setActiveLevelId(level.id);
+            setDisplay(initialDisplay);
+            setCollectedCount(0);
             setPhase('playing');
-            setMission(INITIAL_MISSION);
-            gameAudio.startLevel();
+            setMission(getMission(word));
+            gameAudio.startLevel(level);
         };
 
         const handleLetterCollected = ({
@@ -73,7 +104,7 @@ export default function App()
         {
             setMission(`Quase! Agora procure a letra ${expected}.`);
             setAnnouncement(`Agora procure a letra ${expected}.`);
-            gameAudio.playHint(expected);
+            gameAudio.playHint();
         };
 
         const handleWordCompleted = ({ word }: WordCompletedEvent): void =>
@@ -117,18 +148,21 @@ export default function App()
 
         startInProgress.current = true;
         setMenuReady(false);
+        const level = getRequestedLevel();
         const audioReady = await gameAudio.unlock();
+        const initialDisplay = getInitialWordDisplay(level.word);
 
-        setDisplay(INITIAL_DISPLAY);
+        setActiveLevelId(level.id);
+        setDisplay(initialDisplay);
         setCollectedCount(0);
-        setMission(INITIAL_MISSION);
+        setMission(getMission(level.word));
         setAnnouncement(
             audioReady
-                ? 'Palavra: S, espaço, espaço, espaço.'
-                : 'Áudio indisponível. Palavra: S, espaço, espaço, espaço.'
+                ? `Palavra: ${getSpokenDisplay(initialDisplay)}.`
+                : `Áudio indisponível. Palavra: ${getSpokenDisplay(initialDisplay)}.`
         );
         setPhase('playing');
-        EventBus.emit('start-game');
+        EventBus.emit('start-game', { levelId: level.id });
     };
 
     return (
@@ -136,7 +170,7 @@ export default function App()
             <main className="lab-shell">
                 <section className="game-stage" aria-label="Laboratório das Letras">
                     <div className="game-frame">
-                        <PhaserGame />
+                        <PhaserGame word={getLevelById(activeLevelId).word} />
 
                         <AnimatePresence>
                             {phase === 'menu' && (
