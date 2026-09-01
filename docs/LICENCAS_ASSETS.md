@@ -60,3 +60,15 @@ Personagem Lumi, Bosque-Laboratório, plataformas, cartões, ilustrações de sa
 | Asset | Autor/organização | Origem | Licença | Verificação | Uso |
 | --- | --- | --- | --- | --- | --- |
 | Lexend Variable, pacote `@fontsource-variable/lexend` versão `5.3.0` | Copyright 2019 The Lexend Project Authors; pacote distribuído por Fontsource | [Página oficial da Lexend no Fontsource](https://fontsource.org/fonts/lexend); [pacote publicado no npm](https://www.npmjs.com/package/@fontsource-variable/lexend/v/5.3.0); licença também incluída em `node_modules/@fontsource-variable/lexend/LICENSE` | SIL Open Font License 1.1 (`OFL-1.1`); [texto oficial no repositório da Lexend](https://github.com/googlefonts/lexend/blob/main/OFL.txt) | 2026-08-31 | Tipografia da interface React |
+
+## Marco 5 — conceito próprio de Pisco
+
+Pisco é um personagem original do Laboratório das Letras. A prancha foi gerada especificamente para o projeto sem imagem de referência externa; o SVG-fonte foi redesenhado localmente com formas próprias e grupos preparados para importação no Rive.
+
+| Grupo | Arquivos | Autor/organização | Proveniência e origem | Licença e escopo | Verificação | Uso |
+| --- | --- | --- | --- | --- | --- | --- |
+| Conceito | `docs/assets/pisco-concept.png` | Laboratório das Letras; geração assistida por OpenAI | Prompt próprio baseado na direção de arte do projeto; sem mídia externa | Asset próprio do projeto, aprovado como referência de produção | 2026-09-01 | Aparência e estados de Pisco |
+| Vetor-fonte | `design/rive/pisco-source.svg` | Laboratório das Letras | Redesenho vetorial local com formas SVG próprias | Asset próprio do projeto | 2026-09-01 | Importação e rig no editor Rive |
+| Fallback de runtime | `public/assets/rive/pisco-fallback.svg` | Laboratório das Letras | Derivação direta do vetor-fonte próprio | Asset próprio do projeto | 2026-09-01 | Representação reativa enquanto o `.riv` não pode ser exportado |
+
+O arquivo de autoria foi criado na conta Rive do projeto, mas as opções **For Runtime** e **For Backup** exigem upgrade no plano atual. O futuro `public/assets/rive/pisco.riv` deverá ser acrescentado a este registro somente depois de exportado e validado; nenhuma licença, assinatura ou asset externo foi adquirido nesta etapa.

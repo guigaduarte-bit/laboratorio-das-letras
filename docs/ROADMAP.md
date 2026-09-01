@@ -154,7 +154,7 @@ Objetivo: permitir que uma única cena jogável carregue palavras diferentes a p
 
 ## Marco 4 — direção de arte e animação
 
-Status: **implementado e validado localmente; aguardando preview remoto**.
+Status: **concluído para preview remoto; aguardando validação em tablet real**.
 
 Objetivo: substituir os placeholders por uma identidade visual própria sem alterar a mecânica, a arquitetura orientada por dados ou a estabilidade tipográfica das letras.
 
@@ -175,7 +175,7 @@ Objetivo: substituir os placeholders por uma identidade visual própria sem alte
 - [x] Barra da palavra preparada visualmente para quantidades diferentes de letras.
 - [x] Rótulo acessível do nível solicitado corrigido ainda na tela inicial.
 - [x] Lint, verificação de tipos e build executados com sucesso.
-- [ ] Preview remoto do Marco 4 apresentado.
+- [x] Preview remoto do Marco 4 apresentado.
 - [ ] Movimento, áudio e leitura visual validados em tablet real.
 
 ### Arquivos principais do Marco 4
@@ -197,6 +197,54 @@ Objetivo: substituir os placeholders por uma identidade visual própria sem alte
 - Vozes, efeitos e música ainda são os placeholders técnicos do Marco 2 e do Marco 3.
 - Nenhuma versão do Marco 4 foi publicada em produção.
 
-## Próximo marco recomendado
+## Marco 5 — mascote-guia com Rive
 
-**Preview e validação do Marco 4.** Publicar somente uma branch de preview, conferir SAPO e `?level=forest-pato` em desktop e tablet e ajustar ritmo, contraste ou densidade de partículas conforme o teste. Não integrar à branch principal nem publicar em produção antes da aprovação visual e da validação de uso.
+Status: **integração React concluída com fallback; exportação `.riv` bloqueada pelo plano atual do editor**.
+
+Objetivo: acrescentar um mascote reativo na camada React sem transferir para o Rive qualquer responsabilidade do personagem jogável ou do mundo Phaser.
+
+### Definições concluídas
+
+- [x] Vagalume-cientista escolhido como espécie e função do mascote.
+- [x] `Pisco` definido como nome de trabalho.
+- [x] Identidade visual alinhada ao Bosque-Laboratório.
+- [x] Anatomia vetorial e peças do rig especificadas.
+- [x] Estados `idle`, `ouvindo`, `pensando`, `dando_dica`, `feliz` e `comemorando` documentados.
+- [x] Artboard, máquina de estados, inputs e mapeamento do EventBus definidos.
+- [x] Separação entre Lumi/Phaser e Pisco/React registrada.
+- [x] Conceito visual e nome aprovados.
+- [x] Prancha conceitual registrada no projeto.
+- [x] SVG-fonte próprio organizado para importação no Rive.
+- [x] Runtime `@rive-app/react-canvas` instalado.
+- [x] Arquivo de autoria criado na conta Rive com artboard `Mascot`.
+- [x] Seis timelines, `MascotState` e propriedades de View Model preparados no editor.
+- [x] Componente React conectado a `menu-ready`, `level-started`, `letter-collected`, `letter-mismatch` e `word-completed`.
+- [x] Runtime preparado com data binding, triggers e preferência `reducedMotion`.
+- [x] Fallback vetorial próprio e reativo usado enquanto o `.riv` não está disponível.
+- [x] Lint, TypeScript e build executados com sucesso.
+- [ ] Transições finais da máquina revisadas no editor.
+- [ ] Arquivo próprio `pisco.riv` exportado, registrado e ativado.
+- [ ] Preview remoto do Marco 5 apresentado.
+
+### Arquivos principais do Marco 5
+
+- `docs/MASCOTE_RIVE.md`
+- `docs/assets/pisco-concept.png`
+- `design/rive/pisco-source.svg`
+- `public/assets/rive/pisco-fallback.svg`
+- `public/assets/rive/README.md`
+- `src/ui/MascotGuide.tsx`
+- `src/ui/RiveMascot.tsx`
+- `src/styles/globals.css`
+
+### Limitações atuais
+
+- A exportação **For Runtime** e **For Backup** exige `Upgrade` no plano Rive atual; nenhuma compra foi feita.
+- Ainda não existe arquivo `.riv` no repositório; o preview usa o SVG próprio com reações CSS equivalentes.
+- O componente Rive está implementado e compilado, mas permanece desativado até a presença e validação do asset final.
+- As transições finais da máquina de estados precisam ser concluídas e testadas no arquivo exportável.
+- Os detalhes finais do rig ainda podem ser simplificados depois do teste em tablet.
+
+## Próximo passo recomendado
+
+**Liberar e validar o arquivo de runtime de Pisco.** Quando a conta Rive permitir exportação, concluir as transições de `MascotState`, exportar `pisco.riv`, registrar o asset, ativar `RIVE_ASSET_READY` e testar os triggers no preview. Nenhuma publicação em produção deve ocorrer antes dessa validação.

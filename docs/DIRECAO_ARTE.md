@@ -27,6 +27,19 @@ O sistema visual segue uma direção orgânica. A tipografia da interface contin
 
 Lumi é construído por formas vetoriais próprias dentro do Phaser, sem asset externo. O corpo físico permanece separado da representação visual, permitindo ajustar animação e colisão sem acoplamento.
 
+## Mascote-guia
+
+**Pisco** é o nome de trabalho do vagalume-cientista que acompanhará as instruções na interface React. Ele é menor, mais leve e mais expressivo que Lumi, sem aparência robótica e sem entrar no canvas do Phaser.
+
+- Cabeça e torso em tinta, com silhueta arredondada.
+- Abdômen luminoso em ocre, usado como feedback suave.
+- Duas asas claras e translúcidas.
+- Colete de pesquisador em lagoa e lenço em argila.
+- Olhos grandes, antenas curtas e gestos legíveis em tamanho reduzido.
+- Brilho contido, sem flashes, oscilações intensas ou estímulo contínuo.
+
+A especificação de rig, expressões e máquina de estados está em `docs/MASCOTE_RIVE.md`.
+
 ## Estados mínimos
 
 - `idle`: respiração suave e pulso discreto da antena.

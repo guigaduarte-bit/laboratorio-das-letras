@@ -200,6 +200,145 @@ button:focus-visible {
     text-align: center;
 }
 
+.mascot-guide {
+    width: clamp(82px, 13vw, 148px);
+    aspect-ratio: 1;
+    position: absolute;
+    inset-block-end: clamp(10px, 2vw, 22px);
+    inset-inline-end: clamp(10px, 2vw, 22px);
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    isolation: isolate;
+    z-index: 9;
+}
+
+.mascot-guide[data-phase="menu"] {
+    z-index: 12;
+}
+
+.mascot-guide__halo {
+    position: absolute;
+    inset: 8%;
+    border: 3px solid rgb(192 142 58 / 58%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(227 189 87 / 34%), rgb(168 188 134 / 13%) 52%, transparent 72%);
+    box-shadow:
+        0 0 0 7px rgb(232 220 199 / 28%),
+        0 0 28px rgb(227 189 87 / 54%);
+}
+
+.mascot-guide__halo::after {
+    content: "";
+    width: 9%;
+    aspect-ratio: 1;
+    position: absolute;
+    inset-block-start: 9%;
+    inset-inline-end: 8%;
+    border-radius: 50%;
+    background: #e3bd57;
+    box-shadow: 0 0 12px #e3bd57;
+    transform-origin: -380% 410%;
+    animation: pisco-orbit 6s linear infinite;
+}
+
+.mascot-guide__visual {
+    width: 76%;
+    height: 76%;
+    display: grid;
+    place-items: center;
+    transform-origin: 50% 72%;
+    animation: pisco-idle 2.8s ease-in-out infinite;
+}
+
+.mascot-guide__visual img,
+.mascot-guide__rive {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 7px 0 rgb(38 56 58 / 17%));
+    user-select: none;
+}
+
+.mascot-guide__name {
+    position: absolute;
+    inset-block-end: -2%;
+    padding: 4px 10px;
+    color: #26383a;
+    background: #e8dcc7;
+    border: 2px solid #355f4b;
+    border-radius: 999px;
+    box-shadow: 0 3px 0 rgb(38 56 58 / 18%);
+    font-size: clamp(0.58rem, 1.3vw, 0.78rem);
+    font-weight: 780;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+.mascot-guide[data-state="ouvindo"] .mascot-guide__visual {
+    animation: pisco-listen 1.5s ease-in-out both;
+}
+
+.mascot-guide[data-state="pensando"] .mascot-guide__visual {
+    animation: pisco-think 650ms ease-in-out both;
+}
+
+.mascot-guide[data-state="dando_dica"] .mascot-guide__visual {
+    animation: pisco-hint 900ms ease-in-out both;
+}
+
+.mascot-guide[data-state="feliz"] .mascot-guide__visual {
+    animation: pisco-happy 850ms ease-out both;
+}
+
+.mascot-guide[data-state="comemorando"] .mascot-guide__visual {
+    animation: pisco-celebrate 760ms ease-in-out infinite;
+}
+
+.mascot-guide[data-state="feliz"] .mascot-guide__halo,
+.mascot-guide[data-state="comemorando"] .mascot-guide__halo {
+    border-color: #c08e3a;
+    box-shadow:
+        0 0 0 8px rgb(232 220 199 / 38%),
+        0 0 36px rgb(227 189 87 / 78%);
+}
+
+@keyframes pisco-idle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-3%) rotate(1deg); }
+}
+
+@keyframes pisco-listen {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    38%, 72% { transform: translateY(-2%) rotate(4deg); }
+}
+
+@keyframes pisco-think {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: translateY(-2%) rotate(-5deg); }
+}
+
+@keyframes pisco-hint {
+    0%, 100% { transform: translateX(0) scale(1); }
+    50% { transform: translateX(-6%) scale(1.04); }
+}
+
+@keyframes pisco-happy {
+    0%, 100% { transform: translateY(0) scale(1); }
+    42% { transform: translateY(-10%) scale(1.06); }
+    68% { transform: translateY(-3%) scale(0.99); }
+}
+
+@keyframes pisco-celebrate {
+    0%, 100% { transform: translateY(0) rotate(-3deg) scale(1); }
+    50% { transform: translateY(-10%) rotate(4deg) scale(1.06); }
+}
+
+@keyframes pisco-orbit {
+    to { transform: rotate(360deg); }
+}
+
 .touch-controls {
     width: min(760px, 100%);
     margin: clamp(18px, 3vw, 28px) auto 0;
@@ -288,6 +427,16 @@ button:focus-visible {
         border-width: 2px;
     }
 
+    .mascot-guide {
+        width: clamp(66px, 17vw, 90px);
+        inset-block-end: 6px;
+        inset-inline-end: 6px;
+    }
+
+    .mascot-guide__name {
+        padding: 3px 7px;
+    }
+
     .touch-controls button {
         min-height: 76px;
         padding-inline: 4px;
@@ -304,5 +453,9 @@ button:focus-visible {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+
+    .mascot-guide__visual {
+        transform: none !important;
     }
 }

@@ -16,6 +16,9 @@ Antes de realizar qualquer alteração, leia:
 - Usar Motion somente em menus, botões, barra da palavra, transições React e cartões de missão.
 - Nunca usar Motion para animar elementos dentro do canvas; usar tweens, sprites e partículas do Phaser.
 - Usar Howler para voz, fonemas, efeitos sonoros e música ambiente.
+- Usar Rive somente no React para o mascote, instruções ou pequenas sequências externas ao canvas.
+- Manter o personagem explorador e toda a jogabilidade sob responsabilidade do Phaser.
+- Comunicar eventos do Phaser ao mascote Rive por `Phaser → EventBus → React → máquina de estados`.
 - Liberar o áudio somente após uma interação explícita, atualmente o botão `COMEÇAR`.
 - Usar a fonte Lexend, via Fontsource, na interface React.
 - Usar TypeScript.
@@ -30,6 +33,7 @@ Antes de realizar qualquer alteração, leia:
 - Não atualizar dependências principais sem necessidade.
 - Não instalar bibliotecas adicionais sem justificar.
 - Não usar Phaser 3 ou exemplos incompatíveis com Phaser 4.
+- Não renderizar o runtime Rive nem publicar um `.riv` antes de o conceito e o arquivo final serem aprovados.
 
 ## Experiência infantil
 

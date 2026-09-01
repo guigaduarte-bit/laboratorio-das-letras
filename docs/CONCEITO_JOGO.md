@@ -48,3 +48,9 @@ O primeiro mundo passa a ser o **Bosque-Laboratório**, uma estação de pesquis
 O Marco 4 substitui os placeholders geométricos por uma linguagem vetorial própria desenhada no Phaser. Cenário, personagem, cartões e celebração continuam sem assets externos, mas agora seguem um sistema visual documentado em `docs/DIRECAO_ARTE.md`.
 
 As letras permanecem estáveis e legíveis. Somente o cartão e os elementos ao redor recebem brilho, pequena mudança de escala, balanço discreto e partículas.
+
+## Mascote-guia do Marco 5
+
+O mascote-guia será um **vagalume-cientista**, com o nome de trabalho **Pisco**. Ele não substitui Lumi e não participa da física ou da exploração do mundo. Sua função é acompanhar as instruções na camada React e reagir de maneira curta e positiva às ações da criança.
+
+Pisco será animado por uma máquina de estados Rive somente depois da aprovação do conceito e da criação de um arquivo `.riv` próprio. A comunicação seguirá `Phaser → EventBus → React → Rive`.

@@ -9,6 +9,7 @@ import {
 } from './game/content/levels';
 import { EventBus } from './game/EventBus';
 import { GameHud } from './ui/GameHud';
+import { MascotGuide } from './ui/MascotGuide';
 import { StartMenu } from './ui/StartMenu';
 import { TouchControls } from './ui/TouchControls';
 
@@ -176,6 +177,7 @@ export default function App()
                 <section className="game-stage" aria-label="Laboratório das Letras">
                     <div className="game-frame">
                         <PhaserGame word={getLevelById(activeLevelId).word} />
+                        <MascotGuide phase={phase} />
 
                         <AnimatePresence>
                             {phase === 'menu' && (

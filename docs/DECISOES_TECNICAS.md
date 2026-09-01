@@ -83,3 +83,19 @@
 - Cartões de letras usam `LetterCardView`; a hitbox física invisível permanece estável e independente do balanço visual.
 - Partículas usam texturas próprias geradas em tempo de execução por `PreloadScene`; nenhuma mídia externa foi adicionada.
 - Motion continua restrito ao React. Toda animação no canvas usa tweens, formas e partículas do Phaser.
+
+## Preparação do Rive no Marco 5
+
+- O mascote-guia é um vagalume-cientista com o nome de trabalho `Pisco`.
+- Pisco pertence à camada React e não participa do mundo físico do Phaser.
+- Lumi continua sendo o personagem explorador controlado pelo Phaser.
+- A comunicação seguirá `Phaser → EventBus → componente React → máquina de estados Rive`.
+- O artboard previsto é `Mascot` e a máquina de estados prevista é `MascotState`.
+- O runtime `@rive-app/react-canvas` foi instalado após a aprovação do conceito; ele só será renderizado quando houver um `.riv` próprio pronto para integração.
+- O React manterá texto acessível separado; o Rive será visual e não substituirá mensagens ou regiões `aria-live`.
+- A preferência `prefers-reduced-motion` deverá oferecer uma representação estática ou reduzir os ciclos contínuos.
+- `MascotGuide.tsx` concentra os listeners do EventBus e converte eventos do jogo nos seis estados visuais de Pisco.
+- `RiveMascot.tsx` é carregado dinamicamente, fora da renderização no servidor, e usa View Model Properties em vez dos inputs legados da máquina de estados.
+- Os triggers de data binding são `listen`, `think`, `hint`, `happy`, `celebrate` e `reset`; `reducedMotion` é uma propriedade booleana.
+- Enquanto `pisco.riv` não puder ser exportado, `pisco-fallback.svg` preserva a identidade e demonstra as reações sem requisição `404` ao runtime.
+- `RIVE_ASSET_READY` permanece `false` até o `.riv` ser exportado, registrado e validado.
