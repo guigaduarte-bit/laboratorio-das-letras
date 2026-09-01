@@ -15,7 +15,7 @@ type MascotGuideProps = {
     phase: 'menu' | 'playing' | 'celebrating';
 };
 
-const RIVE_ASSET_READY = false;
+const RIVE_ASSET_READY = true;
 const RiveMascot = dynamic(
     () => import('./RiveMascot').then(({ RiveMascot: Component }) => Component),
     { ssr: false }

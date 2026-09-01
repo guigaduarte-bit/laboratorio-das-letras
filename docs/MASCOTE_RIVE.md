@@ -156,9 +156,9 @@ Foram preparados no editor:
 - o View Model com os triggers `listen`, `think`, `hint`, `happy`, `celebrate` e `reset`;
 - a propriedade booleana `reducedMotion`.
 
-A exportação **For Runtime** e a exportação **For Backup** aparecem bloqueadas por `Upgrade` no plano atual. Nenhuma assinatura ou compra foi realizada. Por isso, o arquivo `.riv` ainda não faz parte do repositório e as transições finais da máquina precisam ser revisadas quando a exportação estiver disponível.
+O arquivo de runtime foi exportado e incorporado em `public/assets/rive/pisco.riv` em 2026-09-01. O binário tem 4.815 bytes e SHA-256 `0e1671cb73c3937e4e4a6523d809b702e4036bda7fc26acdd17c803ee116f7c4`.
 
-Enquanto isso, `MascotGuide.tsx` já recebe o EventBus e demonstra os mesmos estados com `pisco-fallback.svg`. `RiveMascot.tsx` contém a integração final por data binding, mas permanece desativada por `RIVE_ASSET_READY = false` para não solicitar um arquivo inexistente.
+A inspeção estrutural confirmou no arquivo os identificadores `Mascot`, `MascotState`, `ViewModel1`, as seis timelines, os seis triggers e `reducedMotion`. `MascotGuide.tsx` está com o runtime ativo; `pisco-fallback.svg` permanece como recuperação automática caso o carregamento falhe. A renderização e as transições ainda precisam ser confirmadas no preview remoto em navegador real.
 
 ## Critérios para aprovar o `.riv`
 
@@ -175,10 +175,10 @@ Enquanto isso, `MascotGuide.tsx` já recebe o EventBus e demonstra os mesmos est
 1. Aprovar conceito, nome e aparência. **Concluído.**
 2. Preparar o SVG-fonte e instalar `@rive-app/react-canvas`. **Concluído.**
 3. Importar o SVG e preparar as peças no editor Rive. **Concluído.**
-4. Criar as seis animações, `MascotState` e o View Model. **Preparado; transições finais pendentes.**
+4. Criar as seis animações, `MascotState` e o View Model. **Concluído no arquivo exportado; validação visual pendente.**
 5. Criar `MascotGuide.tsx` e conectar o EventBus. **Concluído com fallback próprio.**
 6. Executar lint, TypeScript e build. **Concluído.**
-7. Exportar `public/assets/rive/pisco.riv`. **Bloqueado pelo plano atual do editor.**
-8. Registrar o `.riv` final em `docs/LICENCAS_ASSETS.md`.
-9. Ativar `RIVE_ASSET_READY` e validar os triggers do arquivo exportado.
-10. Apresentar preview em desktop e tablet antes de produção.
+7. Exportar `public/assets/rive/pisco.riv`. **Concluído.**
+8. Registrar o `.riv` final em `docs/LICENCAS_ASSETS.md`. **Concluído.**
+9. Ativar `RIVE_ASSET_READY`. **Concluído; triggers aguardam validação visual.**
+10. Apresentar preview em desktop e tablet antes de produção. **Pendente.**

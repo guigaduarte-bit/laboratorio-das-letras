@@ -1,7 +1,8 @@
 # Pisco no runtime
 
-- `pisco-fallback.svg` é a representação própria usada enquanto o editor Rive não libera a exportação do arquivo de runtime.
-- O arquivo final deve ser exportado como `pisco.riv`, com artboard `Mascot`, máquina `MascotState` e as propriedades registradas em `docs/MASCOTE_RIVE.md`.
-- Depois da exportação e validação do `.riv`, altere `RIVE_ASSET_READY` para `true` em `src/ui/MascotGuide.tsx`.
+- `pisco.riv` é o arquivo próprio exportado do editor Rive para o runtime React.
+- O arquivo usa o artboard `Mascot`, a máquina `MascotState` e as propriedades registradas em `docs/MASCOTE_RIVE.md`.
+- `pisco-fallback.svg` permanece como fallback se o runtime ou o arquivo não puderem ser carregados.
+- `RIVE_ASSET_READY` está ativo em `src/ui/MascotGuide.tsx`.
 
-Não substitua o fallback por um arquivo externo sem registrar licença e proveniência.
+Não substitua os arquivos por assets externos sem registrar licença e proveniência.

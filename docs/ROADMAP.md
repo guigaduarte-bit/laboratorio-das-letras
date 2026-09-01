@@ -199,7 +199,7 @@ Objetivo: substituir os placeholders por uma identidade visual própria sem alte
 
 ## Marco 5 — mascote-guia com Rive
 
-Status: **integração React concluída com fallback; exportação `.riv` bloqueada pelo plano atual do editor**.
+Status: **arquivo `.riv` integrado; aguardando validação visual no preview remoto**.
 
 Objetivo: acrescentar um mascote reativo na camada React sem transferir para o Rive qualquer responsabilidade do personagem jogável ou do mundo Phaser.
 
@@ -223,7 +223,7 @@ Objetivo: acrescentar um mascote reativo na camada React sem transferir para o R
 - [x] Fallback vetorial próprio e reativo usado enquanto o `.riv` não está disponível.
 - [x] Lint, TypeScript e build executados com sucesso.
 - [ ] Transições finais da máquina revisadas no editor.
-- [ ] Arquivo próprio `pisco.riv` exportado, registrado e ativado.
+- [x] Arquivo próprio `pisco.riv` exportado, registrado e ativado.
 - [ ] Preview remoto do Marco 5 apresentado.
 
 ### Arquivos principais do Marco 5
@@ -232,6 +232,7 @@ Objetivo: acrescentar um mascote reativo na camada React sem transferir para o R
 - `docs/assets/pisco-concept.png`
 - `design/rive/pisco-source.svg`
 - `public/assets/rive/pisco-fallback.svg`
+- `public/assets/rive/pisco.riv`
 - `public/assets/rive/README.md`
 - `src/ui/MascotGuide.tsx`
 - `src/ui/RiveMascot.tsx`
@@ -239,12 +240,11 @@ Objetivo: acrescentar um mascote reativo na camada React sem transferir para o R
 
 ### Limitações atuais
 
-- A exportação **For Runtime** e **For Backup** exige `Upgrade` no plano Rive atual; nenhuma compra foi feita.
-- Ainda não existe arquivo `.riv` no repositório; o preview usa o SVG próprio com reações CSS equivalentes.
-- O componente Rive está implementado e compilado, mas permanece desativado até a presença e validação do asset final.
-- As transições finais da máquina de estados precisam ser concluídas e testadas no arquivo exportável.
+- O arquivo e seus identificadores internos foram verificados, mas a renderização e as transições ainda precisam ser testadas no preview remoto.
+- O fallback SVG permanece disponível se o carregamento do runtime falhar.
+- A validação local completa ficou limitada porque o runtime é browser-only e o navegador de teste remoto não acessa o servidor local deste ambiente.
 - Os detalhes finais do rig ainda podem ser simplificados depois do teste em tablet.
 
 ## Próximo passo recomendado
 
-**Liberar e validar o arquivo de runtime de Pisco.** Quando a conta Rive permitir exportação, concluir as transições de `MascotState`, exportar `pisco.riv`, registrar o asset, ativar `RIVE_ASSET_READY` e testar os triggers no preview. Nenhuma publicação em produção deve ocorrer antes dessa validação.
+**Validar Pisco no preview remoto.** Conferir carregamento, os seis estados, retorno a `idle`, preferência de movimento reduzido e fallback; depois testar em tablet real. Nenhuma publicação em produção deve ocorrer antes dessa validação.

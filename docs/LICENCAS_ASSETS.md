@@ -69,6 +69,7 @@ Pisco é um personagem original do Laboratório das Letras. A prancha foi gerada
 | --- | --- | --- | --- | --- | --- | --- |
 | Conceito | `docs/assets/pisco-concept.png` | Laboratório das Letras; geração assistida por OpenAI | Prompt próprio baseado na direção de arte do projeto; sem mídia externa | Asset próprio do projeto, aprovado como referência de produção | 2026-09-01 | Aparência e estados de Pisco |
 | Vetor-fonte | `design/rive/pisco-source.svg` | Laboratório das Letras | Redesenho vetorial local com formas SVG próprias | Asset próprio do projeto | 2026-09-01 | Importação e rig no editor Rive |
-| Fallback de runtime | `public/assets/rive/pisco-fallback.svg` | Laboratório das Letras | Derivação direta do vetor-fonte próprio | Asset próprio do projeto | 2026-09-01 | Representação reativa enquanto o `.riv` não pode ser exportado |
+| Runtime Rive | `public/assets/rive/pisco.riv` | Laboratório das Letras | Exportação do arquivo de autoria `Pisco - Laboratorio das Letras` criado na conta Rive do projeto | Asset próprio do projeto, autorizado para repositório e preview | 2026-09-01 | Mascote reativo na interface React |
+| Fallback de runtime | `public/assets/rive/pisco-fallback.svg` | Laboratório das Letras | Derivação direta do vetor-fonte próprio | Asset próprio do projeto | 2026-09-01 | Recuperação visual caso o runtime ou o `.riv` falhem |
 
-O arquivo de autoria foi criado na conta Rive do projeto, mas as opções **For Runtime** e **For Backup** exigem upgrade no plano atual. O futuro `public/assets/rive/pisco.riv` deverá ser acrescentado a este registro somente depois de exportado e validado; nenhuma licença, assinatura ou asset externo foi adquirido nesta etapa.
+O arquivo de runtime tem SHA-256 `0e1671cb73c3937e4e4a6523d809b702e4036bda7fc26acdd17c803ee116f7c4`. A exportação não incorpora mídia ou personagem externo. O fallback continua no projeto para tolerância a falhas e não substitui o asset principal durante o carregamento normal.

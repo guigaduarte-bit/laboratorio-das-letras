@@ -97,5 +97,6 @@
 - `MascotGuide.tsx` concentra os listeners do EventBus e converte eventos do jogo nos seis estados visuais de Pisco.
 - `RiveMascot.tsx` é carregado dinamicamente, fora da renderização no servidor, e usa View Model Properties em vez dos inputs legados da máquina de estados.
 - Os triggers de data binding são `listen`, `think`, `hint`, `happy`, `celebrate` e `reset`; `reducedMotion` é uma propriedade booleana.
-- Enquanto `pisco.riv` não puder ser exportado, `pisco-fallback.svg` preserva a identidade e demonstra as reações sem requisição `404` ao runtime.
-- `RIVE_ASSET_READY` permanece `false` até o `.riv` ser exportado, registrado e validado.
+- `pisco.riv` é o asset principal do mascote e foi exportado pelo editor Rive para `public/assets/rive/`.
+- `pisco-fallback.svg` permanece como recuperação automática se o arquivo ou o runtime não puderem ser carregados.
+- `RIVE_ASSET_READY` está ativo; a promoção para produção depende da validação dos triggers no preview remoto.
