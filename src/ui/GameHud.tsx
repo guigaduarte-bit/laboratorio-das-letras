@@ -22,6 +22,7 @@ export function GameHud({ collectedCount, display, mission }: GameHudProps)
                 className="word-bar"
                 layout
                 aria-label={`Palavra: ${display}`}
+                style={{ gridTemplateColumns: `repeat(${slots.length}, minmax(0, 1fr))` }}
             >
                 {slots.map((slot, index) => {
                     const collected = index < collectedCount;

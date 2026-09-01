@@ -71,3 +71,15 @@
 
 - `level-started`: o Phaser informa ao React/Howler que a fase começou.
 - `word-audio-completed`: o Howler informa ao Phaser que a palavra já foi falada e a celebração pode começar.
+
+## Sistema visual do Marco 4
+
+- A direção de arte está registrada em `docs/DIRECAO_ARTE.md`.
+- O Bosque-Laboratório é construído por camadas vetoriais em `src/game/visuals/ForestLabArt.ts`.
+- Paleta e fonte do canvas são centralizadas em `src/game/visuals/palette.ts`.
+- Lumi é um rig vetorial reutilizável em `src/game/visuals/PlayerAvatar.ts`.
+- O sprite físico do jogador fica invisível e separado do rig visual; colisão e aparência podem evoluir sem acoplamento.
+- Os estados `idle`, `walk`, `jump`, `land`, `collect` e `celebrate` usam tweens nativos do Phaser.
+- Cartões de letras usam `LetterCardView`; a hitbox física invisível permanece estável e independente do balanço visual.
+- Partículas usam texturas próprias geradas em tempo de execução por `PreloadScene`; nenhuma mídia externa foi adicionada.
+- Motion continua restrito ao React. Toda animação no canvas usa tweens, formas e partículas do Phaser.

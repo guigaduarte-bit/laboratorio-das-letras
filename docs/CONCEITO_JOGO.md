@@ -40,3 +40,11 @@ A primeira palavra de validação é **SAPO**.
 Após a validação da vertical slice, a lógica jogável passa a receber uma definição de nível separada da cena. `SAPO` continua sendo a palavra principal; `PATO` entra somente como segundo conteúdo técnico para provar que outra palavra pode usar a mesma cena, os mesmos sistemas e o mesmo HUD.
 
 A presença de uma palavra no catálogo técnico não equivale à sua aprovação pedagógica. A sequência apresentada ao Ben será definida conforme o trabalho de alfabetização realizado no período.
+
+## Direção visual do Marco 4
+
+O primeiro mundo passa a ser o **Bosque-Laboratório**, uma estação de pesquisa integrada à natureza. O personagem é **Lumi**, um pequeno robô-pesquisador cuja antena reage às descobertas.
+
+O Marco 4 substitui os placeholders geométricos por uma linguagem vetorial própria desenhada no Phaser. Cenário, personagem, cartões e celebração continuam sem assets externos, mas agora seguem um sistema visual documentado em `docs/DIRECAO_ARTE.md`.
+
+As letras permanecem estáveis e legíveis. Somente o cartão e os elementos ao redor recebem brilho, pequena mudança de escala, balanço discreto e partículas.

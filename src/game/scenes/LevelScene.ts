@@ -1,4 +1,4 @@
-import { Display, Scene } from 'phaser';
+import { Scene } from 'phaser';
 import {
     getInitialWordDisplay,
     getLevelById,
@@ -8,6 +8,8 @@ import { EventBus } from '../EventBus';
 import { LetterCollector } from '../systems/LetterCollector';
 import { PlayerController } from '../systems/PlayerController';
 import { WordProgress } from '../systems/WordProgress';
+import { drawForestLabBackground, drawPlatformVisual } from '../visuals/ForestLabArt';
+import { PlayerAvatar } from '../visuals/PlayerAvatar';
 
 type LevelSceneData = {
     levelId?: string;
@@ -17,10 +19,16 @@ type WordCompletedEvent = {
     word: string;
 };
 
+type LetterCollectedEvent = {
+    letter: string;
+    word: string;
+};
+
 export class LevelScene extends Scene
 {
     private level: LevelDefinition = getLevelById();
     private player!: Phaser.Physics.Arcade.Sprite;
+    private playerAvatar!: PlayerAvatar;
     private playerController!: PlayerController;
     private letterCollector!: LetterCollector;
     private celebrationTimer?: Phaser.Time.TimerEvent;
@@ -40,11 +48,12 @@ export class LevelScene extends Scene
 
     create(): void
     {
-        this.drawBackground();
+        drawForestLabBackground(this);
 
         const platforms = this.physics.add.staticGroup();
         this.level.platforms.forEach((placement, index) => {
-            const texture = index === 0 ? 'ground' : 'platform';
+            const isGround = index === 0;
+            const texture = isGround ? 'ground-hitbox' : 'platform-hitbox';
             const platform = platforms.create(
                 placement.x,
                 placement.y,
@@ -52,14 +61,17 @@ export class LevelScene extends Scene
             ) as Phaser.Physics.Arcade.Image;
             platform
                 .setDisplaySize(placement.width, placement.height)
+                .setVisible(false)
                 .refreshBody();
+            drawPlatformVisual(this, placement, isGround);
         });
 
         this.player = this.physics.add.sprite(
             this.level.playerStart.x,
             this.level.playerStart.y,
-            'player'
+            'player-hitbox'
         )
+            .setVisible(false)
             .setCollideWorldBounds(true);
 
         const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
@@ -67,6 +79,11 @@ export class LevelScene extends Scene
         playerBody.setMaxVelocity(280, 700);
 
         this.physics.add.collider(this.player, platforms);
+        this.playerAvatar = new PlayerAvatar(
+            this,
+            this.level.playerStart.x,
+            this.level.playerStart.y
+        );
 
         const progress = new WordProgress(this.level.word);
         this.letterCollector = new LetterCollector(
@@ -75,8 +92,9 @@ export class LevelScene extends Scene
             this.level.letters,
             progress
         );
-        this.playerController = new PlayerController(this, this.player);
+        this.playerController = new PlayerController(this, this.player, this.playerAvatar);
 
+        EventBus.on('letter-collected', this.handleLetterCollected);
         EventBus.on('word-completed', this.handleWordCompleted);
         EventBus.on('word-audio-completed', this.handleWordAudioCompleted);
         this.events.once('shutdown', this.cleanup, this);
@@ -102,10 +120,19 @@ export class LevelScene extends Scene
 
         this.completed = true;
         this.playerController.setEnabled(false);
+        this.playerAvatar.playCelebrate();
         this.celebrationTimer = this.time.delayedCall(
             4200,
             () => this.startCelebration()
         );
+    };
+
+    private readonly handleLetterCollected = ({ word }: LetterCollectedEvent): void =>
+    {
+        if (!this.completed && word === this.level.word)
+        {
+            this.playerAvatar.playCollect();
+        }
     };
 
     private readonly handleWordAudioCompleted = ({ word }: WordCompletedEvent): void =>
@@ -126,36 +153,10 @@ export class LevelScene extends Scene
     private cleanup(): void
     {
         EventBus.off('word-completed', this.handleWordCompleted);
+        EventBus.off('letter-collected', this.handleLetterCollected);
         EventBus.off('word-audio-completed', this.handleWordAudioCompleted);
         this.playerController?.destroy();
         this.letterCollector?.destroy();
-    }
-
-    private drawBackground(): void
-    {
-        const bands = 24;
-        const top = Display.Color.IntegerToColor(0x78c6d0);
-        const bottom = Display.Color.IntegerToColor(0xe6f2c8);
-
-        for (let index = 0; index < bands; index += 1)
-        {
-            const color = Display.Color.Interpolate.ColorWithColor(
-                top,
-                bottom,
-                bands - 1,
-                index
-            );
-            this.add.rectangle(
-                480,
-                (480 / bands) * index + 480 / bands / 2,
-                960,
-                480 / bands + 1,
-                Display.Color.GetColor(color.r, color.g, color.b)
-            );
-        }
-
-        this.add.circle(850, 105, 48, 0xffe49a, 0.9);
-        this.add.ellipse(155, 464, 300, 80, 0x8fbd6a, 0.72);
-        this.add.ellipse(710, 470, 460, 100, 0x8fbd6a, 0.68);
+        this.playerAvatar?.destroy();
     }
 }

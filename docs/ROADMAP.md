@@ -114,7 +114,7 @@ Também foram ajustados `src/App.tsx`, `src/pages/_app.tsx`, `src/styles/globals
 
 ## Marco 3 — níveis orientados por dados
 
-Status: **implementado e validado localmente; aguardando preview remoto e validação pedagógica**.
+Status: **concluído para preview remoto; aguardando validação pedagógica**.
 
 Objetivo: permitir que uma única cena jogável carregue palavras diferentes a partir de conteúdo tipado, sem copiar a lógica de movimento, plataformas, coleta, HUD, áudio ou celebração.
 
@@ -131,7 +131,7 @@ Objetivo: permitir que uma única cena jogável carregue palavras diferentes a p
 - [x] Sinais locais não verbais adicionados para os caminhos ainda sem gravação de PATO/T, evitando arquivos ausentes no preview.
 - [x] Lint, verificação de tipos e build executados com sucesso.
 - [x] Export estático verificado por HTTP para SAPO, PATO e os três áudios técnicos, todos com resposta `200`.
-- [ ] Preview remoto do Marco 3 apresentado antes de qualquer integração em produção.
+- [x] Preview remoto do Marco 3 apresentado antes de qualquer integração em produção.
 - [ ] Segunda palavra definida a partir do trabalho pedagógico atual do Ben.
 
 ### Arquivos principais do Marco 3
@@ -150,8 +150,53 @@ Objetivo: permitir que uma única cena jogável carregue palavras diferentes a p
 - Os três áudios novos de PATO/T são sinais não verbais, não voz, fonema ou leitura válida.
 - SAPO e PATO compartilham o mesmo cenário e as mesmas plataformas; apenas conteúdo, letras, áudio e ilustração final variam.
 - A seleção da segunda definição é feita por parâmetro de preview; ainda não existe seletor de palavras na interface.
-- O navegador remoto disponível não acessa o servidor local, portanto a confirmação visual depende do próximo deployment de preview.
+- O rótulo acessível do canvas mencionava `SAPO` durante o menu de `PATO`; a inicialização pela URL foi corrigida no Marco 4.
+
+## Marco 4 — direção de arte e animação
+
+Status: **implementado e validado localmente; aguardando preview remoto**.
+
+Objetivo: substituir os placeholders por uma identidade visual própria sem alterar a mecânica, a arquitetura orientada por dados ou a estabilidade tipográfica das letras.
+
+### Funcionalidades concluídas
+
+- [x] Paleta orgânica definida e centralizada.
+- [x] Bosque-Laboratório definido como primeiro mundo.
+- [x] Lumi criado como personagem vetorial próprio e reutilizável.
+- [x] Estados `idle`, `walk`, `jump`, `land`, `collect` e `celebrate` implementados.
+- [x] Cenário em camadas com árvores, copas, estação de pesquisa e vegetação.
+- [x] Plataformas redesenhadas como módulos orgânicos cobertos por musgo.
+- [x] Cartões de letras redesenhados, mantendo o caractere estável e legível.
+- [x] Balanço discreto, brilho, pequena escala e partículas aplicados aos cartões.
+- [x] Dica visual suave destaca a letra esperada após tentativa fora da ordem.
+- [x] Partículas de descoberta, aterrissagem e celebração implementadas com Phaser.
+- [x] Celebração redesenhada com Lumi e ilustrações vetoriais próprias de sapo e pato.
+- [x] Interface React atualizada para a mesma paleta, mantendo Motion fora do canvas.
+- [x] Barra da palavra preparada visualmente para quantidades diferentes de letras.
+- [x] Rótulo acessível do nível solicitado corrigido ainda na tela inicial.
+- [x] Lint, verificação de tipos e build executados com sucesso.
+- [ ] Preview remoto do Marco 4 apresentado.
+- [ ] Movimento, áudio e leitura visual validados em tablet real.
+
+### Arquivos principais do Marco 4
+
+- `docs/DIRECAO_ARTE.md`
+- `src/game/visuals/palette.ts`
+- `src/game/visuals/ForestLabArt.ts`
+- `src/game/visuals/PlayerAvatar.ts`
+- `src/game/visuals/LetterCardView.ts`
+- `src/game/scenes/LevelScene.ts`
+- `src/game/scenes/CelebrationScene.ts`
+- `src/styles/globals.css`
+
+### Limitações atuais
+
+- A arte é vetorial e própria, mas ainda precisa de validação de uso com Ben antes de ser tratada como definitiva.
+- Os tempos das animações e a intensidade das partículas ainda podem precisar de ajuste em tablet.
+- PATO continua sendo somente um teste técnico, não uma escolha pedagógica.
+- Vozes, efeitos e música ainda são os placeholders técnicos do Marco 2 e do Marco 3.
+- Nenhuma versão do Marco 4 foi publicada em produção.
 
 ## Próximo marco recomendado
 
-**Preview e validação do Marco 3.** Publicar somente a branch de preview e conferir SAPO e `?level=forest-pato` em desktop e tablet. Depois, decidir a segunda palavra real a partir do conteúdo trabalhado com o Ben, substituir os sinais técnicos por gravações licenciadas em português brasileiro e somente então integrar o marco à branch principal.
+**Preview e validação do Marco 4.** Publicar somente uma branch de preview, conferir SAPO e `?level=forest-pato` em desktop e tablet e ajustar ritmo, contraste ou densidade de partículas conforme o teste. Não integrar à branch principal nem publicar em produção antes da aprovação visual e da validação de uso.

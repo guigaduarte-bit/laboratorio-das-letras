@@ -67,6 +67,11 @@ export default function App()
     const startInProgress = useRef(false);
 
     useEffect(() => {
+        const requestedLevel = getRequestedLevel();
+        setActiveLevelId(requestedLevel.id);
+        setDisplay(getInitialWordDisplay(requestedLevel.word));
+        setMission(getMission(requestedLevel.word));
+
         const handleMenuReady = (): void => setMenuReady(true);
 
         const handleLevelStarted = ({ display: initialDisplay, levelId, word }: LevelStartedEvent): void =>

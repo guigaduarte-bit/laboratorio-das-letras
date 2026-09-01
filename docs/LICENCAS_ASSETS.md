@@ -43,6 +43,18 @@ Os arquivos `voice/instructions/forme-pato.mp3`, `voice/letters/t.mp3` e `voice/
 
 As vozes atuais não têm pronúncia pedagógica validada em português brasileiro. Devem ser substituídas por gravações humanas licenciadas e revisadas antes de uma sessão de teste com crianças ou de qualquer publicação em produção.
 
+## Marco 4 — arte vetorial própria
+
+Personagem Lumi, Bosque-Laboratório, plataformas, cartões, ilustrações de sapo e pato e texturas de partículas foram criados por código dentro do próprio projeto. Não incorporam imagens, personagens, spritesheets ou ilustrações de terceiros.
+
+| Grupo | Arquivos | Autor/organização | Proveniência e origem | Licença e escopo | Verificação | Uso |
+| --- | --- | --- | --- | --- | --- | --- |
+| Direção de arte | `docs/DIRECAO_ARTE.md`, `src/game/visuals/palette.ts` | Laboratório das Letras | Criação própria | Asset próprio do projeto | 2026-09-01 | Paleta e regras visuais |
+| Personagem | `src/game/visuals/PlayerAvatar.ts` | Laboratório das Letras | Rig vetorial desenhado no Phaser | Asset próprio do projeto | 2026-09-01 | Lumi e seus seis estados |
+| Mundo | `src/game/visuals/ForestLabArt.ts` | Laboratório das Letras | Formas vetoriais desenhadas no Phaser | Asset próprio do projeto | 2026-09-01 | Bosque-Laboratório e plataformas |
+| Letras e efeitos | `src/game/visuals/LetterCardView.ts`, texturas geradas por `PreloadScene` | Laboratório das Letras | Formas e partículas geradas localmente | Asset próprio do projeto | 2026-09-01 | Cartões, brilho, folhas e partículas |
+| Celebração | `src/game/scenes/CelebrationScene.ts` | Laboratório das Letras | Ilustrações vetoriais próprias | Asset próprio do projeto | 2026-09-01 | Lumi, sapo, pato e conclusão |
+
 ## Marco 2 — tipografia
 
 | Asset | Autor/organização | Origem | Licença | Verificação | Uso |

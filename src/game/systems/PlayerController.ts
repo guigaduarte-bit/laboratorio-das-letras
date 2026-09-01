@@ -1,6 +1,7 @@
 import type { Physics, Scene } from 'phaser';
 import { Input } from 'phaser';
 import { EventBus } from '../EventBus';
+import type { PlayerAvatar } from '../visuals/PlayerAvatar';
 
 type MovementKeys = {
     left: Input.Keyboard.Key;
@@ -30,7 +31,8 @@ export class PlayerController
 
     constructor(
         private readonly scene: Scene,
-        private readonly player: Physics.Arcade.Sprite
+        private readonly player: Physics.Arcade.Sprite,
+        private readonly avatar: PlayerAvatar
     )
     {
         this.body = player.body as Physics.Arcade.Body;
@@ -56,6 +58,7 @@ export class PlayerController
         if (!this.enabled)
         {
             this.player.setVelocityX(0);
+            this.avatar.updateFromBody(this.body);
             return;
         }
 
@@ -85,6 +88,7 @@ export class PlayerController
         }
 
         this.touchJumpQueued = false;
+        this.avatar.updateFromBody(this.body);
     }
 
     setEnabled(enabled: boolean): void

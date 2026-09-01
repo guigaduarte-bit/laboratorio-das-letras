@@ -1,11 +1,12 @@
-import type { GameObjects, Physics, Scene } from 'phaser';
+import type { Physics, Scene } from 'phaser';
 import type { LetterDefinition } from '../content/levels';
 import { EventBus } from '../EventBus';
+import { LetterCardView } from '../visuals/LetterCardView';
 import type { WordProgress } from './WordProgress';
 
 type LetterCard = {
     card: Physics.Arcade.Image;
-    label: GameObjects.Text;
+    view: LetterCardView;
     letter: string;
     lastWrongAt: number;
 };
@@ -23,24 +24,21 @@ export class LetterCollector
     )
     {
         placements.forEach((placement) => {
-            const card = scene.physics.add.staticImage(placement.x, placement.y, 'letter-card')
-                .setDisplaySize(64, 70)
-                .setDepth(8)
+            const card = scene.physics.add.staticImage(placement.x, placement.y, 'letter-hitbox')
+                .setDisplaySize(70, 80)
+                .setVisible(false)
                 .refreshBody();
             card.setData('letter', placement.value);
-
-            const label = scene.add.text(placement.x, placement.y, placement.value, {
-                color: '#24344A',
-                fontFamily: 'Trebuchet MS, sans-serif',
-                fontSize: '38px',
-                fontStyle: 'bold'
-            })
-                .setOrigin(0.5)
-                .setDepth(9);
+            const view = new LetterCardView(
+                scene,
+                placement.x,
+                placement.y,
+                placement.value
+            );
 
             const entry: LetterCard = {
                 card,
-                label,
+                view,
                 letter: placement.value,
                 lastWrongAt: -1000
             };
@@ -54,6 +52,13 @@ export class LetterCollector
     destroy(): void
     {
         this.overlaps.forEach((overlap) => overlap.destroy());
+        this.cards.forEach(({ card, view }) => {
+            if (card.active)
+            {
+                card.destroy();
+            }
+            view.destroy();
+        });
     }
 
     private tryCollect(entry: LetterCard): void
@@ -73,32 +78,15 @@ export class LetterCollector
             {
                 entry.lastWrongAt = now;
                 EventBus.emit('letter-mismatch', { found: entry.letter, expected });
-                this.scene.tweens.add({
-                    targets: [entry.card, entry.label],
-                    angle: { from: -4, to: 4 },
-                    duration: 80,
-                    yoyo: true,
-                    repeat: 1,
-                    onComplete: () => {
-                        entry.card.setAngle(0);
-                        entry.label.setAngle(0);
-                    }
-                });
+                entry.view.showMismatch();
+                this.cards.find(({ card, letter }) => card.active && letter === expected)
+                    ?.view.showExpectedHint();
             }
             return;
         }
 
         (entry.card.body as Physics.Arcade.StaticBody).enable = false;
-        this.scene.tweens.add({
-            targets: [entry.card, entry.label],
-            alpha: 0,
-            scale: 1.3,
-            duration: 240,
-            ease: 'Back.In',
-            onComplete: () => {
-                entry.card.destroy();
-                entry.label.destroy();
-            }
-        });
+        entry.card.destroy();
+        entry.view.collect();
     }
 }

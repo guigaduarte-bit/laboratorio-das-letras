@@ -8,7 +8,7 @@ import { PreloadScene } from './scenes/PreloadScene';
 const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
     parent: 'game-container',
-    backgroundColor: '#7EC8D9',
+    backgroundColor: '#78ADA8',
     scale: {
         mode: Scale.FIT,
         autoCenter: Scale.CENTER_BOTH,
