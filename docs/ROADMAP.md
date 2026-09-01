@@ -223,8 +223,10 @@ Objetivo: acrescentar um mascote reativo na camada React sem transferir para o R
 - [x] Fallback vetorial próprio e reativo usado enquanto o `.riv` não está disponível.
 - [x] Lint, TypeScript e build executados com sucesso.
 - [ ] Transições finais da máquina revisadas no editor.
-- [x] Arquivo próprio `pisco.riv` exportado, registrado e ativado.
-- [ ] Preview remoto do Marco 5 apresentado.
+- [x] Arquivo próprio `pisco.riv` exportado e registrado.
+- [x] Preview remoto do Marco 5 apresentado; detectou fundo opaco e enquadramento deslocado no `.riv`.
+- [x] Fallback SVG transparente reativado para remover o artefato visual da versão jogável.
+- [ ] `.riv` reexportado com artboard transparente, Pisco centralizado e validado no preview.
 
 ### Arquivos principais do Marco 5
 
@@ -240,11 +242,11 @@ Objetivo: acrescentar um mascote reativo na camada React sem transferir para o R
 
 ### Limitações atuais
 
-- O arquivo e seus identificadores internos foram verificados, mas a renderização e as transições ainda precisam ser testadas no preview remoto.
-- O fallback SVG permanece disponível se o carregamento do runtime falhar.
+- O arquivo e seus identificadores internos foram verificados, mas o primeiro preview expôs fundo opaco e enquadramento incorreto no artboard exportado.
+- O fallback SVG está ativo e responde aos estados do EventBus enquanto o `.riv` é corrigido.
 - A validação local completa ficou limitada porque o runtime é browser-only e o navegador de teste remoto não acessa o servidor local deste ambiente.
 - Os detalhes finais do rig ainda podem ser simplificados depois do teste em tablet.
 
 ## Próximo passo recomendado
 
-**Validar Pisco no preview remoto.** Conferir carregamento, os seis estados, retorno a `idle`, preferência de movimento reduzido e fallback; depois testar em tablet real. Nenhuma publicação em produção deve ocorrer antes dessa validação.
+**Corrigir e reexportar o artboard de Pisco.** Remover o fundo opaco, centralizar o rig, reativar `RIVE_ASSET_READY` e conferir os seis estados no preview em desktop e tablet. Nenhuma publicação em produção deve ocorrer antes dessa validação.

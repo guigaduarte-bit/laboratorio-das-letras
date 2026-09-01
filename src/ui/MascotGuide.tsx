@@ -15,7 +15,10 @@ type MascotGuideProps = {
     phase: 'menu' | 'playing' | 'celebrating';
 };
 
-const RIVE_ASSET_READY = true;
+// O export atual contém um fundo opaco e o desenho está fora do enquadramento.
+// Mantemos o runtime preparado, mas usamos o SVG transparente até o `.riv`
+// ser reexportado e validado no preview.
+const RIVE_ASSET_READY = false;
 const RiveMascot = dynamic(
     () => import('./RiveMascot').then(({ RiveMascot: Component }) => Component),
     { ssr: false }

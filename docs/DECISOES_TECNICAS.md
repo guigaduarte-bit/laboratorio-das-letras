@@ -99,4 +99,5 @@
 - Os triggers de data binding são `listen`, `think`, `hint`, `happy`, `celebrate` e `reset`; `reducedMotion` é uma propriedade booleana.
 - `pisco.riv` é o asset principal do mascote e foi exportado pelo editor Rive para `public/assets/rive/`.
 - `pisco-fallback.svg` permanece como recuperação automática se o arquivo ou o runtime não puderem ser carregados.
-- `RIVE_ASSET_READY` está ativo; a promoção para produção depende da validação dos triggers no preview remoto.
+- O primeiro preview remoto revelou fundo opaco e enquadramento deslocado no export de `pisco.riv`.
+- `RIVE_ASSET_READY` permanece desativado temporariamente; o SVG próprio e transparente mantém Pisco visível e reativo até o `.riv` ser reexportado e validado.

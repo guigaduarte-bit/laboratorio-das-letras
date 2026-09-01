@@ -158,7 +158,7 @@ Foram preparados no editor:
 
 O arquivo de runtime foi exportado e incorporado em `public/assets/rive/pisco.riv` em 2026-09-01. O binário tem 4.815 bytes e SHA-256 `0e1671cb73c3937e4e4a6523d809b702e4036bda7fc26acdd17c803ee116f7c4`.
 
-A inspeção estrutural confirmou no arquivo os identificadores `Mascot`, `MascotState`, `ViewModel1`, as seis timelines, os seis triggers e `reducedMotion`. `MascotGuide.tsx` está com o runtime ativo; `pisco-fallback.svg` permanece como recuperação automática caso o carregamento falhe. A renderização e as transições ainda precisam ser confirmadas no preview remoto em navegador real.
+A inspeção estrutural confirmou no arquivo os identificadores `Mascot`, `MascotState`, `ViewModel1`, as seis timelines, os seis triggers e `reducedMotion`. O primeiro preview remoto, porém, revelou fundo opaco e o rig deslocado no artboard. `MascotGuide.tsx` usa temporariamente `pisco-fallback.svg`, que preserva Pisco transparente e reativo, até um novo export ser validado.
 
 ## Critérios para aprovar o `.riv`
 
@@ -180,5 +180,5 @@ A inspeção estrutural confirmou no arquivo os identificadores `Mascot`, `Masco
 6. Executar lint, TypeScript e build. **Concluído.**
 7. Exportar `public/assets/rive/pisco.riv`. **Concluído.**
 8. Registrar o `.riv` final em `docs/LICENCAS_ASSETS.md`. **Concluído.**
-9. Ativar `RIVE_ASSET_READY`. **Concluído; triggers aguardam validação visual.**
-10. Apresentar preview em desktop e tablet antes de produção. **Pendente.**
+9. Ativar `RIVE_ASSET_READY`. **Revertido temporariamente após o preview revelar fundo opaco e enquadramento deslocado.**
+10. Apresentar preview em desktop e tablet antes de produção. **Primeiro preview concluído; nova validação pendente após o reexport.**
