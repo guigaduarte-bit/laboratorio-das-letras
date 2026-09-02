@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { EventBus } from '../game/EventBus';
+import { PiscoFallback } from './PiscoFallback';
 
 export type MascotState =
     | 'idle'
@@ -103,14 +103,7 @@ export function MascotGuide({ phase }: MascotGuideProps)
                         onLoadError={() => setRiveFailed(true)}
                     />
                 ) : (
-                    <Image
-                        src="/assets/rive/pisco-fallback.svg"
-                        alt=""
-                        width={300}
-                        height={320}
-                        priority
-                        draggable={false}
-                    />
+                    <PiscoFallback />
                 )}
             </div>
             <span className="mascot-guide__name">Pisco</span>

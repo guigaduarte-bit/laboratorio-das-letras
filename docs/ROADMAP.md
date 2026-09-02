@@ -226,6 +226,7 @@ Objetivo: acrescentar um mascote reativo na camada React sem transferir para o R
 - [x] Arquivo próprio `pisco.riv` exportado e registrado.
 - [x] Preview remoto do Marco 5 apresentado; detectou fundo opaco e enquadramento deslocado no `.riv`.
 - [x] Fallback SVG transparente reativado para remover o artefato visual da versão jogável.
+- [x] Fallback incorporado ao React para não depender do carregador de imagens ou de uma requisição externa.
 - [ ] `.riv` reexportado com artboard transparente, Pisco centralizado e validado no preview.
 
 ### Arquivos principais do Marco 5
@@ -237,13 +238,14 @@ Objetivo: acrescentar um mascote reativo na camada React sem transferir para o R
 - `public/assets/rive/pisco.riv`
 - `public/assets/rive/README.md`
 - `src/ui/MascotGuide.tsx`
+- `src/ui/PiscoFallback.tsx`
 - `src/ui/RiveMascot.tsx`
 - `src/styles/globals.css`
 
 ### Limitações atuais
 
 - O arquivo e seus identificadores internos foram verificados, mas o primeiro preview expôs fundo opaco e enquadramento incorreto no artboard exportado.
-- O fallback SVG está ativo e responde aos estados do EventBus enquanto o `.riv` é corrigido.
+- O fallback vetorial incorporado ao React está ativo e responde aos estados do EventBus enquanto o `.riv` é corrigido.
 - A validação local completa ficou limitada porque o runtime é browser-only e o navegador de teste remoto não acessa o servidor local deste ambiente.
 - Os detalhes finais do rig ainda podem ser simplificados depois do teste em tablet.
 

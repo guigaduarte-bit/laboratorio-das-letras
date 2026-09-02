@@ -158,7 +158,7 @@ Foram preparados no editor:
 
 O arquivo de runtime foi exportado e incorporado em `public/assets/rive/pisco.riv` em 2026-09-01. O binário tem 4.815 bytes e SHA-256 `0e1671cb73c3937e4e4a6523d809b702e4036bda7fc26acdd17c803ee116f7c4`.
 
-A inspeção estrutural confirmou no arquivo os identificadores `Mascot`, `MascotState`, `ViewModel1`, as seis timelines, os seis triggers e `reducedMotion`. O primeiro preview remoto, porém, revelou fundo opaco e o rig deslocado no artboard. `MascotGuide.tsx` usa temporariamente `pisco-fallback.svg`, que preserva Pisco transparente e reativo, até um novo export ser validado.
+A inspeção estrutural confirmou no arquivo os identificadores `Mascot`, `MascotState`, `ViewModel1`, as seis timelines, os seis triggers e `reducedMotion`. O primeiro preview remoto, porém, revelou fundo opaco e o rig deslocado no artboard. `MascotGuide.tsx` usa temporariamente `PiscoFallback.tsx`, uma representação vetorial incorporada ao React que preserva Pisco transparente e reativo sem requisição externa, até um novo export ser validado.
 
 ## Critérios para aprovar o `.riv`
 

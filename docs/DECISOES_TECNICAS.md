@@ -100,4 +100,4 @@
 - `pisco.riv` é o asset principal do mascote e foi exportado pelo editor Rive para `public/assets/rive/`.
 - `pisco-fallback.svg` permanece como recuperação automática se o arquivo ou o runtime não puderem ser carregados.
 - O primeiro preview remoto revelou fundo opaco e enquadramento deslocado no export de `pisco.riv`.
-- `RIVE_ASSET_READY` permanece desativado temporariamente; o SVG próprio e transparente mantém Pisco visível e reativo até o `.riv` ser reexportado e validado.
+- `RIVE_ASSET_READY` permanece desativado temporariamente; o vetor próprio foi incorporado ao componente React para manter Pisco visível e reativo sem depender do carregador de imagens até o `.riv` ser reexportado e validado.
