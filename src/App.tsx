@@ -8,6 +8,7 @@ import {
     getLevelById
 } from './game/content/levels';
 import { EventBus } from './game/EventBus';
+import { localProgress } from './progress/LocalProgress';
 import { GameHud } from './ui/GameHud';
 import { MascotGuide } from './ui/MascotGuide';
 import { StartMenu } from './ui/StartMenu';
@@ -69,6 +70,7 @@ export default function App()
 
     useEffect(() => {
         const requestedLevel = getRequestedLevel();
+        let currentLevelId = requestedLevel.id;
         setActiveLevelId(requestedLevel.id);
         setDisplay(getInitialWordDisplay(requestedLevel.word));
         setMission(getMission(requestedLevel.word));
@@ -78,12 +80,14 @@ export default function App()
         const handleLevelStarted = ({ display: initialDisplay, levelId, word }: LevelStartedEvent): void =>
         {
             const level = getLevelById(levelId);
+            currentLevelId = level.id;
             setMenuReady(false);
             setActiveLevelId(level.id);
             setDisplay(initialDisplay);
             setCollectedCount(0);
             setPhase('playing');
             setMission(getMission(word));
+            localProgress.recordSessionStarted();
             gameAudio.startLevel(level);
         };
 
@@ -103,6 +107,7 @@ export default function App()
                     ? `Muito bem! Agora procure a letra ${word[count]}.`
                     : `Você formou ${word}!`
             );
+            localProgress.recordCorrectLetter(letter);
             gameAudio.playLetter(letter);
         };
 
@@ -110,6 +115,7 @@ export default function App()
         {
             setMission(`Quase! Agora procure a letra ${expected}.`);
             setAnnouncement(`Agora procure a letra ${expected}.`);
+            localProgress.recordHintAttempt(expected);
             gameAudio.playHint();
         };
 
@@ -117,6 +123,7 @@ export default function App()
         {
             setMission(`Você formou ${word}!`);
             setAnnouncement(`Palavra completa: ${word}.`);
+            localProgress.recordLevelCompleted(currentLevelId);
             gameAudio.completeWord(word);
         };
 

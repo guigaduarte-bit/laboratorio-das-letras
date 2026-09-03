@@ -101,3 +101,16 @@
 - `pisco-fallback.svg` permanece como recuperação automática se o arquivo ou o runtime não puderem ser carregados.
 - O primeiro preview remoto revelou fundo opaco e enquadramento deslocado no export de `pisco.riv`.
 - `RIVE_ASSET_READY` permanece desativado temporariamente; o vetor próprio foi incorporado ao componente React para manter Pisco visível e reativo sem depender do carregador de imagens até o `.riv` ser reexportado e validado.
+
+## Persistência local do Marco 6
+
+- O progresso inicial usa somente `localStorage`; não há Supabase, conta, login ou sincronização entre dispositivos.
+- A chave versionada é `laboratorio-das-letras:progress:v1`, permitindo uma migração futura sem confundir formatos.
+- `LocalProgressStore` concentra leitura, validação e escrita. Dados ausentes ou corrompidos voltam a uma estrutura vazia sem interromper o jogo.
+- Se o navegador bloquear o armazenamento, a partida continua e mantém apenas um fallback em memória durante a página atual.
+- Uma sessão é contada no evento `level-started`, depois de a criança acionar `COMEÇAR` e a fase realmente iniciar.
+- `letter-collected` incrementa `correct` para a letra coletada; `letter-mismatch` incrementa `hints` para a letra esperada, não para a letra tocada por engano.
+- `word-completed` adiciona o identificador do nível a `completedLevels` sem duplicatas.
+- `lastPlayedAt` recebe data e hora ISO em cada uma dessas atividades.
+- O total de tentativas com dica é derivado pela soma de `letterStats[*].hints`, evitando informação duplicada.
+- O fluxo permanece `Phaser → EventBus → React → LocalProgressStore → localStorage`.

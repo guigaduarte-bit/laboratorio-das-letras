@@ -54,3 +54,9 @@ As letras permanecem estáveis e legíveis. Somente o cartão e os elementos ao 
 O mascote-guia será um **vagalume-cientista**, com o nome de trabalho **Pisco**. Ele não substitui Lumi e não participa da física ou da exploração do mundo. Sua função é acompanhar as instruções na camada React e reagir de maneira curta e positiva às ações da criança.
 
 Pisco será animado por uma máquina de estados Rive somente depois da aprovação do conceito e da criação de um arquivo `.riv` próprio. A comunicação seguirá `Phaser → EventBus → React → Rive`.
+
+## Progresso local do Marco 6
+
+O primeiro progresso persistente permanece restrito ao dispositivo e ao navegador usados pela criança. Não há conta, login, Supabase, identificação pessoal, ranking ou sincronização em nuvem.
+
+São registrados somente níveis concluídos, quantidade de sessões iniciadas, última atividade e contagens de acertos e dicas por letra. Esses dados servem para retomar o percurso e identificar letras que precisam de mais apoio, sem criar pontuação ou punição.

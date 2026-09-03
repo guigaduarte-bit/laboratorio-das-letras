@@ -249,6 +249,49 @@ Objetivo: acrescentar um mascote reativo na camada React sem transferir para o R
 - A validação local completa ficou limitada porque o runtime é browser-only e o navegador de teste remoto não acessa o servidor local deste ambiente.
 - Os detalhes finais do rig ainda podem ser simplificados depois do teste em tablet.
 
+## Marco 6 — progresso local
+
+Status: **implementado e validado localmente; aguardando preview remoto**.
+
+Objetivo: preservar um conjunto mínimo de indicadores pedagógicos no próprio navegador, sem conta, login, Supabase ou coleta de dados pessoais.
+
+### Funcionalidades implementadas
+
+- [x] Estrutura `LocalProgress` tipada e centralizada.
+- [x] Chave de armazenamento versionada para migração futura.
+- [x] Níveis concluídos armazenados sem duplicação.
+- [x] Quantidade de sessões contada apenas quando a fase realmente inicia.
+- [x] Última atividade registrada em formato ISO.
+- [x] Acertos contabilizados por letra.
+- [x] Tentativas com dica atribuídas à letra que era esperada.
+- [x] Dados lidos do navegador são validados antes do uso.
+- [x] Conteúdo corrompido ou armazenamento bloqueado não interrompe o jogo.
+- [x] Fallback em memória mantém o funcionamento durante a página atual.
+- [x] Serviço verificado nos cenários de gravação normal, deduplicação, conteúdo corrompido e armazenamento bloqueado.
+- [x] Lint, verificação de tipos e build estático executados com sucesso.
+- [ ] Persistência confirmada após fechar e reabrir o preview no navegador de teste.
+
+### Dados armazenados
+
+```ts
+type LocalProgress = {
+    completedLevels: string[];
+    sessionCount: number;
+    lastPlayedAt: string;
+    letterStats: Record<string, { correct: number; hints: number }>;
+};
+```
+
+Não são armazenados nome, idade, perfil, pontuação, tempo detalhado de jogo ou histórico de cada erro.
+
+### Arquivos principais do Marco 6
+
+- `src/progress/LocalProgress.ts`
+- `src/App.tsx`
+- `docs/CONCEITO_JOGO.md`
+- `docs/DECISOES_TECNICAS.md`
+- `docs/ROADMAP.md`
+
 ## Próximo passo recomendado
 
-**Corrigir e reexportar o artboard de Pisco.** Remover o fundo opaco, centralizar o rig, reativar `RIVE_ASSET_READY` e conferir os seis estados no preview em desktop e tablet. Nenhuma publicação em produção deve ocorrer antes dessa validação.
+**Validar o Marco 6 em preview.** Concluir uma sessão, recarregar a página e confirmar que os dados permanecem na chave `laboratorio-das-letras:progress:v1`. Nenhuma publicação em produção deve ocorrer antes dessa validação.
