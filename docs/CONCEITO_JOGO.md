@@ -60,3 +60,17 @@ Pisco será animado por uma máquina de estados Rive somente depois da aprovaç�
 O primeiro progresso persistente permanece restrito ao dispositivo e ao navegador usados pela criança. Não há conta, login, Supabase, identificação pessoal, ranking ou sincronização em nuvem.
 
 São registrados somente níveis concluídos, quantidade de sessões iniciadas, última atividade e contagens de acertos e dicas por letra. Esses dados servem para retomar o percurso e identificar letras que precisam de mais apoio, sem criar pontuação ou punição.
+
+## Expedição das Letras — 2026-09-05
+
+Adaptação original do ciclo de corrida, coleta e crescimento solicitado como referência. Lumi avança pela pista em perspectiva do Bosque-Laboratório e acumula anéis em seu equipamento ao encontrar as letras de SAPO. Pisco acompanha cada descoberta.
+
+- A pista para diante das alternativas, sem limite de tempo para escolher.
+- A primeira escolha tem duas alternativas; as seguintes têm três. As posições variam, mantendo todas as letras com a mesma aparência.
+- Toque nos cartões ou nos botões de letras para coletar. Setas/A/D e deslizar selecionam; espaço/Enter confirma.
+- Escolher outra letra preserva todas as descobertas e ilumina a letra esperada. Também é possível pedir dica.
+- A palavra modelo permanece visível. A atividade pratica reconhecimento e pareamento; não presume leitura autônoma nem mede domínio de alfabetização.
+- Quatro letras completam a invenção. A criança escolhe repetir ou encerrar a sessão.
+- Pausa manual e pausa ao ocultar a página preservam a escolha atual.
+
+A raiz abre a nova experiência. O protótipo de plataformas permanece em `?mode=explore`. A entrega continua restrita a SAPO.

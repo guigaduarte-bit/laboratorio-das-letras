@@ -121,6 +121,21 @@ export class PlayerAvatar
         this.root.setPosition(x, y);
     }
 
+    setRunnerPose(moving: boolean, scale: number, reducedMotion: boolean): void
+    {
+        this.root.setScale(scale).setDepth(70);
+        if (reducedMotion)
+        {
+            this.clearTweens();
+            this.resetPose();
+            return;
+        }
+        if (!this.celebrationLocked && this.scene.time.now >= this.lockedUntil)
+        {
+            this.applyState(moving ? 'walk' : 'idle');
+        }
+    }
+
     playCollect(): void
     {
         if (this.celebrationLocked)

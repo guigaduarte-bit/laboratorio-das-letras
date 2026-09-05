@@ -294,4 +294,24 @@ Não são armazenados nome, idade, perfil, pontuação, tempo detalhado de jogo 
 
 ## Próximo passo recomendado
 
-**Validar o Marco 6 em preview.** Concluir uma sessão, recarregar a página e confirmar que os dados permanecem na chave `laboratorio-das-letras:progress:v1`. Nenhuma publicação em produção deve ocorrer antes dessa validação.
+**Validar a Expedição das Letras em preview.** Conferir o ciclo de SAPO, uma tentativa com dica, pausa, repetição e persistência do marco 6. Observar se o Ben identifica a letra antes de escolher o caminho. Nenhuma publicação em produção ocorre antes da aprovação do preview.
+
+## Expedição das Letras — referência de corrida/coleta
+
+Status: **implementada; build e invariantes validados; em preparação para preview**.
+
+Entrega solicitada em 2026-09-05:
+
+- [x] Pista 2.5D no Bosque-Laboratório; Lumi, Pisco e anéis acumulados por letra.
+- [x] Avanço entre escolhas e parada sem cronômetro diante das letras.
+- [x] Duas alternativas no início; três nas seguintes, com posições variáveis.
+- [x] Palavra modelo, dica voluntária e feedback sem perda de progresso.
+- [x] Toque nos cartões, botões acessíveis, teclado e deslizar para selecionar.
+- [x] Pausa, retomada, pausa ao sair da página, repetição e encerramento.
+- [x] Voz pt-BR condicional do dispositivo e efeitos Howler após interação.
+- [x] Acompanhamento com sessões, palavras, coletas, dicas e última atividade.
+- [x] Progresso do marco 6 preservado; plataformas disponíveis em `?mode=explore`.
+- [x] Testes de alvo único, posições variadas, letras repetidas, escolha incorreta, conclusão única, persistência e armazenamento indisponível.
+- [x] Typecheck, lint e build estático bem-sucedidos.
+- [ ] Fluxo visual completo conferido no navegador de preview.
+- [ ] Pronúncia, toque e conforto do movimento conferidos no iPhone/iPad do Ben.
