@@ -81,3 +81,11 @@ O Bosque-Laboratório usa:
 - Não usar câmera tremendo como punição.
 - Não usar flashes intensos ou animações contínuas de alto contraste.
 - Respeitar a preferência de redução de movimento na interface React.
+
+## Expedição das Letras
+
+A pista de brinquedo em areia atravessa água em lagoa e ilhas arredondadas, mantendo a direção orgânica e a Lexend. A perspectiva, as bordas espessas e os cartões verticais dão volume sem distorcer os caracteres. O menu ocupa o próprio mundo; o percurso é a superfície principal.
+
+Cada letra encontrada acrescenta três anéis ao equipamento de Lumi. Sua cor é uma recompensa após a coleta e não indica a alternativa correta. As escolhas usam letra em tinta sobre areia; apenas a dica reforça a borda do alvo e acrescenta um sinal de confirmação.
+
+Pisco permanece no React com o fallback já aprovado. Não são incorporados personagens, imagens, sons ou gráficos da referência externa.

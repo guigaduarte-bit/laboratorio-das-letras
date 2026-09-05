@@ -1,5 +1,18 @@
 # Licenças de assets — Laboratório das Letras
 
+## Expedição das Letras — 2026-09-05
+
+| Elemento | Origem e uso |
+| --- | --- |
+| Pista, ilhas, laboratório e anéis | Geometria original do projeto em `RunnerWorld.ts` e `RunnerScene.ts`; renderização Phaser, sem mídia externa |
+| Lumi e Pisco | Reutilização dos personagens originais já registrados abaixo |
+| Ícones funcionais | Traços próprios em `RunnerIcon.tsx`, sem biblioteca ou imagem de terceiros |
+| Narração | Textos fixos originais e voz pt-BR disponibilizada pela Web Speech API do dispositivo; nenhum arquivo de voz de terceiro copiado ou redistribuído; depende da disponibilidade e das condições do fornecedor da voz |
+| Efeitos | Reutilização dos sinais próprios do marco 2 já registrados abaixo |
+| Referência de mecânica | [Layer Man na App Store](https://apps.apple.com/br/app/layer-man-3d-run-collect/id6445820370?l=en-GB), consultado em 2026-09-05; somente ciclo abstrato de corrida, coleta e crescimento, sem assets, personagens, código ou texto copiados |
+
+As vozes Flite antigas não são usadas na nova corrida. A voz sintética do dispositivo ainda precisa de conferência de pronúncia antes da sessão acompanhada.
+
 ## Entrega 1
 
 Não há assets externos. Personagem, cenário, letras e elementos da celebração são placeholders desenhados por código e pertencem ao próprio projeto.

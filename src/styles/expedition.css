@@ -1,0 +1,176 @@
+.expedition-shell {
+    --exp-ink: #26383a;
+    --exp-green: #355f4b;
+    --exp-sand: #e8dcc7;
+    --exp-oat: #d4b895;
+    --exp-sun: #e3bd57;
+    width: 100%;
+    min-height: 100dvh;
+    padding: 0 clamp(14px, 3vw, 46px) 12px;
+    color: var(--exp-ink);
+    background: #d1dcc1;
+}
+.expedition-header { max-width: 1380px; min-height: 86px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.expedition-brand { display: flex; align-items: center; gap: 11px; padding: 0; border: 0; background: none; text-align: left; color: var(--exp-green); text-decoration: none; font-size: 19px; font-weight: 760; letter-spacing: -.7px; line-height: 1.13; }
+.expedition-brand > span > span { display: block; }
+.brand-mark { width: 46px; height: 46px; display: grid; place-items: center; border: 2px solid var(--exp-green); border-radius: 15px; background: var(--exp-sand); box-shadow: 0 3px 0 #355f4b22; }
+.header-actions { display: flex; align-items: center; gap: 10px; }
+.expedition-shell button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.expedition-shell button:disabled { cursor: default; opacity: .5; }
+.expedition-shell button:focus-visible, .expedition-shell a:focus-visible { outline: 3px solid var(--exp-ink); outline-offset: 4px; }
+.icon-button { min-width: 46px; min-height: 46px; display: inline-grid; place-items: center; color: var(--exp-green); background: #e8dcc780; border: 1.5px solid #355f4b30; border-radius: 50%; }
+.icon-button:hover { background: var(--exp-sand); }
+.parent-button { padding: 13px 16px; margin-left: 10px; color: var(--exp-green); background: none; border: 1.5px solid #355f4b50; border-radius: 24px; font-size: 14px; font-weight: 500; }
+.parent-button:hover { background: var(--exp-sand); }
+.expedition-stage { width: 100%; max-width: 1380px; height: min(740px, calc(100dvh - 192px)); min-height: 570px; margin: auto; overflow: hidden; position: relative; isolation: isolate; border-radius: 30px; border: 2px solid #355f4b55; background: #82b8ac; box-shadow: 0 8px 0 #355f4b15, 0 20px 36px -30px #26383a90; }
+.expedition-stage #game-container { width: 100%; height: 100%; aspect-ratio: auto; touch-action: none; }
+.expedition-stage #game-container canvas { display: block; /* O ScaleManager é responsável pelas dimensões. */ }
+.world-label { position: absolute; top: 24px; left: 28px; display: flex; align-items: center; gap: 7px; padding: 8px 12px; background: #e8dcc77d; color: var(--exp-green); font-size: 13px; font-weight: 520; border-radius: 20px; pointer-events: none; }
+.expedition-start { position: absolute; top: 20%; left: 5%; width: 410px; z-index: 3; }
+.expedition-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 2px; margin: 0 0 17px; color: var(--exp-green); }
+.expedition-start h1 { font-size: clamp(44px, 4.5vw, 72px); font-weight: 760; letter-spacing: -3.5px; line-height: 1.05; margin: 0 0 20px; color: var(--exp-ink); text-wrap: balance; }
+.expedition-start h1 span { color: var(--exp-green); }
+.expedition-intro { font-size: 18px; line-height: 1.6; margin: 0 0 27px; max-width: 350px; }
+.expedition-primary { width: 100%; min-height: 62px; padding: 15px 24px; display: flex; justify-content: center; align-items: center; gap: 11px; color: var(--exp-sand); background: var(--exp-green); border: 2px solid #2b4f3f; border-radius: 19px; box-shadow: 0 5px 0 #254434; font-weight: 700; font-size: 16px; letter-spacing: .5px; transition: background-color 150ms, translate 150ms, box-shadow 150ms; }
+.expedition-primary:hover:not(:disabled) { background: #426e53; translate: 0 -2px; box-shadow: 0 7px 0 #254434; }
+.expedition-primary:active:not(:disabled) { translate: 0 3px; box-shadow: 0 2px 0 #254434; }
+.start-button { max-width: 246px; color: var(--exp-ink); background: var(--exp-sun); border-color: #b9923e; box-shadow: 0 5px 0 #af8936; }
+.start-button:hover:not(:disabled) { background: #edc868; box-shadow: 0 7px 0 #af8936; }
+.start-note { font-size: 12px; line-height: 1.5; margin-top: 18px; color: #355649; }
+.expedition-hud { width: 266px; position: absolute; top: 23px; left: 58%; transform: translateX(-50%); pointer-events: none; }
+.word-heading { display: flex; align-items: center; justify-content: space-between; padding: 0 5px 10px; font-size: 12px; font-weight: 650; letter-spacing: 1.1px; color: var(--exp-green); }
+.word-heading span:last-child { letter-spacing: 0; }
+.expedition-word { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.expedition-word > span { height: 64px; position: relative; display: grid; place-items: center; border-radius: 14px; border: 2px solid #355f4b55; background: #e8dcc7b8; color: #5f7160; font-size: 34px; font-weight: 700; box-shadow: 0 4px 0 #355f4b20; }
+.expedition-word > span.next { background: var(--exp-sun); color: var(--exp-ink); border-color: #ac8d3d; }
+.expedition-word > span.found { background: var(--exp-green); border-color: var(--exp-green); color: var(--exp-sand); }
+.expedition-word svg { position: absolute; bottom: 4px; right: 4px; }
+.expedition-pisco { position: absolute; left: 24px; bottom: 25px; display: flex; align-items: center; gap: 3px; z-index: 4; pointer-events: none; }
+.expedition-pisco .mascot-guide { width: 100px; height: 100px; position: relative; inset: auto; flex: 0 0 auto; }
+.expedition-pisco .mascot-guide__halo { border: none; box-shadow: none; background: radial-gradient(circle, #e3bd575e, #e3bd5700 72%); }
+.expedition-pisco .mascot-guide__halo::after { display: none; }
+.expedition-pisco .mascot-guide__visual { width: 100%; height: 100%; }
+.expedition-pisco .mascot-guide__name { display: none; }
+.pisco-speech { max-width: 210px; padding: 13px 17px; background: #e8dcc7f2; border: 1px solid #355f4b30; border-radius: 17px 17px 17px 4px; box-shadow: 0 4px 0 #355f4b18; }
+.pisco-speech > span { color: #5a7057; display: block; font-size: 10px; letter-spacing: 1.8px; font-weight: 650; margin-bottom: 5px; }
+.pisco-speech p { margin: 0; line-height: 1.4; font-size: 14px; font-weight: 500; }
+.equipment-note { display: flex; align-items: center; gap: 7px; color: #2b5548; position: absolute; right: 28px; bottom: 28px; font-size: 12px; background: #e8dcc795; padding: 9px 12px; border-radius: 20px; pointer-events: none; }
+.expedition-controls { max-width: 1140px; min-height: 96px; margin: 0 auto; padding: 20px 4px 5px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 28px; }
+.control-prompt > span { display: block; font-size: 11px; font-weight: 620; letter-spacing: 1.5px; margin-bottom: 5px; color: var(--exp-green); }
+.control-prompt p { font-size: 16px; margin: 0; }
+.control-prompt p strong { padding-left: 3px; font-size: 23px; }
+.lane-buttons { display: flex; gap: 12px; }
+.lane-buttons button { width: 72px; height: 65px; border: 2px solid #899875; border-radius: 15px; background: var(--exp-sand); color: var(--exp-ink); box-shadow: 0 4px 0 #899875; font-size: 32px; font-weight: 660; touch-action: manipulation; }
+.lane-buttons button:hover:not(:disabled), .lane-buttons button:focus-visible { background: #f1deb6; }
+.lane-buttons button.selected { border-color: var(--exp-green); box-shadow: 0 4px 0 var(--exp-green); }
+.lane-buttons button.hinted { background: var(--exp-sun); border-color: var(--exp-green); }
+.lane-buttons button:active:not(:disabled) { translate: 0 3px; box-shadow: 0 1px 0 #355f4b; }
+.learning-actions { display: flex; justify-content: flex-end; gap: 18px; }
+.small-action { min-width: 56px; min-height: 58px; display: grid; place-items: center; gap: 4px; border: 0; background: transparent; color: var(--exp-green); font-size: 12px; }
+.small-action:hover:not(:disabled) { background: #e8dcc77a; border-radius: 12px; }
+.expedition-footer { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 20px; font-size: 12px; color: #526b58; }
+.expedition-complete { position: absolute; z-index: 5; top: 50%; left: 50%; transform: translate(-50%, -50%) !important; width: min(430px, calc(100% - 36px)); background: var(--exp-sand); border: 2px solid #355f4b50; padding: 30px 32px 22px; border-radius: 28px; box-shadow: 0 14px 0 #355f4b25, 0 25px 60px #26383a28; text-align: center; }
+.completion-badge { width: 62px; height: 62px; margin: 0 auto 18px; border: 2px solid #b8913e; background: var(--exp-sun); border-radius: 50%; display: grid; place-items: center; }
+.expedition-complete h2 { font-size: 27px; line-height: 1.25; letter-spacing: -1px; margin: 0 0 13px; font-weight: 560; }
+.expedition-complete h2 strong { display: block; color: var(--exp-green); font-size: 57px; letter-spacing: 2px; font-weight: 750; }
+.expedition-complete > p:not(.expedition-eyebrow) { font-size: 14px; margin: 0 0 15px; }
+.word-listen { background: none; border: 1px solid #355f4b50; color: var(--exp-green); display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 14px; border-radius: 30px; font-size: 13px; margin-bottom: 23px; }
+.text-button { min-height: 44px; padding: 12px; margin-top: 13px; border: 0; background: transparent; color: var(--exp-green); font-size: 14px; text-decoration: underline; text-underline-offset: 4px; }
+.expedition-dialog { width: min(580px, calc(100vw - 30px)); max-height: calc(100dvh - 40px); padding: 34px; overflow-y: auto; border: 2px solid #355f4b70; border-radius: 25px; background: var(--exp-sand); color: var(--exp-ink); box-shadow: 0 20px 80px #26383a40; }
+.expedition-dialog::backdrop { background: #173e35aa; backdrop-filter: blur(6px); }
+.expedition-dialog h2 { font-size: 28px; margin: 10px 0 16px; line-height: 1.2; letter-spacing: -1px; }
+.expedition-dialog p { font-size: 16px; line-height: 1.6; }
+.dialog-close { position: absolute; top: 15px; right: 15px; min-height: 38px; min-width: 38px; }
+.parent-dialog .expedition-eyebrow { padding-right: 40px; font-size: 11px; }
+.progress-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 24px 0; }
+.progress-summary > div { background: #d4b89560; border-radius: 14px; padding: 13px 11px; }
+.progress-summary strong { display: block; color: var(--exp-green); font-size: 28px; font-weight: 650; margin-bottom: 5px; }
+.progress-summary span { font-size: 12px; line-height: 1.4; display: block; }
+.parent-dialog table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.parent-dialog caption { font-size: 16px; font-weight: 650; text-align: left; margin: 0 0 10px; }
+.parent-dialog th, .parent-dialog td { padding: 10px 9px; border-bottom: 1px solid #355f4b25; }
+.parent-dialog thead th { font-size: 12px; color: #526b58; font-weight: 550; }
+.parent-dialog .parent-detail { font-size: 13px; color: #4b6152; margin-top: 20px; }
+.voice-status { display: flex; align-items: flex-start; gap: 10px; background: #d4b89555; padding: 14px; border-radius: 13px; margin: 18px 0 25px; }
+.voice-status svg { flex-shrink: 0; margin-top: 3px; }
+.voice-status p { font-size: 13px; margin: 0; }
+.pause-dialog { max-width: 410px; text-align: center; }
+.dialog-symbol { width: 62px; height: 62px; display: grid; place-items: center; border-radius: 50%; background: var(--exp-sun); margin: 0 auto 24px; }
+.pause-dialog p { margin-bottom: 26px; }
+.game-loading { min-height: 100dvh; margin: 0; display: grid; place-items: center; color: #355f4b; }
+
+@media (max-width: 899px) {
+    .expedition-stage { min-height: 610px; height: calc(100dvh - 205px); }
+    .expedition-start { width: calc(100% - 40px); left: 20px; top: 73px; text-align: center; }
+    .expedition-start h1 { font-size: 49px; letter-spacing: -2.4px; margin-bottom: 13px; }
+    .expedition-start h1 br { display: none; }
+    .expedition-intro { font-size: 16px; margin: 0 auto 18px; max-width: 460px; }
+    .desktop-break { display: none; }
+    .start-button { margin: auto; min-height: 57px; }
+    .start-note { margin: 14px auto 0; }
+    .expedition-start .expedition-eyebrow { font-size: 10px; margin-bottom: 12px; }
+    .expedition-hud { left: 50%; }
+    .expedition-pisco { left: 14px; bottom: 14px; }
+    .expedition-pisco .mascot-guide { width: 82px; height: 82px; }
+    .pisco-speech { max-width: 190px; padding: 11px 13px; }
+    .equipment-note { display: none; }
+    .expedition-controls { gap: 14px; }
+    .world-label { top: 17px; left: 18px; font-size: 12px; }
+    .expedition-stage:not([data-phase="ready"]) .world-label { display: none; }
+    .control-prompt p { font-size: 14px; }
+}
+@media (max-width: 600px) {
+    .expedition-shell { padding: 0 10px 10px; }
+    .expedition-header { min-height: 72px; padding: 0 4px; gap: 10px; }
+    .expedition-brand { font-size: 15px; gap: 7px; }
+    .brand-mark { width: 35px; height: 38px; border-radius: 11px; }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .header-actions { gap: 6px; }
+    .icon-button { min-width: 40px; min-height: 40px; }
+    .parent-button { max-width: 90px; font-size: 11px; line-height: 1.3; padding: 6px 8px; min-height: 40px; margin: 0; border-radius: 14px; }
+    .expedition-stage { border-radius: 22px; min-height: 505px; height: calc(100dvh - 207px); }
+    .expedition-start { top: 63px; left: 17px; width: calc(100% - 34px); }
+    .expedition-start h1 { font-size: 41px; line-height: 1.06; max-width: 320px; margin: 0 auto 13px; }
+    .expedition-start h1 br { display: block; }
+    .expedition-intro { font-size: 14px; line-height: 1.5; max-width: 265px; }
+    .expedition-primary { min-height: 55px; border-radius: 16px; font-size: 14px; }
+    .start-button { max-width: 214px; }
+    .start-note { font-size: 11px; max-width: 210px; }
+    .expedition-pisco { bottom: 12px; left: 8px; gap: 0; }
+    .expedition-pisco .mascot-guide { width: 63px; height: 69px; }
+    .pisco-speech { max-width: 205px; padding: 9px 12px; }
+    .pisco-speech p { font-size: 13px; }
+    .pisco-speech > span { font-size: 9px; margin-bottom: 4px; }
+    .expedition-hud { top: 17px; width: 228px; }
+    .word-heading { font-size: 10px; padding-bottom: 8px; }
+    .expedition-word { gap: 7px; }
+    .expedition-word > span { height: 54px; font-size: 28px; border-radius: 12px; }
+    .expedition-controls { grid-template-columns: 1fr auto; gap: 8px 12px; padding: 15px 7px 2px; min-height: 115px; }
+    .control-prompt { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; }
+    .control-prompt > span { font-size: 10px; margin: 0; }
+    .control-prompt p { font-size: 13px; }
+    .control-prompt p strong { font-size: 19px; }
+    .lane-buttons { gap: 9px; }
+    .lane-buttons button { width: 58px; height: 54px; font-size: 28px; border-radius: 12px; }
+    .learning-actions { gap: 4px; }
+    .small-action { min-width: 46px; min-height: 53px; font-size: 10px; }
+    .expedition-footer { font-size: 11px; width: 100%; flex-direction: column; gap: 7px; text-align: center; }
+    .expedition-controls[data-phase="ready"], .expedition-controls[data-phase="celebrate"] { min-height: 70px; }
+    .expedition-complete { padding: 23px 22px 18px; top: 45%; }
+    .expedition-complete h2 { font-size: 24px; }
+    .expedition-complete h2 strong { font-size: 49px; }
+    .expedition-complete .completion-badge { width: 49px; height: 49px; margin-bottom: 14px; }
+    .expedition-complete .expedition-eyebrow { font-size: 10px; }
+    .expedition-dialog { padding: 28px 20px; }
+    .expedition-dialog h2 { font-size: 26px; }
+}
+@media (max-height: 560px) and (min-width: 601px) {
+    .expedition-header { min-height: 62px; }
+    .expedition-stage { min-height: 420px; }
+    .expedition-start { left: 4%; top: 22%; width: 300px; text-align: left; }
+    .expedition-start h1 { font-size: 36px; }
+    .expedition-start h1 br { display: block; }
+    .expedition-intro { max-width: 260px; margin-left: 0; }
+    .start-button { margin-left: 0; }
+    .start-note { display: none; }
+}
