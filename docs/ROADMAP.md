@@ -298,7 +298,7 @@ Não são armazenados nome, idade, perfil, pontuação, tempo detalhado de jogo 
 
 ## Expedição das Letras — referência de corrida/coleta
 
-Status: **implementada; build e invariantes validados; em preparação para preview**.
+Status: **publicada em preview; build e invariantes validados; acesso visual protegido pela autenticação da Vercel**.
 
 Entrega solicitada em 2026-09-05:
 
@@ -315,3 +315,16 @@ Entrega solicitada em 2026-09-05:
 - [x] Typecheck, lint e build estático bem-sucedidos.
 - [ ] Fluxo visual completo conferido no navegador de preview.
 - [ ] Pronúncia, toque e conforto do movimento conferidos no iPhone/iPad do Ben.
+
+## Jogabilidade por setas e touchscreen — 2026-09-07
+
+Status: **implementada e validada automaticamente; preparada para atualizar o preview existente**.
+
+- [x] Seta para cima avança até a letra selecionada; esquerda/direita escolhem o caminho.
+- [x] Movimento de aproximação antes da coleta e retorno suave após outra escolha, sem perder progresso.
+- [x] Setas continuam disponíveis após tocar nos botões da interface; diálogos preservam o foco.
+- [x] Botões grandes de direção e AVANÇAR, toque direto e gestos de deslizar.
+- [x] Área de toque alinhada aos cartões; gestos cancelados e segundo dedo não causam escolhas acidentais.
+- [x] Layout adaptado à orientação e à altura da tela; canvas acompanha mudanças do contêiner.
+- [x] Build estático, tipos, lint, invariantes e testes de controles concluídos com sucesso.
+- [ ] Partida conferida no tablet físico e no navegador com acesso ao preview.

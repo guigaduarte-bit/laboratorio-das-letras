@@ -1,6 +1,6 @@
 import type { LevelDefinition } from './levels';
 
-export type RunnerPhase = 'ready' | 'travel' | 'choose' | 'collect' | 'finish' | 'celebrate';
+export type RunnerPhase = 'ready' | 'travel' | 'choose' | 'approach' | 'retry' | 'collect' | 'finish' | 'celebrate';
 export type RunnerSnapshot = {
     phase: RunnerPhase;
     count: number;

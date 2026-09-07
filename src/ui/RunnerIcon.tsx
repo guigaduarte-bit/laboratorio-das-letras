@@ -1,4 +1,4 @@
-export type RunnerIconName = 'flask' | 'play' | 'pause' | 'sound' | 'muted' | 'help' | 'close' | 'back' | 'leaf' | 'check' | 'replay';
+export type RunnerIconName = 'flask' | 'play' | 'pause' | 'sound' | 'muted' | 'help' | 'close' | 'back' | 'leaf' | 'check' | 'replay' | 'left' | 'right' | 'up';
 
 export function RunnerIcon({ name, size = 24 }: { name: RunnerIconName; size?: number })
 {
@@ -11,6 +11,9 @@ export function RunnerIcon({ name, size = 24 }: { name: RunnerIconName; size?: n
         help: <><path d="M8 9a4 4 0 1 1 6 3.5c-1.6.9-2 1.5-2 3M12 19v.1" /><circle cx="12" cy="12" r="10" /></>,
         close: <path d="m6 6 12 12M6 18 18 6" />,
         back: <path d="m10 5-7 7 7 7M3 12h18" />,
+        left: <path d="m10 5-7 7 7 7M3 12h18" />,
+        right: <path d="m14 5 7 7-7 7M3 12h18" />,
+        up: <path d="m5 10 7-7 7 7M12 3v18" />,
         leaf: <><path d="M20 3C7 2 2 8 6 15s14 3 14-12ZM5 21 15 9" /></>,
         check: <path d="m5 12 4 4L19 6" />,
         replay: <><path d="M4 10a8 8 0 1 1 .8 7M4 3v7h7" /></>

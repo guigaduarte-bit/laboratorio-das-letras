@@ -29,6 +29,7 @@ export default function RunnerApp()
     const completeFocus = useRef<HTMLHeadingElement>(null);
     const phase = state.phase;
     const isPlaying = phase !== 'ready' && phase !== 'celebrate';
+    const canChoose = phase === 'choose' && !state.paused;
     const target = WORD[state.count] ?? '';
 
     useEffect(() => {
@@ -38,7 +39,7 @@ export default function RunnerApp()
             if (next.phase === 'choose' && lastPhase !== 'choose')
             {
                 const letter = WORD[next.count];
-                setAnnouncement(`Encontre a letra ${letter}. Escolha um caminho.`);
+                setAnnouncement(`Encontre a letra ${letter}. Escolha um caminho com esquerda e direita e avance com a seta para cima. Você também pode tocar na letra.`);
                 runnerAudio.prompt(letter);
             }
             if (next.phase === 'ready' || next.phase === 'celebrate') startGuard.current = false;
@@ -113,8 +114,7 @@ export default function RunnerApp()
         runnerAudio.unlock(); runnerAudio.setEnabled(soundRef.current);
         setVoice(runnerAudio.hasVoice());
         EventBus.emit('runner-start');
-        // O canvas pode receber setas/espaço depois do botão inicial.
-        (document.activeElement as HTMLElement | null)?.blur();
+        document.getElementById('game-container')?.focus({ preventScroll: true });
     };
     const toggleSound = () => {
         const enabled = !soundRef.current;
@@ -133,16 +133,19 @@ export default function RunnerApp()
     const home = () => { runnerAudio.stop(); EventBus.emit('runner-home'); pauseDialog.current?.close(); };
     const resume = () => {
         runnerAudio.unlock(); EventBus.emit('runner-pause', false);
+        pauseDialog.current?.close();
+        document.getElementById('game-container')?.focus({ preventScroll: true });
         if (phase === 'choose') runnerAudio.prompt(target);
     };
     const mission = phase === 'collect' ? (state.count === 4 ? 'Você formou SAPO!' : 'Encontrou! Vamos em frente.')
         : phase === 'finish' ? 'Vamos levar a palavra ao laboratório!'
+        : phase === 'approach' ? `Vamos até a letra ${state.choices[state.lane]}!`
         : state.hinted ? `Vamos juntos. Procure ${target}.`
         : phase === 'travel' ? `A próxima descoberta é ${target}.` : `Encontre a letra ${target}`;
     const hintTotal = Object.values(progress.letterStats).reduce((sum, item) => sum + item.hints, 0);
 
     return <MotionConfig reducedMotion="user">
-        <main className="expedition-shell">
+        <main className="expedition-shell" data-playing={isPlaying}>
             <header className="expedition-header">
                 <button className="expedition-brand" aria-label="Laboratório das Letras, início" onClick={home}>
                     <span className="brand-mark"><RunnerIcon name="flask" size={27} /></span>
@@ -164,7 +167,7 @@ export default function RunnerApp()
                         <h1>Expedição<br />das <span>letras.</span></h1>
                         <p className="expedition-intro">Vamos encontrar letras<br className="desktop-break" /> e construir uma invenção?</p>
                         <button className="expedition-primary start-button" onClick={start} disabled={!ready}><RunnerIcon name="play" /> {ready ? 'COMEÇAR' : 'PREPARANDO…'}</button>
-                        <p className="start-note">Toque para escolher. Explore no seu ritmo.</p>
+                        <p className="start-note">Jogue com as setas do teclado ou tocando na tela.</p>
                     </motion.div>}
                 </AnimatePresence>
 
@@ -199,18 +202,26 @@ export default function RunnerApp()
 
             <div className="expedition-controls" data-phase={phase}>
                 {isPlaying ? <>
-                    <div className="control-prompt"><span>{phase === 'choose' ? 'QUAL CAMINHO?' : phase === 'collect' ? 'LETRA ENCONTRADA' : phase === 'finish' ? 'PALAVRA COMPLETA' : 'VAMOS EXPLORAR'}</span>
-                        <p>{phase === 'choose' ? <>Procure <strong>{target}</strong></> : phase === 'collect' ? 'Muito bem!' : phase === 'finish' ? 'SAPO!' : 'A pista espera por você.'}</p>
+                    <div className="control-prompt"><span>{phase === 'choose' || phase === 'retry' ? 'QUAL CAMINHO?' : phase === 'approach' ? 'VAMOS EM FRENTE' : phase === 'collect' ? 'LETRA ENCONTRADA' : phase === 'finish' ? 'PALAVRA COMPLETA' : 'VAMOS EXPLORAR'}</span>
+                        <p>{phase === 'choose' || phase === 'retry' ? <>Procure <strong>{target}</strong></> : phase === 'approach' ? 'Indo até a letra…' : phase === 'collect' ? 'Muito bem!' : phase === 'finish' ? 'SAPO!' : 'A pista espera por você.'}</p>
                     </div>
-                    <div className="lane-buttons" role="group" aria-label="Escolha uma letra">
-                        {state.choices.map((letter, index) => <button key={`${state.count}-${index}`} aria-label={`Coletar letra ${letter}`} disabled={phase !== 'choose' || state.paused}
-                            className={`${state.lane === index ? 'selected' : ''} ${state.hinted && letter === target ? 'hinted' : ''}`}
-                            onClick={() => EventBus.emit('runner-choose', index)}>{letter}</button>)}
+                    <div className="runner-inputs">
+                        <div className="lane-buttons" role="group" aria-label="Toque em uma letra para avançar até ela">
+                            {state.choices.map((letter, index) => <button key={`lane-${index}`} aria-label={`Avançar até a letra ${letter}`} aria-pressed={state.lane === index} disabled={!canChoose}
+                                className={`${state.lane === index ? 'selected' : ''} ${state.hinted && letter === target ? 'hinted' : ''}`}
+                                onClick={() => EventBus.emit('runner-choose', index)}>{letter}</button>)}
+                        </div>
+                        <div className="direction-controls" role="group" aria-label="Mover o personagem" aria-describedby="runner-control-help">
+                            <button className="direction-button" aria-label="Mover para a esquerda" disabled={!canChoose || state.lane === 0} onClick={() => EventBus.emit('runner-move', -1)}><RunnerIcon name="left" size={28} /></button>
+                            <button className="direction-button advance-button" aria-label="Avançar até a letra selecionada" disabled={!canChoose} onClick={() => EventBus.emit('runner-advance')}><RunnerIcon name="up" size={28} /><span>AVANÇAR</span></button>
+                            <button className="direction-button" aria-label="Mover para a direita" disabled={!canChoose || state.lane === state.choices.length - 1} onClick={() => EventBus.emit('runner-move', 1)}><RunnerIcon name="right" size={28} /></button>
+                        </div>
                     </div>
                     <div className="learning-actions">
-                        <button className="small-action" disabled={!voice || !sound || phase !== 'choose'} onClick={() => runnerAudio.prompt(target)} aria-label="Ouvir a letra procurada"><RunnerIcon name="sound" size={22} /><span>Ouvir</span></button>
-                        <button className="small-action" disabled={phase !== 'choose' || state.hinted} onClick={() => EventBus.emit('runner-hint')}><RunnerIcon name="help" size={22} /><span>Dica</span></button>
+                        <button className="small-action" disabled={!voice || !sound || !canChoose} onClick={() => runnerAudio.prompt(target)} aria-label="Ouvir a letra procurada"><RunnerIcon name="sound" size={22} /><span>Ouvir</span></button>
+                        <button className="small-action" disabled={!canChoose || state.hinted} onClick={() => EventBus.emit('runner-hint')}><RunnerIcon name="help" size={22} /><span>Dica</span></button>
                     </div>
+                    <p className="runner-control-help" id="runner-control-help"><span className="keyboard-help">← → escolhem o caminho · ↑ avança.</span><span className="touch-help">Toque nas setas e em AVANÇAR, ou toque na letra.</span></p>
                 </> : <div className="expedition-footer"><span>Uma aventura com Lumi e Pisco</span><span>Reconhecer · Coletar · Descobrir</span></div>}
             </div>
 

@@ -67,10 +67,15 @@ Adaptação original do ciclo de corrida, coleta e crescimento solicitado como r
 
 - A pista para diante das alternativas, sem limite de tempo para escolher.
 - A primeira escolha tem duas alternativas; as seguintes têm três. As posições variam, mantendo todas as letras com a mesma aparência.
-- Toque nos cartões ou nos botões de letras para coletar. Setas/A/D e deslizar selecionam; espaço/Enter confirma.
+- Esquerda/direita (ou A/D) escolhem o caminho; seta para cima (ou W, espaço/Enter) faz o personagem avançar até a letra. A coleta acontece na chegada.
+- No touchscreen, botões grandes de esquerda/direita e AVANÇAR reproduzem os controles do teclado. Também é possível tocar diretamente na letra ou deslizar para os lados e para cima.
 - Escolher outra letra preserva todas as descobertas e ilumina a letra esperada. Também é possível pedir dica.
 - A palavra modelo permanece visível. A atividade pratica reconhecimento e pareamento; não presume leitura autônoma nem mede domínio de alfabetização.
 - Quatro letras completam a invenção. A criança escolhe repetir ou encerrar a sessão.
 - Pausa manual e pausa ao ocultar a página preservam a escolha atual.
 
 A raiz abre a nova experiência. O protótipo de plataformas permanece em `?mode=explore`. A entrega continua restrita a SAPO.
+
+### Ajuste de jogabilidade — 2026-09-07
+
+A parada diante das alternativas permanece sem limite de tempo. O avanço até a letra torna a decisão visível: após uma escolha diferente da esperada, o personagem volta ao ponto de escolha e a dica permanece, preservando as letras já encontradas. O controle por toque funciona sem teclado conectado. A pista adapta sua altura para deixar os botões disponíveis na vertical e na horizontal.

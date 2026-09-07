@@ -118,9 +118,18 @@
 ## Expedição das Letras — 2026-09-05
 
 - `RunnerScene` implementa a nova mecânica e `RunnerWorld` desenha a perspectiva 2.5D no Phaser 4. `RunnerApp` cuida dos controles, HUD e acompanhamento em React. O modo de plataformas permanece disponível.
-- Estados: `ready → travel → choose → collect → travel/finish → celebrate`. `choose` não expira. Pausa congela avanço e tweens. A coleta usa `WordProgress` e bloqueia novos toques antes de emitir eventos.
+- Estados: `ready → travel → choose → approach → collect → travel/finish → celebrate`. Uma alternativa incorreta segue `approach → retry → choose`. `choose` não expira. Pausa congela avanço e tweens. A coleta usa `WordProgress` na chegada; `approach` bloqueia entradas simultâneas antes de qualquer evento de coleta.
 - `Scale.RESIZE` adapta a pista ao contêiner; o modo de plataformas mantém `Scale.FIT`. Fontes são aguardadas antes de criar o canvas. React recebe mudanças de estado, sem atualizações por frame. Paisagem parada reutiliza a geometria desenhada. Movimento reduzido é respeitado.
 - Howler cuida dos efeitos. A narração desta experiência usa a API de voz do navegador, somente com voz `pt-BR`, priorizando serviço local. Essa adaptação sem nova dependência evita reutilizar os MP3 Flite de voz não validados. Não há gravação da criança; apenas textos fixos do jogo são enviados à API. Algumas vozes do navegador podem depender do serviço remoto do fornecedor.
 - A narração usa **nomes de letras**, não fonemas. Começa somente após interação, com pausa, mute e cancelamento. A disponibilidade depende do dispositivo ([getVoices](https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis/getVoices)). Ausência de voz mantém o jogo visual e desativa Ouvir. Conferir a pronúncia no aparelho real continua necessário.
 - O progresso mantém chave e formato do marco 6. Dicas são atribuídas à letra procurada. SAPO usa `forest-sapo`, preservando o histórico da palavra entre modalidades.
 - Verificação: `node tests/runner-invariants.cjs`, typecheck, lint e build existentes. Nenhuma dependência foi adicionada ou atualizada.
+
+### Teclado e touchscreen — 2026-09-07
+
+- `runner-move` recebe a direção lateral e `runner-advance` confirma o caminho. Toque em uma letra, teclado e gestos usam a mesma ação de avanço em `RunnerScene`.
+- Seta para cima/W avançam; esquerda/direita/A/D mudam o caminho. Espaço/Enter continuam como alternativas, preservando a ativação nativa de botões em foco. Setas funcionam após clicar na interface, sem capturar campos de texto ou diálogos e sem rolar a página durante a partida.
+- Toque nos cartões é avaliado no `pointerup`. O gesto guarda o identificador do dedo; deslizar não dispara coleta por acidente. Saída do canvas e pausa cancelam o gesto pendente.
+- A área sensível dos Containers compensa `displayOriginX/Y`, conforme o `InputManager` do Phaser 4. Os cartões ficam separados nas telas menores. Botões externos de direção/avanço têm pelo menos 52 × 58 px; botões de letra, 58 × 56 px.
+- `ResizeObserver` atualiza o ScaleManager quando o contêiner muda de tamanho, incluindo entrada na partida, rotação e reorganização dos controles. A altura usa `svh`; em telas horizontais baixas os controles ficam ao lado da pista.
+- `tests/runner-controls.cjs` exercita a cena real com substitutos apenas para renderização: setas após foco em botões, avanço até a letra, pausa, repetição, áreas de toque, tap/swipe, dois dedos, cancelamento e ciclo completo de SAPO. Não substitui a inspeção visual ou o teste em tablet físico.
