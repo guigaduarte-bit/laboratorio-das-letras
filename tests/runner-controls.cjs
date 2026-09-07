@@ -38,7 +38,8 @@ class Scene {
         this.events = new EventEmitter();
         this.tweens = { resumeAll() {}, pauseAll() {} };
         this.time = { now: 0 };
-        this.scale = { width: 1024, height: 490 };
+        this.scale = Object.assign(new EventEmitter(), { width: 1024, height: 490 });
+        this.cameras = { resize() {} };
     }
 }
 class Avatar {

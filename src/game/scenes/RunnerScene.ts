@@ -34,6 +34,8 @@ export class RunnerScene extends Scene
     {
         this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         this.world = new RunnerWorld(this);
+        this.scale.on('resize', this.resizeViewport);
+        this.resizeViewport();
         this.avatar = new PlayerAvatar(this, 0, 0);
         this.reset();
         EventBus.on('runner-start', this.startRun);
@@ -205,6 +207,13 @@ export class RunnerScene extends Scene
         if (this.pointerStart?.id === pointer.id) this.pointerStart = undefined;
     };
 
+    private readonly resizeViewport = (): void =>
+    {
+        // A câmera acompanha o canvas mesmo se o tamanho anterior veio do menu.
+        this.cameras.resize(this.scale.width, this.scale.height);
+        this.world.resize();
+    };
+
     update(_time: number, delta: number): void
     {
         if (!this.world) return;
@@ -311,6 +320,7 @@ export class RunnerScene extends Scene
 
     private cleanup(): void
     {
+        this.scale.off('resize', this.resizeViewport);
         EventBus.off('runner-start', this.startRun);
         EventBus.off('runner-state-request', this.publish);
         EventBus.off('runner-choose', this.choose);

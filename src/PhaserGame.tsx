@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import StartGame from './game/main';
+import { syncRunnerViewport } from './game/systems/syncRunnerViewport';
 
 type PhaserGameProps = {
     word: string;
@@ -20,7 +21,9 @@ export function PhaserGame({ word, mode = 'explore' }: PhaserGameProps)
                 const container = document.getElementById('game-container');
                 if (mode === 'runner' && container && typeof ResizeObserver !== 'undefined')
                 {
-                    resizeObserver = new ResizeObserver(() => game.current?.scale.refresh());
+                    resizeObserver = new ResizeObserver(() => {
+                        if (game.current) syncRunnerViewport(game.current.scale);
+                    });
                     resizeObserver.observe(container);
                 }
             }

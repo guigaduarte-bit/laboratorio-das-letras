@@ -133,3 +133,12 @@
 - A área sensível dos Containers compensa `displayOriginX/Y`, conforme o `InputManager` do Phaser 4. Os cartões ficam separados nas telas menores. Botões externos de direção/avanço têm pelo menos 52 × 58 px; botões de letra, 58 × 56 px.
 - `ResizeObserver` atualiza o ScaleManager quando o contêiner muda de tamanho, incluindo entrada na partida, rotação e reorganização dos controles. A altura usa `svh`; em telas horizontais baixas os controles ficam ao lado da pista.
 - `tests/runner-controls.cjs` exercita a cena real com substitutos apenas para renderização: setas após foco em botões, avanço até a letra, pausa, repetição, áreas de toque, tap/swipe, dois dedos, cancelamento e ciclo completo de SAPO. Não substitui a inspeção visual ou o teste em tablet físico.
+
+### Correção do recorte no desktop — 2026-09-07
+
+- O print de validação revelou letras cortadas e o explorador abaixo da área visível. O teste com o `ScaleManager` real reproduziu a falha: após a moldura encolher de 570 para 354 px, `refresh()` usava o tamanho antigo para desenhar e atualizava o cache de medidas somente ao final; a verificação periódica já não detectava a diferença.
+- `syncRunnerViewport` chama `getParentBounds()` antes de `refresh()` e preserva as dimensões anteriores no evento de redimensionamento. Ignora o período anterior à criação do canvas e medidas transitoriamente zeradas.
+- O contêiner do canvas ocupa a moldura com `position: absolute; inset: 0`, sem depender das dimensões intrínsecas do canvas. O Phaser continua responsável pelo tamanho do próprio canvas.
+- A câmera da corrida acompanha explicitamente os eventos de redimensionamento; não depende de ainda ter as dimensões do menu.
+- No desktop com altura disponível, os controles ficam em uma linha, liberando 76 px de altura para a pista. A disposição de toque em telas menores é preservada.
+- `node tests/runner-viewport.cjs` reproduz a versão defeituosa e verifica a correção com o gerenciador de escala real do Phaser 4, incluindo as dimensões aproximadas do print, mudança de tamanho, retorno ao menu e rotação de tablet. O teste não renderiza pixels e não substitui a conferência no navegador.

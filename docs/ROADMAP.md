@@ -328,3 +328,15 @@ Status: **implementada e validada automaticamente; preparada para atualizar o pr
 - [x] Layout adaptado à orientação e à altura da tela; canvas acompanha mudanças do contêiner.
 - [x] Build estático, tipos, lint, invariantes e testes de controles concluídos com sucesso.
 - [ ] Partida conferida no tablet físico e no navegador com acesso ao preview.
+
+## Correção do recorte no computador — 2026-09-07
+
+Status: **causa reproduzida e corrigida; build e testes aprovados para preview**.
+
+- [x] Falha de sincronização reproduzida no ScaleManager real: moldura menor com canvas mantendo a altura do menu.
+- [x] Medidas do contêiner relidas antes de atualizar canvas, câmera e coordenadas de toque.
+- [x] Contêiner independente do tamanho intrínseco do canvas.
+- [x] Controles em uma linha no desktop para aumentar a altura do cenário.
+- [x] Teste de regressão confirma as dimensões após início, redimensionamento, retorno ao menu e rotação.
+- [x] Build, tipos, lint e testes de jogabilidade executados após a correção.
+- [ ] Enquadramento conferido pelo usuário no novo preview.
