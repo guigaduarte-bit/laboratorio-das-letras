@@ -110,3 +110,11 @@ A Web Speech API foi retirada da nova corrida nesta iteração. As fontes de áu
 | eventemitter3 5.0.4 | Primus, MIT, licença em `node_modules/eventemitter3/LICENSE` | Barramento independente de renderizador |
 
 Não foram usados modelos, texturas ou personagens do jogo de referência. Áudios permanecem como na iteração anterior.
+
+## Habitats e cumprimentos — 2026-09-08
+
+| Elemento | Origem | Uso |
+| --- | --- | --- |
+| Mata Atlântica, Pantanal, Cerrado e Amazônia | Geometria original do projeto em `BiomeWorld3D.ts`; sem mídia externa | Cenário da respectiva palavra |
+| Aceno do explorador e respostas dos animais | Animação original dos rigs em `Explorer3D.ts` e `Animals3D.ts` | Encontro ao completar a palavra |
+| Associação de habitats | Referências públicas listadas em `BIOMAS_EXPEDICAO.md`, sem copiar conteúdo ou incorporar arquivos | Direção visual dos cenários |

@@ -25,6 +25,7 @@ const { RunnerController, RUNNER_TIMINGS: times } = load('src/game/systems/Runne
     ...bus,
     '../content/levels': content,
     '../content/runner': load('src/game/content/runner.ts'),
+    '../content/runnerPace': load('src/game/content/runnerPace.ts'),
     './WordProgress': load('src/game/systems/WordProgress.ts', bus)
 });
 const collections = [], starts = [], completions = [], celebrations = [], mismatches = [], hints = [];
@@ -41,9 +42,12 @@ EventBus.on('celebration-ready', (event) => celebrations.push(event));
 EventBus.on('letter-mismatch', (event) => mismatches.push(event));
 EventBus.on('runner-hint-used', (event) => hints.push(event));
 const controller = new RunnerController();
+let animatedMs = 0;
 function tick(ms) {
     while (ms > 0) {
         const dt = Math.min(ms, 50);
+        const { paused, phase } = controller.snapshot;
+        if (!paused && ['travel', 'approach', 'retry', 'collect', 'finish'].includes(phase)) animatedMs += dt;
         controller.update(dt);
         ms -= dt;
     }
@@ -156,6 +160,7 @@ for (const level of content.schoolLevels) {
     const initialCompletions = completions.length;
     const initialCelebrations = celebrations.length;
     EventBus.emit('runner-start', level.id);
+    const animatedStart = animatedMs;
     assert.equal(starts.at(-1).word, level.word);
     assert.equal(starts.at(-1).levelId, level.id);
     assert.equal(starts.at(-1).display.split(' ').length, level.word.length);
@@ -188,6 +193,11 @@ for (const level of content.schoolLevels) {
     tick(times.finish);
     assert.ok(controller.frame.distance > finishDistance);
     assert.equal(controller.snapshot.phase, 'celebrate');
+    const previousDuration = level.word.length * (2400 + 700 + 1000) + 2800;
+    assert.equal(animatedMs - animatedStart, level.word.length * 3050 + 2200,
+        'The observed journey uses the faster pace through arrival and celebration');
+    assert.ok(animatedMs - animatedStart < previousDuration * 0.8,
+        'A full word has at least 20% less animation waiting than the previous 3D journey');
     assert.equal(celebrations.length, initialCelebrations + 1);
     assert.equal(celebrations.at(-1).levelId, level.id);
     tick(10000);

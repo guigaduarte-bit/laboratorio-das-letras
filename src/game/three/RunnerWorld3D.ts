@@ -1,17 +1,19 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { getSchoolLevel } from '../content/levels';
+import { getBiomeForLevel } from '../content/biomes';
+import { RUNNER_SPEED } from '../content/runnerPace';
 import { lanePosition } from '../content/runner';
 import { RUNNER_TIMINGS, type RunnerFrame } from '../systems/RunnerController';
 import { Explorer3D } from './Explorer3D';
 import { createAnimal3D, animateAnimal3D } from './Animals3D';
 import { configureRunnerCamera } from './RunnerCamera3D';
+import { BiomeWorld3D } from './BiomeWorld3D';
+import { dampFacing, facingPartner, sampleAnimalEncounter } from './AnimalEncounter3D';
 
-const C = { sky: 0xc7e0d4, grass: 0xa0ba82, moss: 0x355f4b, sage: 0x7eaa83, sand: 0xe8dcc7, ochre: 0xe3bd57, clay: 0xc66b48, water: 0x79b7ac, ink: 0x26383a };
+const C = { sky: 0xc7e0d4, moss: 0x355f4b, sand: 0xe8dcc7, ochre: 0xe3bd57, clay: 0xc66b48, water: 0x79b7ac };
 const ease = (x: number) => { const t = THREE.MathUtils.clamp(x, 0, 1); return t * t * (3 - 2 * t); };
 type Gate = { root: THREE.Group; body: THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>; face: THREE.Mesh; halo: THREE.Mesh; index: number };
-type LoopInstance = { x: number; y: number; z: number; baseZ: number };
-type LoopBatch = { mesh: THREE.InstancedMesh; instances: LoopInstance[] };
 
 /** A small, original toy forest: all silhouettes, rings, scenery and rewards are real meshes. */
 export class RunnerWorld3D {
@@ -20,13 +22,13 @@ export class RunnerWorld3D {
     private readonly scene = new THREE.Scene();
     private readonly camera = new THREE.PerspectiveCamera(48, 1, 0.1, 150);
     private readonly explorer = new Explorer3D();
-    private readonly scenery = new THREE.Group();
+    private biomeWorld?: BiomeWorld3D;
+    private biomeId = '';
+    private readonly sunlight = new THREE.DirectionalLight(0xffecc7, 3.3);
+    private readonly ambient = new THREE.HemisphereLight(0xfff4d9, 0x718c69, 2.7);
     private readonly laboratory = new THREE.Group();
     private readonly animals = new Map<string, THREE.Group>();
     private readonly gates: Gate[] = [];
-    private readonly foliage: THREE.Object3D[] = [];
-    private readonly clouds: THREE.Object3D[] = [];
-    private readonly loopBatches: LoopBatch[] = [];
     private readonly textures = new Map<string, THREE.CanvasTexture>();
     private readonly materials = new Map<number, THREE.MeshStandardMaterial>();
     private readonly geometry = new Map<string, THREE.BufferGeometry>();
@@ -40,7 +42,6 @@ export class RunnerWorld3D {
     private readonly targetColor = new THREE.Color();
     private time = 0;
     private distance = 0;
-    private loopDistance = -1;
     private velocity = 0;
     private previousLane = 0;
     private lastLevel = '';
@@ -48,50 +49,51 @@ export class RunnerWorld3D {
     private choiceKey = '';
     private lastFrame: RunnerFrame | null = null;
     private width = 1000;
+    private sidePanel = true;
     private disposed = false;
 
     constructor(container: HTMLElement) {
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
         this.canvas = this.renderer.domElement;
         try {
-        this.canvas.setAttribute('aria-hidden', 'true');
-        this.canvas.style.touchAction = 'none';
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.22;
-        this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFShadowMap;
-        this.scene.background = new THREE.Color(C.sky);
-        this.scene.fog = new THREE.Fog(C.sky, 30, 90);
-        this.scene.add(new THREE.HemisphereLight(0xfff4d9, 0x718c69, 2.7));
-        const sun = new THREE.DirectionalLight(0xffecc7, 3.3);
-        sun.position.set(-12, 23, 9);
-        sun.castShadow = true;
-        sun.shadow.mapSize.set(1024, 1024);
-        Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 20, bottom: -20, near: 1, far: 65 });
-        sun.shadow.normalBias = 0.035;
-        sun.shadow.bias = -0.0002;
-        sun.target.position.set(0, 0, -5);
-        this.scene.add(sun, sun.target, this.scenery, this.laboratory, this.explorer.root);
-        this.buildForest();
-        this.buildLaboratory();
-        this.buildGates();
-        for (const kind of ['sapo', 'onca', 'tucano', 'macaco']) {
-            const animal = createAnimal3D(kind);
-            animal.visible = false;
-            this.animals.set(kind, animal);
-            this.scene.add(animal);
-        }
-        this.dust = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.07, 0), this.material(C.ochre), 30);
-        this.dust.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        this.dust.frustumCulled = false;
-        this.fireflies = new THREE.InstancedMesh(new THREE.SphereGeometry(0.045, 6, 4), new THREE.MeshBasicMaterial({ color: 0xffe99d }), 22);
-        this.fireflies.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        this.fireflies.frustumCulled = false;
-        this.scene.add(this.dust, this.fireflies);
-        container.appendChild(this.canvas);
-        this.resize(container.clientWidth, container.clientHeight);
+            this.canvas.setAttribute('aria-hidden', 'true');
+            this.canvas.style.touchAction = 'none';
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+            this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+            this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            this.renderer.toneMappingExposure = 1.22;
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFShadowMap;
+            this.scene.background = new THREE.Color(C.sky);
+            this.scene.fog = new THREE.Fog(C.sky, 30, 90);
+            this.scene.add(this.ambient);
+            const sun = this.sunlight;
+            sun.position.set(-12, 23, 9);
+            sun.castShadow = true;
+            sun.shadow.mapSize.set(1024, 1024);
+            Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 20, bottom: -20, near: 1, far: 65 });
+            sun.shadow.normalBias = 0.035;
+            sun.shadow.bias = -0.0002;
+            sun.target.position.set(0, 0, -5);
+            this.scene.add(sun, sun.target, this.laboratory, this.explorer.root);
+            this.setBiome('forest-sapo');
+            this.buildLaboratory();
+            this.buildGates();
+            for (const kind of ['sapo', 'onca', 'tucano', 'macaco']) {
+                const animal = createAnimal3D(kind);
+                animal.visible = false;
+                this.animals.set(kind, animal);
+                this.scene.add(animal);
+            }
+            this.dust = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.07, 0), this.material(C.ochre), 30);
+            this.dust.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            this.dust.frustumCulled = false;
+            this.fireflies = new THREE.InstancedMesh(new THREE.SphereGeometry(0.045, 6, 4), new THREE.MeshBasicMaterial({ color: 0xffe99d }), 22);
+            this.fireflies.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            this.fireflies.frustumCulled = false;
+            this.scene.add(this.dust, this.fireflies);
+            container.appendChild(this.canvas);
+            this.resize(container.clientWidth, container.clientHeight);
         } catch (error) {
             this.dispose();
             throw error;
@@ -118,116 +120,18 @@ export class RunnerWorld3D {
         return mesh;
     }
 
-    private loopBatch(name: string, geometry: THREE.BufferGeometry, color: number, instances: LoopInstance[]): void {
-        const mesh = new THREE.InstancedMesh(geometry, this.material(color), instances.length);
-        mesh.name = name;
-        mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        // The batch spans the whole trail; its individual instances are clipped by the GPU.
-        mesh.frustumCulled = false;
-        mesh.receiveShadow = true;
-        mesh.castShadow = false;
-        this.scene.add(mesh);
-        this.loopBatches.push({ mesh, instances });
-    }
-
-    private updateLoopBatches(): void {
-        if (this.loopDistance === this.distance) return;
-        this.loopDistance = this.distance;
-        // This transform is also reused by particles, so clear their rotation and scale first.
-        this.dummy.rotation.set(0, 0, 0);
-        this.dummy.scale.set(1, 1, 1);
-        for (const { mesh, instances } of this.loopBatches) {
-            instances.forEach((instance, index) => {
-                const parentZ = 14 - ((14 - instance.baseZ - this.distance) % 94 + 94) % 94;
-                this.dummy.position.set(instance.x, instance.y, parentZ + instance.z);
-                this.dummy.updateMatrix();
-                mesh.setMatrixAt(index, this.dummy.matrix);
-            });
-            mesh.instanceMatrix.needsUpdate = true;
-        }
-    }
-
-    private buildForest(): void {
-        const sphere = new THREE.SphereGeometry(1, 12, 9);
-        const ground = this.mesh(this.scene, this.box(110, 1, 150, 0.25), C.grass, 0, -0.7, -40);
-        ground.castShadow = false;
-        this.mesh(this.scene, this.box(11.8, 0.28, 150, 0.1), C.sand, 0, -0.12, -40).castShadow = false;
-        const water = this.mesh(this.scene, this.box(8, 0.08, 145, 0.03), C.water, -12.5, -0.13, -40);
-        water.castShadow = false;
-        // Broad, soft hills form the horizon without flat scenic billboards.
-        for (let i = 0; i < 9; i++) {
-            const hill = this.mesh(this.scene, sphere, i % 2 ? 0x91b28d : 0xa3bf99, (i - 4) * 16, -1.2, -66 - (i % 3) * 7);
-            hill.scale.set(16, 7 + i % 3 * 2, 12);
-            hill.castShadow = false;
-        }
-        const trunkGeometry = new THREE.CylinderGeometry(0.16, 0.23, 1.8, 7);
-        const pebbleGeometry = new THREE.DodecahedronGeometry(0.4, 0);
-        const stemGeometry = new THREE.CylinderGeometry(0.025, 0.035, 0.45, 5);
-        const petalGeometry = new THREE.SphereGeometry(0.12, 6, 4);
-        const stems: LoopInstance[] = [];
-        const creamFlowers: LoopInstance[] = [];
-        const amberFlowers: LoopInstance[] = [];
-        // Each roadside island loops only behind the camera; foreground parallax comes from depth.
-        for (let i = 0; i < 18; i++) {
-            const island = new THREE.Group();
-            island.position.set((i % 2 ? 1 : -1) * (7.9 + (i % 3) * 1.4), 0, 10 - i * 4.8);
-            island.userData.baseZ = island.position.z;
-            this.scenery.add(island);
-            const size = 0.85 + (i % 4) * 0.16;
-            const mound = this.mesh(island, sphere, i % 2 ? 0x90ad78 : 0xabc18b, 0, -0.05, 0);
-            mound.scale.set(2 * size, 0.23, 1.8 * size);
-            this.mesh(island, trunkGeometry, 0xb49b73, 0, 0.85, 0);
-            const crown = new THREE.Group();
-            crown.position.y = 2.2;
-            crown.userData.seed = i;
-            island.add(crown);
-            this.foliage.push(crown);
-            for (let leaf = 0; leaf < 3; leaf++) {
-                const shape = this.mesh(crown, sphere, [C.moss, C.sage, 0x789e62][(leaf + i) % 3], (leaf - 1) * 0.48, leaf === 1 ? 0.65 : 0.15, leaf % 2 * 0.16);
-                shape.scale.set(size * 0.88, size * 1.13, size * 0.85);
-            }
-            if (i % 3 === 0) {
-                for (let j = 0; j < 3; j++) this.mesh(crown, petalGeometry, C.ochre, (j - 1) * 0.48, 0.25 + j % 2 * 0.5, size * 0.9);
-            }
-            const pebble = this.mesh(island, pebbleGeometry, 0xb3b496, 1.35, 0.16, 0.6);
-            pebble.scale.set(1, 0.6, 0.9);
-            pebble.castShadow = false;
-            for (let j = 0; j < 3; j++) {
-                const x = island.position.x - 1.5 + j * 0.28, z = 0.55 + j % 2 * 0.3;
-                const baseZ = island.userData.baseZ as number;
-                stems.push({ x, y: 0.22, z, baseZ });
-                (j % 2 ? creamFlowers : amberFlowers).push({ x, y: 0.48, z, baseZ });
-            }
-        }
-        this.loopBatch('Flores • hastes', stemGeometry, C.moss, stems);
-        this.loopBatch('Flores • creme', petalGeometry, C.sand, creamFlowers);
-        this.loopBatch('Flores • âmbar', petalGeometry, C.ochre, amberFlowers);
-        // Repeating paving stones and borders keep speed visible even in a narrow viewport.
-        const borders: LoopInstance[] = [];
-        const laneMarks: LoopInstance[] = [];
-        const crossMarks: LoopInstance[] = [];
-        for (let i = 0; i < 23; i++) {
-            const baseZ = 11 - i * 4;
-            for (const x of [-5.7, 5.7]) borders.push({ x, y: 0.035, z: 0, baseZ });
-            for (const x of [-3.4, 0, 3.4]) laneMarks.push({ x, y: 0.029, z: 0, baseZ });
-            crossMarks.push({ x: 0, y: 0.026, z: -1.98, baseZ });
-        }
-        this.loopBatch('Pista • bordas', this.box(0.26, 0.18, 3.65, 0.06), 0xd1bf98, borders);
-        this.loopBatch('Pista • marcas longitudinais', this.box(0.055, 0.012, 1.4, 0.005), 0xd4c6a8, laneMarks);
-        this.loopBatch('Pista • travessas', this.box(10.8, 0.008, 0.025, 0.001), 0xd5c7aa, crossMarks);
-        this.updateLoopBatches();
-        for (let i = 0; i < 5; i++) {
-            const cloud = new THREE.Group();
-            cloud.position.set((i - 2) * 14, 12 + i % 2 * 3, -38 - i % 3 * 8);
-            cloud.userData.baseX = cloud.position.x;
-            this.scene.add(cloud);
-            this.clouds.push(cloud);
-            for (let j = 0; j < 3; j++) {
-                const puff = this.mesh(cloud, sphere, 0xe8eee0, (j - 1) * 1.7, j % 2 * 0.6, 0);
-                puff.scale.set(2.1, 0.8 + j % 2 * 0.4, 1.1);
-                puff.castShadow = false;
-            }
-        }
+    private setBiome(levelId: string): void {
+        const biome = getBiomeForLevel(levelId);
+        if (this.biomeId === biome.id) return;
+        const next = new BiomeWorld3D(biome);
+        this.biomeWorld?.dispose();
+        this.biomeWorld = next;
+        this.biomeId = biome.id;
+        this.scene.add(next.root);
+        (this.scene.background as THREE.Color).setHex(biome.sky);
+        this.scene.fog = new THREE.Fog(biome.sky, biome.fogNear, biome.fogFar);
+        this.sunlight.color.setHex(biome.sunlight);
+        this.ambient.groundColor.setHex(biome.ground);
     }
 
     private buildLaboratory(): void {
@@ -292,6 +196,7 @@ export class RunnerWorld3D {
     resize(width: number, height: number): void {
         if (this.disposed) return;
         this.width = Math.max(1, width);
+        this.sidePanel = typeof window.matchMedia === 'function' ? window.matchMedia('(min-width: 900px)').matches : this.width >= 900;
         configureRunnerCamera(this.camera, this.width, Math.max(1, height));
         this.cameraHome.copy(this.camera.position);
         this.camera.getWorldDirection(this.cameraBack).negate();
@@ -312,38 +217,37 @@ export class RunnerWorld3D {
             this.distance = 0; this.velocity = 0;
             this.explorer.root.position.set(0, 0.03, 4.5);
         }
+        this.setBiome(frame.levelId);
         this.lastLevel = frame.levelId;
         this.lastPhase = phase;
         this.lastFrame = frame;
         const moving = phase === 'travel' || phase === 'finish';
-        let speed = moving ? 5.8 : 0;
-        if (phase === 'travel') speed *= 1 - ease((frame.elapsed - 1500) / 900);
-        if (phase === 'finish') speed *= 1 - ease((frame.elapsed - 2000) / 800);
+        let speed = moving ? RUNNER_SPEED : 0;
+        if (phase === 'travel') speed *= 1 - ease((frame.elapsed / RUNNER_TIMINGS.travel - 0.64) / 0.36);
+        if (phase === 'finish') speed *= 1 - ease((frame.elapsed / RUNNER_TIMINGS.finish - 0.55) / 0.35);
         this.velocity = THREE.MathUtils.damp(this.velocity, speed, 7, dt);
         this.camera.position.copy(this.cameraHome).addScaledVector(this.cameraBack, reducedMotion ? 0 : this.velocity * 0.075);
         this.camera.updateMatrixWorld();
         this.distance += this.velocity * dt;
-        for (const object of this.scenery.children) object.position.z = 14 - ((14 - object.userData.baseZ - this.distance) % 94 + 94) % 94;
-        this.updateLoopBatches();
-        this.foliage.forEach((tree, i) => { tree.rotation.z = reducedMotion ? 0 : Math.sin(this.time * 0.9 + i * 1.7) * 0.025; });
-        this.clouds.forEach((cloud, i) => { cloud.position.x = cloud.userData.baseX + (reducedMotion ? 0 : Math.sin(this.time * 0.06 + i) * 1.8); });
+        this.biomeWorld?.update(this.time, this.distance, reducedMotion);
 
         const approach = phase === 'approach' ? ease(frame.elapsed / RUNNER_TIMINGS.approach)
             : phase === 'retry' ? 1 - ease(frame.elapsed / RUNNER_TIMINGS.retry)
             : phase === 'collect' ? 1 : (phase === 'travel' && frame.count > 0) || phase === 'finish' ? 1 - ease(frame.elapsed / 750) : 0;
-        const completing = phase === 'finish' ? ease(frame.elapsed / RUNNER_TIMINGS.finish) : phase === 'celebrate' ? 1 : 0;
-        const endX = this.width >= 900 ? -4.0 : -1.35;
-        const x = THREE.MathUtils.lerp(frame.lane * 3.4, endX, completing);
-        const targetZ = 4.5 - approach * 6.1;
+        const encounter = sampleAnimalEncounter(phase, frame.elapsed, this.sidePanel);
+        const completing = encounter.progress;
+        const x = THREE.MathUtils.lerp(frame.lane * 3.4, encounter.explorerX, completing);
+        const targetZ = THREE.MathUtils.lerp(4.5 - approach * 6.1, encounter.explorerZ, completing);
         this.explorer.root.position.x = THREE.MathUtils.damp(this.explorer.root.position.x, x, 12, dt);
         this.explorer.root.position.z = THREE.MathUtils.damp(this.explorer.root.position.z, targetZ, 16, dt);
-        const yaw = phase === 'ready' ? -0.25 : phase === 'celebrate' || phase === 'finish' ? -0.15 : Math.PI;
-        this.explorer.root.rotation.y = THREE.MathUtils.damp(this.explorer.root.rotation.y, yaw, reducedMotion ? 20 : 5, dt);
+        const towardAnimal = facingPartner(this.explorer.root.position.x, this.explorer.root.position.z, encounter.animalX, encounter.animalZ);
+        const yaw = phase === 'ready' ? -0.25 : completing > 0.34 ? towardAnimal : Math.PI;
+        this.explorer.root.rotation.y = dampFacing(this.explorer.root.rotation.y, yaw, dt);
         const laneLean = dt > 0 ? THREE.MathUtils.clamp((frame.lane - this.previousLane) / dt * -0.09, -0.2, 0.2) : 0;
         this.previousLane = frame.lane;
-        this.explorer.update({ time: this.time, delta: dt, moving: Math.max(this.velocity / 5.8, phase === 'approach' || phase === 'retry' ? 0.75 : 0), laneLean,
+        this.explorer.update({ time: this.time, delta: dt, moving: Math.max(this.velocity / RUNNER_SPEED, phase === 'approach' || phase === 'retry' ? 0.85 : 0), pace: RUNNER_SPEED / 5.8, laneLean,
             ringCount: frame.count * 3, collect: phase === 'collect' ? frame.elapsed / RUNNER_TIMINGS.collect : 0,
-            celebrate: completing, reducedMotion });
+            celebrate: completing * (1 - encounter.greeting * 0.65), greeting: encounter.greeting, greetingTime: encounter.time, reducedMotion });
 
         const key = `${frame.levelId}:${frame.choices.join('')}`;
         if (key !== this.choiceKey) {
@@ -378,12 +282,14 @@ export class RunnerWorld3D {
         this.laboratory.position.z = -40 + completing * 28;
         const kind = getSchoolLevel(frame.levelId).imageKey;
         this.animals.forEach((animal, keyName) => {
-            animal.visible = keyName === kind && completing > 0.48;
+            const wasVisible = animal.visible;
+            animal.visible = keyName === kind && encounter.reveal > 0;
             if (!animal.visible) return;
-            animal.position.set(this.width >= 900 ? -1.8 : 1.25, 0.05, 1.3);
-            animal.scale.setScalar(ease((completing - 0.48) / 0.38) * 1.15);
-            animal.rotation.y = -0.15;
-            animateAnimal3D(animal, this.time, reducedMotion);
+            animal.position.set(encounter.animalX, 0.05, encounter.animalZ);
+            animal.scale.setScalar(encounter.reveal * 1.15);
+            const animalYaw = facingPartner(animal.position.x, animal.position.z, this.explorer.root.position.x, this.explorer.root.position.z);
+            animal.rotation.y = wasVisible ? dampFacing(animal.rotation.y, animalYaw, dt) : animalYaw;
+            animateAnimal3D(animal, this.time, reducedMotion, { strength: encounter.greeting, time: encounter.time });
         });
         this.updateParticles(frame, reducedMotion);
     }
@@ -426,6 +332,8 @@ export class RunnerWorld3D {
     dispose(): void {
         if (this.disposed) return;
         this.disposed = true;
+        this.biomeWorld?.dispose();
+        this.biomeWorld = undefined;
         this.scene.remove(this.explorer.root);
         this.explorer.dispose();
         const geometries = new Set<THREE.BufferGeometry>();

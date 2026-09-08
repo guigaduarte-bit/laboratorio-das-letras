@@ -6,11 +6,17 @@ export type ExplorerFrame = {
     time: number;
     delta: number;
     moving: number;
+    /** Relative walking cadence; keeps the steps in sync with faster ground travel. */
+    pace?: number;
     laneLean: number;
     ringCount: number;
     /** Progress of the current collection, from 0 to 1; 0 when inactive. */
     collect: number;
     celebrate: number;
+    /** Blend of the animal greeting; the world's placement continues to own the facing direction. */
+    greeting?: number;
+    /** Seconds since this encounter began, shared with the responding animal and frozen on pause. */
+    greetingTime?: number;
     reducedMotion: boolean;
 };
 
@@ -28,6 +34,7 @@ export class Explorer3D {
     private readonly antenna = new THREE.Group();
     private readonly eyes: THREE.Group[] = [];
     private readonly arms: THREE.Group[] = [];
+    private readonly hands: THREE.Group[] = [];
     private readonly legs: THREE.Group[] = [];
     private readonly rings: THREE.Mesh[] = [];
     private readonly ringAge = Array<number>(MAX_RINGS).fill(-1);
@@ -47,6 +54,8 @@ export class Explorer3D {
 
     constructor() {
         this.root.name = 'Lumi • explorador do bosque';
+        this.rig.name = 'explorer-body';
+        this.head.name = 'explorer-head';
         this.root.add(this.rig);
         this.sphere = this.track(new THREE.SphereGeometry(1, 20, 14));
 
@@ -92,6 +101,7 @@ export class Explorer3D {
         this.rig.add(this.shoulders);
         [-1, 1].forEach((side) => {
             const arm = new THREE.Group();
+            arm.name = side < 0 ? 'explorer-arm-left' : 'explorer-arm-right';
             arm.position.set(side * 0.445, 0, 0);
             this.shoulders.add(arm);
             this.arms.push(arm);
@@ -99,8 +109,13 @@ export class Explorer3D {
             this.box(arm, cream, 0.235, 0.28, 0.27, 0.09, side * 0.016, -0.11, 0);
             this.ball(arm, deepSage, 0.09, 0.09, 0.09, 0, -0.29, 0);
             this.box(arm, sage, 0.18, 0.19, 0.20, 0.07, 0, -0.35, 0.012);
-            this.ball(arm, dark, 0.11, 0.12, 0.12, 0, -0.465, 0.025);
-            this.ball(arm, dark, 0.048, 0.064, 0.062, -side * 0.082, -0.436, 0.088);
+            const hand = new THREE.Group();
+            hand.name = side < 0 ? 'explorer-hand-left' : 'explorer-hand-right';
+            hand.position.set(0, -0.42, 0.025);
+            arm.add(hand);
+            this.hands.push(hand);
+            this.ball(hand, dark, 0.11, 0.12, 0.12, 0, -0.045, 0);
+            this.ball(hand, dark, 0.048, 0.064, 0.062, -side * 0.082, -0.016, 0.063);
 
             const leg = new THREE.Group();
             leg.position.set(side * 0.225, 0.58, 0);
@@ -171,13 +186,23 @@ export class Explorer3D {
         const delta = clamp(Number.isFinite(frame.delta) ? frame.delta : 0, 0, 0.05);
         const ringCount = clamp(Math.floor(frame.ringCount || 0), 0, MAX_RINGS);
         const reduced = frame.reducedMotion;
-        const celebration = clamp(frame.celebrate || 0, 0, 1);
+        const greeting = clamp(Number.isFinite(frame.greeting) ? frame.greeting! : 0, 0, 1);
+        // A short call followed by the animal's reply, then a quiet pause. The encounter
+        // clock starts at zero rather than joining an arbitrary global animation phase.
+        const encounterTime = Math.max(0, Number.isFinite(frame.greetingTime) ? frame.greetingTime! : 0);
+        const greetingPhase = encounterTime % 6.4;
+        const waveEnvelope = THREE.MathUtils.smoothstep(greetingPhase, 0.15, 0.55)
+            * (1 - THREE.MathUtils.smoothstep(greetingPhase, 1.9, 2.3));
+        const greetingPose = greeting * (reduced ? 0.65 : waveEnvelope);
+        const wave = reduced ? 0 : Math.sin(Math.max(0, greetingPhase - 0.55) * Math.PI * 4) * greetingPose;
+        const celebration = clamp(frame.celebrate || 0, 0, 1) * (1 - greeting);
         const collection = clamp(frame.collect || 0, 0, 1);
         const moving = clamp(frame.moving || 0, 0, 1);
         const lean = clamp(frame.laneLean || 0, -1, 1);
         this.clock += delta;
         this.movement = reduced ? moving : THREE.MathUtils.damp(this.movement, moving, 12, delta);
-        this.stride += delta * (7 + this.movement * 4) * this.movement;
+        const pace = clamp(Number.isFinite(frame.pace) ? frame.pace! : 1, 0.7, 1.6);
+        this.stride += delta * (7 + this.movement * 4) * this.movement * pace;
 
         if (ringCount < this.previousRingCount) {
             // A new mission resets immediately; rings from the previous animal never linger.
@@ -197,7 +222,7 @@ export class Explorer3D {
         const celebrateHop = reduced ? 0 : Math.max(0, Math.sin(this.clock * 5)) * celebration * 0.085;
         this.rig.position.y = strideBob + collectHop + celebrateHop;
         this.rig.rotation.z = reduced ? 0 : -lean * 0.105 - Math.sin(this.stride) * this.movement * 0.025;
-        this.rig.rotation.x = reduced ? 0 : this.movement * 0.07;
+        this.rig.rotation.x = (reduced ? 0 : this.movement * 0.07) + greetingPose * 0.035;
 
         this.torso.position.y = 0.91 + (this.growth + breath) / 2;
         this.torso.scale.y = 1 + (this.growth + breath) / 0.58;
@@ -207,6 +232,8 @@ export class Explorer3D {
         this.head.rotation.z = reduced ? 0 : lean * 0.045 + Math.sin(this.clock * 1.7) * 0.022 * (1 - this.movement);
         this.head.rotation.x = reduced ? 0 : -this.movement * 0.055 - Math.sin(collection * Math.PI) * 0.06;
         this.head.rotation.y = reduced ? 0 : Math.sin(this.clock * 0.87) * 0.025 * (1 - this.movement);
+        this.head.rotation.x += greeting * 0.065 + greetingPose * 0.085;
+        this.head.rotation.z += greetingPose * -0.06;
         this.antenna.rotation.z = -0.18 + (reduced ? 0 : Math.sin(this.stride + 0.8) * this.movement * 0.06);
         this.beacon.emissiveIntensity = 0.70 + Math.sin(collection * Math.PI) * 0.7 + celebration * 0.2;
 
@@ -220,6 +247,14 @@ export class Explorer3D {
             arm.rotation.x = swing * (1 - celebration) - celebration * 0.35;
             arm.rotation.z = side * (0.09 + celebration * 2.25 + (reduced ? 0 : Math.sin(collection * Math.PI) * 0.33));
             if (!reduced) arm.rotation.z += side * celebration * Math.sin(this.clock * 6) * 0.075;
+            // Only the right arm reaches toward +Z. The free arm stays relaxed so the
+            // greeting reads as a directed exchange rather than another victory pose.
+            if (index === 1) {
+                arm.rotation.x = THREE.MathUtils.lerp(arm.rotation.x, -1.30, greetingPose);
+                arm.rotation.z = THREE.MathUtils.lerp(arm.rotation.z, 0.72, greetingPose);
+            }
+            this.hands[index].rotation.z = index === 1 ? wave * 0.34 : 0;
+            this.hands[index].rotation.y = index === 1 ? wave * 0.16 : 0;
         });
         this.legs.forEach((leg, index) => {
             const phase = this.stride + index * Math.PI;

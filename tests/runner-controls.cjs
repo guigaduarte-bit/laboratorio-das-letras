@@ -60,10 +60,13 @@ const EventBus = new EventEmitter();
 const busImport = { '../EventBus': { EventBus } };
 const { WordProgress } = load('src/game/systems/WordProgress.ts', busImport);
 const content = load('src/game/content/runner.ts', {});
+const pace = load('src/game/content/runnerPace.ts', {});
+const { RUNNER_TIMINGS: times } = pace;
 const { RunnerScene } = load('src/game/scenes/RunnerScene.ts', {
     ...busImport, phaser: { Scene, Geom: { Rectangle } },
     '../content/levels': load('src/game/content/levels.ts', {}),
     '../content/runner': content, '../systems/WordProgress': { WordProgress },
+    '../content/runnerPace': pace,
     '../visuals/PlayerAvatar': { PlayerAvatar: Avatar },
     '../visuals/RunnerWorld': { RunnerWorld: World },
     '../visuals/palette': { ART_COLORS: {}, PHASER_FONT: 'Lexend' }
@@ -95,10 +98,14 @@ function select(index, method = 'keyboard') {
 scene.create();
 EventBus.emit('runner-start');
 assert.equal(key('ArrowUp').prevented, true, 'An early arrow must not scroll the page');
-tick(2700);
+tick(times.travel - 1);
+assert.equal(state.phase, 'travel', 'Travel lasts until arrival, even at the faster pace');
+tick(1);
 assert.equal(state.phase, 'choose');
-tick(12000);
+const choiceDistance = scene.distance;
+tick(120000);
 assert.equal(state.phase, 'choose', 'The child can take as long as needed');
+assert.equal(scene.distance, choiceDistance, 'More speed does not advance the path during reading');
 
 // Engine input coordinates include the Container origin: test the visible letter center and edges.
 for (const { root } of scene.gates) {
@@ -130,15 +137,15 @@ const pausedY = scene.avatar.y;
 EventBus.emit('runner-advance'); tick(1200);
 assert.equal(scene.avatar.y, pausedY);
 assert.equal(hints, 0, 'Pause freezes the pending choice');
-EventBus.emit('runner-pause', false); tick(350);
+EventBus.emit('runner-pause', false); tick(times.approach - 300);
 assert.equal(state.phase, 'retry'); assert.equal(hints, 1); assert.equal(state.count, 0);
-tick(500);
+tick(times.retry);
 assert.equal(state.phase, 'choose'); assert.equal(state.hinted, true);
 select(state.choices.indexOf('S'));
 key('ArrowUp'); key('ArrowUp'); EventBus.emit('runner-advance');
-tick(650);
+tick(times.approach);
 assert.equal(collected, 1, 'Multiple inputs cannot duplicate a collection');
-tick(4000);
+tick(times.collect + times.travel);
 assert.equal(state.phase, 'choose'); assert.equal(state.count, 1);
 
 // A swipe starting on a card changes lanes without accidentally choosing that card.
@@ -156,16 +163,16 @@ const secondTarget = scene.gates[state.choices.indexOf('A')].root;
 scene.input.emit('pointerdown', { id: 1, x: 100, y: 150 }, [secondTarget]);
 assert.equal(state.phase, 'choose', 'Touch waits for release');
 scene.input.emit('pointerup', { id: 1, x: 103, y: 151 }, [secondTarget]);
-tick(650); assert.equal(state.count, 2);
-tick(4000);
+tick(times.approach); assert.equal(state.count, 2);
+tick(times.collect + times.travel);
 select(state.choices.indexOf('P'), 'touch');
-EventBus.emit('runner-advance'); tick(650);
+EventBus.emit('runner-advance'); tick(times.approach);
 assert.equal(state.count, 3, 'Direction buttons and Advance use the same game action');
-tick(4000);
+tick(times.collect + times.travel);
 select(state.choices.indexOf('O'));
 scene.input.emit('pointerdown', { id: 1, x: 100, y: 150 }, []);
 scene.input.emit('pointerup', { id: 1, x: 105, y: 80 }, []);
-tick(650); tick(4600);
+tick(times.approach); tick(times.collect + times.finish);
 assert.equal(state.phase, 'celebrate'); assert.equal(collected, 4); assert.equal(completed, 1);
 EventBus.emit('runner-start');
 assert.equal(state.count, 0); assert.equal(state.phase, 'travel');
@@ -180,16 +187,16 @@ for (const level of schoolLevels) {
     EventBus.emit('runner-start', 'forest-sapo');
     assert.equal(state.levelId, level.id, 'Cannot change a level during an active run');
     for (const [index, letter] of [...level.word].entries()) {
-        tick(2700);
+        tick(times.travel);
         assert.equal(state.phase, 'choose');
         assert.equal(state.count, index);
         select(state.choices.indexOf(letter));
-        EventBus.emit('runner-advance'); tick(650);
+        EventBus.emit('runner-advance'); tick(times.approach);
         assert.equal(state.count, index + 1);
         assert.equal(scene.avatar.rings, (index + 1) * 3);
-        tick(1300);
+        tick(times.collect);
     }
-    tick(3300);
+    tick(times.finish);
     assert.equal(state.phase, 'celebrate'); assert.equal(state.count, level.word.length);
 }
 EventBus.emit('runner-home', 'unknown');

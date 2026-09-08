@@ -366,3 +366,14 @@ Status: **causa reproduzida e corrigida; build e testes aprovados para preview**
 - [x] Testes automáticos de regras, projeção e interação; tipos, lint e build.
 - [ ] Inspeção visual do preview autenticado e medição de fluidez no tablet físico.
 - [ ] Retomar gravações e narração depois da avaliação da jogabilidade, conforme solicitado.
+
+## Refinamento dos destinos e da comemoração — 2026-09-08
+
+- [x] Orientação do explorador corrigida para olhar para o animal.
+- [x] Aceno e resposta diferentes para sapo, onça, tucano e macaco.
+- [x] Ritmo das animações cerca de 25% mais rápido; escolha sem prazo preservada.
+- [x] Quatro habitats com geometrias, vegetação, água, paletas e iluminação próprias.
+- [x] Nome do bioma na seleção e na conclusão.
+- [x] Testes de orientação, enquadramento, pausa, troca de destino e descarte de recursos.
+- [ ] Avaliação visual do novo encontro e do ritmo pelo usuário no computador/tablet.
+- [ ] Retomar narração após a avaliação de jogabilidade.

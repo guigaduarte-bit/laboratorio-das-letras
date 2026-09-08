@@ -299,3 +299,7 @@
 @media (max-width: 899px) {
     .expedition-stage[data-phase="ready"]::after { background: linear-gradient(#d1dcc1f0, #d1dcc1c0 40%, #d1dcc120); }
 }
+
+/* Each expedition names the habitat shown in its 3D scene. */
+.mission-biome { color: #4b6152; font-size: 12px; line-height: 1.4; }
+.expedition-complete .completion-habitat { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--exp-green); font-size: 12px; margin-top: -7px; }

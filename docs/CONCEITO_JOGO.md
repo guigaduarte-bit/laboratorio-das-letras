@@ -89,3 +89,9 @@ A criança escolhe um animal ilustrado, coleta as letras em ordem e vê novament
 Cada letra acrescenta três anéis ao corpo do explorador. A pilha acompanha o personagem e o rosto sobe com ela. A escala considera a altura da tela para preservar o espaço das letras.
 
 A síntese do navegador foi retirada da corrida. A área de acompanhamento permite ao responsável gravar ou carregar os 16 trechos do roteiro, ouvi-los e salvá-los. **Ainda não há um pacote humano pré-gravado incorporado.** Somente os trechos preparados no navegador são narrados; os demais mantêm apoio visual e efeitos. As gravações ficam no aparelho, sem envio a servidores.
+
+## Habitats e encontro com os animais — 2026-09-08
+
+Após a aprovação visual do 3D, cada palavra passa a levar a um ambiente próprio: lagoa na Mata Atlântica, Pantanal, Cerrado e Amazônia. O cenário muda com a missão e mantém a pista e as letras desobstruídas. As escolhas e referências estão em `BIOMAS_EXPEDICAO.md`.
+
+O final é um encontro: explorador e animal olham um para o outro, o explorador acena e o animal responde com seu gesto. O trajeto fica mais ágil, preservando a parada sem prazo para reconhecer cada letra. Áudio e narração permanecem adiados conforme o pedido do usuário.

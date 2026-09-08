@@ -3,6 +3,7 @@ import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { runnerAudio } from './audio/RunnerAudio';
 import { humanVoice, VOICE_SCRIPT } from './audio/HumanVoice';
 import { getSchoolLevel, schoolLevels } from './game/content/levels';
+import { getBiomeForLevel } from './game/content/biomes';
 import { AnimalPortrait } from './ui/AnimalPortrait';
 import { VoiceStudio } from './ui/VoiceStudio';
 import { RunnerGame3D } from './RunnerGame3D';
@@ -32,6 +33,7 @@ export default function RunnerApp()
     const completeFocus = useRef<HTMLHeadingElement>(null);
     const phase = state.phase;
     const level = getSchoolLevel(state.levelId);
+    const biome = getBiomeForLevel(state.levelId);
     const WORD = state.word;
     const total = [...WORD].length;
     const nextLevel = schoolLevels[schoolLevels.findIndex(({ id }) => id === level.id) + 1];
@@ -175,7 +177,7 @@ export default function RunnerApp()
 
             <section className="expedition-stage" aria-label="Expedição das Letras" data-phase={phase}>
                 <RunnerGame3D word={WORD} />
-                <div className="world-label"><RunnerIcon name="leaf" size={17} /> Bosque-laboratório</div>
+                <div className="world-label"><RunnerIcon name="leaf" size={17} /> {biome.name}</div>
                 <AnimatePresence>
                     {phase === 'ready' && <motion.div className="expedition-start" key="start" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
                         <p className="expedition-eyebrow">UMA DESCOBERTA POR VEZ</p>
@@ -191,6 +193,7 @@ export default function RunnerApp()
                         <span className="mission-number">{String(index + 1).padStart(2, '0')}</span>
                         <AnimalPortrait animal={item.imageKey} />
                         <strong>{item.word}</strong>
+                        <span className="mission-biome">{getBiomeForLevel(item.id).name}</span>
                         <span className="mission-meta">{progress.completedLevels.includes(item.id) ? <><RunnerIcon name="check" size={14} /> Descoberto</> : `${item.word.length} letras`}</span>
                     </button>)}
                 </div>}
@@ -216,7 +219,8 @@ export default function RunnerApp()
                         <AnimalPortrait animal={level.imageKey} />
                         <p className="expedition-eyebrow">DESCOBERTA COMPLETA</p>
                         <h2 ref={completeFocus} tabIndex={-1}>Você formou <strong>{WORD}!</strong></h2>
-                        <p>{total} letras. Uma nova descoberta.</p>
+                        <p>{total} letras. Um novo amigo!</p>
+                        <p className="completion-habitat"><RunnerIcon name="leaf" size={15} /> {biome.name}</p>
                         <button className="word-listen" disabled={!runnerAudio.hasWord(WORD) || !sound} onClick={() => runnerAudio.word(WORD)}><RunnerIcon name="sound" size={19} /> Ouvir a palavra</button>
                         {nextLevel ? <button className="expedition-primary" onClick={() => start(nextLevel.id)}><RunnerIcon name="right" /> DESCOBRIR {nextLevel.word}</button>
                             : <button className="expedition-primary" onClick={home}><RunnerIcon name="leaf" /> ESCOLHER OUTRO ANIMAL</button>}

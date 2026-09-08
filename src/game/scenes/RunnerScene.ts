@@ -1,6 +1,7 @@
 import { GameObjects, Geom, Input, Scene } from 'phaser';
 import { getInitialWordDisplay, getSchoolLevel, type LevelDefinition } from '../content/levels';
 import { lanePosition, makeRunnerChoices, type RunnerPhase, type RunnerSnapshot } from '../content/runner';
+import { RUNNER_TIMINGS } from '../content/runnerPace';
 import { EventBus } from '../EventBus';
 import { WordProgress } from '../systems/WordProgress';
 import { PlayerAvatar } from '../visuals/PlayerAvatar';
@@ -220,17 +221,17 @@ export class RunnerScene extends Scene
         const dt = this.paused ? 0 : Math.min(delta, 50);
         this.elapsed += dt;
         const moving = ['travel', 'approach', 'retry', 'collect', 'finish'].includes(this.phase) && !this.paused;
-        if (['travel', 'finish'].includes(this.phase) && !this.paused) this.distance += dt / 2600;
-        if (this.phase === 'travel' && this.elapsed >= 2700)
+        if (['travel', 'finish'].includes(this.phase) && !this.paused) this.distance += dt / RUNNER_TIMINGS.travel;
+        if (this.phase === 'travel' && this.elapsed >= RUNNER_TIMINGS.travel)
         {
             this.phase = 'choose'; this.elapsed = 0; this.publish();
         }
-        else if (this.phase === 'approach' && this.elapsed >= 650) this.resolveChoice();
-        else if (this.phase === 'retry' && this.elapsed >= 500)
+        else if (this.phase === 'approach' && this.elapsed >= RUNNER_TIMINGS.approach) this.resolveChoice();
+        else if (this.phase === 'retry' && this.elapsed >= RUNNER_TIMINGS.retry)
         {
             this.phase = 'choose'; this.elapsed = 0; this.publish();
         }
-        else if (this.phase === 'collect' && this.elapsed >= 1300)
+        else if (this.phase === 'collect' && this.elapsed >= RUNNER_TIMINGS.collect)
         {
             this.elapsed = 0;
             if (this.count === this.level.word.length)
@@ -244,7 +245,7 @@ export class RunnerScene extends Scene
             }
             this.publish();
         }
-        else if (this.phase === 'finish' && this.elapsed >= 3300)
+        else if (this.phase === 'finish' && this.elapsed >= RUNNER_TIMINGS.finish)
         {
             this.phase = 'celebrate'; this.elapsed = 0;
             if (!this.reduced) this.avatar.playCelebrate();
@@ -256,13 +257,15 @@ export class RunnerScene extends Scene
         if (!this.paused) this.playerLane += (lane - this.playerLane) * (this.reduced ? 1 : Math.min(1, dt/150));
         // Inicializa as dimensões antes de calcular a posição do personagem.
         this.world.resize();
-        const approach = this.phase === 'approach' ? Math.min(1, this.elapsed/650)
-            : this.phase === 'retry' || this.phase === 'collect' ? 1 - Math.min(1, this.elapsed/500) : 0;
+        // Após coletar, retorna durante os primeiros 40% do efeito; a tentativa retorna ao longo da etapa.
+        const approach = this.phase === 'approach' ? Math.min(1, this.elapsed / RUNNER_TIMINGS.approach)
+            : this.phase === 'retry' ? 1 - Math.min(1, this.elapsed / RUNNER_TIMINGS.retry)
+            : this.phase === 'collect' ? 1 - Math.min(1, this.elapsed / (RUNNER_TIMINGS.collect * 0.4)) : 0;
         const p = this.world.project(this.playerLane, 0.10 + approach * 0.23);
         this.avatar.setRingCount(this.count * 3);
         const playerScale = this.avatar.getRunnerScale(this.scale.width, this.scale.height, approach);
         const py = p.y - 35 * playerScale;
-        const finish = this.phase === 'celebrate' ? 1 : this.phase === 'finish' ? Math.min(1, this.elapsed/3300) : 0;
+        const finish = this.phase === 'celebrate' ? 1 : this.phase === 'finish' ? Math.min(1, this.elapsed / RUNNER_TIMINGS.finish) : 0;
         this.world.render(this.distance, this.reduced, finish);
         this.avatar.syncPosition(p.x, py);
         this.avatar.setRunnerPose(moving, playerScale, this.reduced);
@@ -272,7 +275,7 @@ export class RunnerScene extends Scene
     private drawGates(): void
     {
         if (this.phase === 'finish' || this.phase === 'celebrate') return;
-        const depth = this.phase === 'travel' ? 0.76 - Math.min(1, this.elapsed/2700)*0.43
+        const depth = this.phase === 'travel' ? 0.76 - Math.min(1, this.elapsed / RUNNER_TIMINGS.travel)*0.43
             : this.phase === 'ready' ? 0.27 : 0.33;
         const spacing = Math.abs(this.world.project(lanePosition(1, this.choices.length), 0.33).x
             - this.world.project(lanePosition(0, this.choices.length), 0.33).x);
@@ -280,9 +283,9 @@ export class RunnerScene extends Scene
         const base = Math.min(1.22, Math.max(0.52, this.scale.width / 860), spacing / 118);
         this.gates.forEach(({ root, panel }, index) => {
             const p = this.world.project(lanePosition(index, this.choices.length), depth);
-            const scale = base * (this.phase === 'travel' ? 0.48 + 0.52 * Math.min(1, this.elapsed/2700) : 1);
+            const scale = base * (this.phase === 'travel' ? 0.48 + 0.52 * Math.min(1, this.elapsed / RUNNER_TIMINGS.travel) : 1);
             const collected = this.phase === 'collect' && index === this.selectedLane;
-            const t = collected ? Math.min(1, this.elapsed/950) : 0;
+            const t = collected ? Math.min(1, this.elapsed / (RUNNER_TIMINGS.collect * 0.75)) : 0;
             root.setPosition(p.x, p.y - (this.reduced ? 0 : t*55)).setScale(scale).setAlpha(1-t).setVisible(true);
             panel.clear();
             panel.fillStyle(C.ink, 0.12);

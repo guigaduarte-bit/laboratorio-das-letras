@@ -1,15 +1,10 @@
 import { getInitialWordDisplay, getSchoolLevel, type LevelDefinition } from '../content/levels';
 import { lanePosition, makeRunnerChoices, type RunnerPhase, type RunnerSnapshot } from '../content/runner';
+import { RUNNER_TIMINGS } from '../content/runnerPace';
 import { EventBus } from '../EventBus';
 import { WordProgress } from './WordProgress';
 
-export const RUNNER_TIMINGS = {
-    travel: 2400,
-    approach: 700,
-    retry: 650,
-    collect: 1000,
-    finish: 2800
-} as const;
+export { RUNNER_TIMINGS } from '../content/runnerPace';
 
 /** Dados de animação consultados pelo renderizador; elapsed usa ms e distance usa segundos. */
 export type RunnerFrame = {

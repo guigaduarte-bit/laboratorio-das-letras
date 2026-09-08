@@ -52,6 +52,7 @@ async function main() {
     const roundedBox = await import('three/addons/geometries/RoundedBoxGeometry.js');
     const three = { ...THREE, WebGLRenderer: Renderer };
     const modules = new Map();
+    let viewportWidth = 1380;
     function load(filename) {
         const absolute = path.resolve(__dirname, '..', filename);
         if (modules.has(absolute)) return modules.get(absolute).exports;
@@ -68,28 +69,43 @@ async function main() {
                 if (name.startsWith('.')) return load(path.resolve(path.dirname(absolute), `${name}.ts`));
                 return require(name);
             },
-            window: { devicePixelRatio: 2 },
+            window: { devicePixelRatio: 2, matchMedia(query) {
+                assert.equal(query, '(min-width: 900px)');
+                return { matches: viewportWidth >= 900 };
+            } },
             document: { createElement(tag) { assert.equal(tag, 'canvas'); return canvas(); } },
             console,
         }, { filename: absolute });
         return module.exports;
     }
 
+    const animalModule = load('src/game/three/Animals3D.ts');
+    const animateAnimal = animalModule.animateAnimal3D;
+    let lastAnimalGreeting;
+    animalModule.animateAnimal3D = (animal, time, reduced, greeting) => {
+        lastAnimalGreeting = greeting;
+        return animateAnimal(animal, time, reduced, greeting);
+    };
     const { RunnerWorld3D } = load('src/game/three/RunnerWorld3D.ts');
     const { RunnerController, RUNNER_TIMINGS } = load('src/game/systems/RunnerController.ts');
     const { schoolLevels } = load('src/game/content/levels.ts');
     const { EventBus } = load('src/game/EventBus.ts');
+    const { getBiomeForLevel } = load('src/game/content/biomes.ts');
     const container = {
         clientWidth: 1300, clientHeight: 550, children: [],
         appendChild(child) { assert(!this.children.includes(child)); child.parentNode = this; this.children.push(child); },
     };
     const world = new RunnerWorld3D(container);
+    const animateExplorer = world.explorer.update.bind(world.explorer);
+    let lastExplorerGreeting;
+    world.explorer.update = (frame) => { lastExplorerGreeting = frame; return animateExplorer(frame); };
     const controller = new RunnerController();
-    let collects = 0, words = 0, picks = 0;
+    let collects = 0, words = 0, picks = 0, encounters = 0, replacedResources = 0;
     const regressions = new Set();
     EventBus.on('letter-collected', () => collects++);
     EventBus.on('word-completed', () => words++);
     const render = (delta = 0, reduced = false) => { world.update(controller.frame, delta, reduced); world.render(); };
+    const resize = (width, height, windowWidth = width) => { viewportWidth = windowWidth; world.resize(width, height); };
     function tick(milliseconds, options = {}) {
         for (let remaining = milliseconds; remaining > 0;) {
             const step = Math.min(50, remaining);
@@ -118,7 +134,7 @@ async function main() {
     function checkPicks() {
         assert.equal(controller.frame.phase, 'choose');
         for (const [width, height] of [[1300, 550], [900, 700], [768, 650], [800, 300], [800, 270], [360, 360], [360, 560]]) {
-            world.resize(width, height);
+            resize(width, height);
             world.render();
             assert.equal(container.children.length, 1, 'Resize must keep a single canvas');
             const frame = controller.frame;
@@ -151,6 +167,59 @@ async function main() {
         return state;
     }
 
+    function facingDot(from, toward) {
+        const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(from.getWorldQuaternion(new THREE.Quaternion()));
+        forward.y = 0;
+        const direction = toward.getWorldPosition(new THREE.Vector3()).sub(from.getWorldPosition(new THREE.Vector3()));
+        direction.y = 0;
+        return forward.normalize().dot(direction.normalize());
+    }
+
+    function checkEncounter(animal, label) {
+        assert(facingDot(world.explorer.root, animal) > 0.9, `${label}: the explorer's actual +Z front must face the animal`);
+        assert(facingDot(animal, world.explorer.root) > 0.9, `${label}: the animal must face the explorer in return`);
+        assert.equal(lastExplorerGreeting.greetingTime, lastAnimalGreeting.time, 'Both rigs must receive the same greeting clock');
+        assert(lastExplorerGreeting.greeting > 0.9 && lastAnimalGreeting.strength > 0.9, 'The final meeting drives both actual greeting rigs');
+        encounters++;
+    }
+
+    function checkEncounterBounds(animal, width, height, windowWidth) {
+        const sidePanel = windowWidth >= 900;
+        assert.equal(world.sidePanel, sidePanel, 'The encounter follows the CSS viewport breakpoint, not the narrower canvas');
+        const rightLimit = sidePanel ? width - 24 - Math.min(360, width * 0.42) - 8 : width * 0.98;
+        for (const [label, root] of [['explorer', world.explorer.root], ['animal', animal]]) {
+            const bounds = new THREE.Box3().setFromObject(root, true);
+            for (const x of [bounds.min.x, bounds.max.x]) for (const y of [bounds.min.y, bounds.max.y]) for (const z of [bounds.min.z, bounds.max.z]) {
+                const point = new THREE.Vector3(x, y, z).project(world.camera);
+                const px = (point.x + 1) * width / 2;
+                const py = (1 - point.y) * height / 2;
+                assert(px >= width * 0.02 && px < rightLimit,
+                    `${width}×${height}, viewport ${windowWidth}: ${label} crosses a side margin or sits under the final card (${px.toFixed(1)} vs ${rightLimit.toFixed(1)})`);
+                assert(py > height * 0.1 && py < height * 0.98, `${label} stays inside the final scene vertically`);
+            }
+        }
+    }
+
+    function observeBiomeDisposal(biome) {
+        const owned = new Map();
+        function record(resource) {
+            if (!resource || owned.has(resource)) return;
+            owned.set(resource, 0);
+            resource.addEventListener('dispose', () => owned.set(resource, owned.get(resource) + 1));
+        }
+        biome.root.traverse(object => {
+            if (!object.isMesh) return;
+            record(object.geometry);
+            for (const material of Array.isArray(object.material) ? object.material : [object.material]) record(material);
+            if (object.isInstancedMesh) record(object);
+        });
+        return () => {
+            assert.equal(biome.root.parent, null, 'The previous biome leaves the actual scene');
+            for (const count of owned.values()) assert.equal(count, 1, 'Changing destinations disposes every previous biome resource once');
+            replacedResources += owned.size;
+        };
+    }
+
     render();
     assert.equal(container.children.length, 1);
     assert.equal(world.renderer.pixelRatio, 1.5, 'High-density screens use the bounded rendering resolution');
@@ -158,8 +227,18 @@ async function main() {
     assert.equal(world.pick(200, 200), null);
 
     for (const level of schoolLevels) {
+        const previousBiome = world.biomeWorld;
+        const replaced = previousBiome.root.userData.biomeId !== getBiomeForLevel(level.id).id;
+        const checkReplaced = replaced ? observeBiomeDisposal(previousBiome) : null;
         EventBus.emit('runner-home', level.id);
         render();
+        checkReplaced?.();
+        assert.equal(world.biomeWorld.root.userData.biomeId, getBiomeForLevel(level.id).id);
+        assert.equal(world.scene.children.filter(child => child.userData.biomeId).length, 1, 'Exactly one destination is mounted');
+        assert.equal(world.scene.background.getHex(), getBiomeForLevel(level.id).sky, 'Sky follows the selected destination');
+        const selectedBiome = world.biomeWorld;
+        render(0.016);
+        assert.equal(world.biomeWorld, selectedBiome, 'A frame never rebuilds an unchanged habitat');
         assert.equal(visibleRings(), 0, 'A new mission clears the previous stack immediately');
         assert.equal(visibleAnimals().length, 0, 'A new mission hides the previous reward');
         assert.equal(world.gates.some((gate) => gate.root.visible), false);
@@ -206,14 +285,42 @@ async function main() {
         }
         assert.equal(controller.frame.phase, 'finish');
         assert.equal(world.gates.some((gate) => gate.root.visible), false, 'The reward sequence clears all letter gates');
-        tick(RUNNER_TIMINGS.finish);
-        assert.equal(controller.frame.phase, 'celebrate');
-        assert.deepEqual(visibleAnimals(), [level.imageKey], 'The 3D reward matches the completed school word');
+        resize(1300, 610);
+        tick(RUNNER_TIMINGS.finish - 50);
         const animal = world.animals.get(level.imageKey);
+        checkEncounter(animal, 'before celebration');
+        const greetingBefore = lastExplorerGreeting.greetingTime;
+        const explorerBefore = world.explorer.root.position.clone();
+        tick(50);
+        assert.equal(controller.frame.phase, 'celebrate');
+        checkEncounter(animal, 'finish → celebrate');
+        assert(Math.abs(lastExplorerGreeting.greetingTime - greetingBefore - 0.05) < 1e-9,
+            'Changing phase advances the greeting clock by exactly one frame; it must not restart');
+        assert(world.explorer.root.position.distanceTo(explorerBefore) < 0.08, 'Entering celebration cannot teleport the explorer');
+        assert.deepEqual(visibleAnimals(), [level.imageKey], 'The 3D reward matches the completed school word');
         assert(animal.scale.x > 0.9 && Number.isFinite(animal.scale.x), 'The reward finishes its appearance at a visible scale');
+        const beforeEncounterPause = frozenState();
+        const clockBeforePause = lastExplorerGreeting.greetingTime;
+        EventBus.emit('runner-pause', true);
+        tick(1000);
+        assert.deepEqual(frozenState(), beforeEncounterPause, 'Pause freezes greeting, reply, environment, particles and facing');
+        assert.equal(lastExplorerGreeting.greetingTime, clockBeforePause);
+        EventBus.emit('runner-pause', false);
+        for (const [width, height, windowWidth] of [[1300, 610, 1380], [836, 610, 912], [768, 320, 820], [360, 320, 390], [1000, 610, 1080]]) {
+            resize(width, height, windowWidth);
+            tick(1000);
+            checkEncounter(animal, `${width}×${height} after resize`);
+            checkEncounterBounds(animal, width, height, windowWidth);
+        }
         render(0, true);
         assert.equal(world.dust.visible, false);
         assert.equal(world.fireflies.visible, false);
+        EventBus.emit('runner-start', level.id);
+        render();
+        assert.equal(visibleRings(), 0, 'Direct replay clears all rings');
+        assert.equal(visibleAnimals().length, 0, 'Direct replay hides the previous animal immediately');
+        assert.equal(lastExplorerGreeting.greeting, 0, 'Direct replay clears the explorer greeting');
+        assert.equal(lastExplorerGreeting.greetingTime, 0, 'Direct replay starts with no stale meeting clock');
     }
     assert.equal(collects, schoolLevels.reduce((sum, level) => sum + level.word.length, 0));
     assert.equal(words, schoolLevels.length, 'Each word completes exactly once');
@@ -249,7 +356,7 @@ async function main() {
     assert.equal(world.pick(200, 200), null);
     controller.destroy();
     assert.equal(regressions.size, 0, [...regressions].join('\n'));
-    console.log(`PASS: real Three world, ${picks} face picks, all school words and rewards, body rings, smooth transitions, pause, resize and ${resources.size} disposed resources (no pixel rendering).`);
+    console.log(`PASS: real Three world, ${picks} face picks, ${encounters} mutual-facing meetings, shared-clock transition/pause/replay, viewport/card framing, four active biomes, ${replacedResources} replaced + ${resources.size} final disposed resources (no pixel rendering).`);
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; });
