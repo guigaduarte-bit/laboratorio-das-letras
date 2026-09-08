@@ -42,7 +42,7 @@
 .expedition-hud { width: 266px; position: absolute; top: 23px; left: 58%; transform: translateX(-50%); pointer-events: none; }
 .word-heading { display: flex; align-items: center; justify-content: space-between; padding: 0 5px 10px; font-size: 12px; font-weight: 650; letter-spacing: 1.1px; color: var(--exp-green); }
 .word-heading span:last-child { letter-spacing: 0; }
-.expedition-word { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.expedition-word { display: grid; grid-template-columns: repeat(var(--letter-count, 4), minmax(0, 1fr)); gap: 8px; }
 .expedition-word > span { height: 64px; position: relative; display: grid; place-items: center; border-radius: 14px; border: 2px solid #355f4b55; background: #e8dcc7b8; color: #5f7160; font-size: 34px; font-weight: 700; box-shadow: 0 4px 0 #355f4b20; }
 .expedition-word > span.next { background: var(--exp-sun); color: var(--exp-ink); border-color: #ac8d3d; }
 .expedition-word > span.found { background: var(--exp-green); border-color: var(--exp-green); color: var(--exp-sand); }
@@ -213,4 +213,58 @@
     .keyboard-help { display: none; }
     .touch-help { display: inline; }
     .expedition-shell button { touch-action: manipulation; }
+}
+
+/* Quatro missões da escola, com imagens antes e depois da palavra. */
+.expedition-stage[data-phase="ready"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; padding: 80px 5% 140px; height: auto; min-height: 650px; }
+.expedition-stage[data-phase="ready"] .expedition-start { position: relative; top: auto; left: auto; width: auto; }
+.mission-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; width: 100%; max-width: 430px; margin-left: auto; z-index: 3; }
+.mission-choice { position: relative; display: flex; align-items: center; flex-direction: column; gap: 2px; min-width: 0; padding: 12px 12px 14px; border: 2px solid #355f4b65; border-radius: 24px; color: var(--exp-ink); background: #e8dcc7ed; box-shadow: 0 5px 0 #355f4b30; }
+.mission-choice[aria-pressed="true"] { border: 3px solid var(--exp-green); background: #eedca7; box-shadow: 0 5px 0 var(--exp-green); }
+.mission-choice:hover:not(:disabled) { background: #f2e5c9; }
+.mission-choice strong { font-size: 21px; letter-spacing: 1px; }
+.mission-number { position: absolute; left: 13px; top: 10px; color: var(--exp-green); font-size: 11px; font-weight: 650; }
+.animal-portrait { display: block; width: 124px; height: 93px; flex-shrink: 0; }
+.mission-meta { display: flex; gap: 4px; align-items: center; font-size: 11px; color: #4b6152; min-height: 19px; }
+.expedition-hud { width: min(calc(var(--letter-count, 4) * 66px), calc(100% - 30px)); }
+.expedition-stage[data-phase="celebrate"] { min-height: 610px; }
+.expedition-complete { width: min(460px, calc(100% - 32px)); padding: 20px 26px; }
+.expedition-complete > .animal-portrait { width: 128px; height: 96px; margin: 0 auto 8px; }
+.expedition-complete .expedition-eyebrow { margin-bottom: 10px; }
+.expedition-complete h2 strong { font-size: clamp(32px, 5vw, 50px); letter-spacing: 1px; overflow-wrap: anywhere; }
+.expedition-complete .text-button { display: block; margin: 5px auto 0; font-size: 13px; }
+.expedition-complete .word-listen { margin-bottom: 18px; }
+.voice-studio { border-top: 1px solid #355f4b40; padding-top: 20px; margin-bottom: 28px; }
+.voice-studio h3 { font-size: 20px; margin: 0 0 10px; }
+.voice-studio p { font-size: 13px; }
+.voice-studio label { display: block; margin-bottom: 8px; font-size: 14px; }
+.voice-studio select { width: 100%; min-height: 48px; padding: 8px 12px; border: 2px solid #355f4b70; border-radius: 12px; background: #f0e7d8; color: var(--exp-ink); font: inherit; }
+.voice-studio select:focus-visible { outline: 3px solid var(--exp-green); outline-offset: 3px; }
+.voice-script { padding: 18px; margin: 16px 0; border-radius: 14px; background: #f1e8d7; }
+.voice-script span { display: block; font-size: 10px; letter-spacing: 1.5px; margin-bottom: 8px; color: var(--exp-green); }
+.voice-script strong { display: block; font-size: 22px; font-weight: 600; }
+.voice-buttons { display: flex; flex-wrap: wrap; gap: 9px; }
+.voice-buttons button { flex: 1 1 130px; min-height: 48px; padding: 10px; border: 1px solid #355f4b80; border-radius: 12px; color: var(--exp-green); background: #f1e8d7; font-size: 13px; }
+.voice-buttons button.recording { background: var(--exp-green); color: var(--exp-sand); }
+@media (max-width: 899px) {
+    .expedition-stage[data-phase="ready"] { grid-template-columns: minmax(0, 1fr); gap: 25px; min-height: 0; padding: 72px 24px 125px; }
+    .expedition-start .expedition-intro { margin-bottom: 18px; }
+    .mission-picker { margin: 0 auto; max-width: 440px; }
+    .expedition-stage[data-phase="ready"] .expedition-start { text-align: center; }
+    .expedition-stage[data-phase="ready"] .start-button { margin: auto; }
+    .expedition-shell[data-playing="true"] .expedition-pisco { left: 4px; bottom: 5px; }
+    .expedition-shell[data-playing="true"] .expedition-pisco .mascot-guide { width: 40px; height: 44px; }
+    .expedition-shell[data-playing="true"] .pisco-speech { display: none; }
+}
+@media (max-width: 600px) {
+    .expedition-stage[data-phase="ready"] { padding: 66px 18px 105px; gap: 20px; }
+    .mission-picker { gap: 12px; }
+    .mission-choice { padding: 10px 7px; border-radius: 18px; }
+    .mission-choice strong { font-size: 17px; }
+    .mission-choice .animal-portrait { width: 100px; height: 75px; }
+    .expedition-hud { width: min(calc(var(--letter-count, 4) * 54px), calc(100% - 22px)); }
+    .expedition-word { gap: 5px; }
+    .expedition-word > span { font-size: 26px; }
+    .expedition-complete { top: 50%; padding: 18px 16px; }
+    .expedition-stage[data-phase="celebrate"] { min-height: 620px; }
 }

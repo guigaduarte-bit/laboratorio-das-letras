@@ -86,3 +86,14 @@ Pisco é um personagem original do Laboratório das Letras. A prancha foi gerada
 | Fallback de runtime | `public/assets/rive/pisco-fallback.svg` | Laboratório das Letras | Derivação direta do vetor-fonte próprio | Asset próprio do projeto | 2026-09-01 | Recuperação visual caso o runtime ou o `.riv` falhem |
 
 O arquivo de runtime tem SHA-256 `0e1671cb73c3937e4e4a6523d809b702e4036bda7fc26acdd17c803ee116f7c4`. A exportação não incorpora mídia ou personagem externo. O fallback continua no projeto para tolerância a falhas e não substitui o asset principal durante o carregamento normal.
+
+## Iteração de 2026-09-08
+
+| Elemento | Origem | Uso |
+| --- | --- | --- |
+| Sapo, onça, tucano e macaco | Desenhos vetoriais originais em `src/ui/AnimalPortrait.tsx`, sem mídia externa | Seleção de missão e conclusão |
+| Anéis no corpo e crescimento | Geometria original em `src/game/visuals/PlayerAvatar.ts` | Rig do explorador no Phaser |
+| Roteiro de 16 trechos | Textos curtos próprios em `src/audio/HumanVoice.ts` | Nomes de letras, palavras e orientação |
+| Gravações humanas | Ainda não fornecidas/incorporadas; gravação ou upload voluntário pelo responsável, somente no navegador | Reprodução local no Howler, sem redistribuição no repositório |
+
+A Web Speech API foi retirada da nova corrida nesta iteração. As fontes de áudio humano pesquisadas na Wikimedia não foram incorporadas, pois não foi obtido um conjunto completo para este roteiro. O protótipo antigo de plataformas mantém seus assets técnicos já registrados.

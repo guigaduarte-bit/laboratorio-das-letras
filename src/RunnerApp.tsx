@@ -1,6 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { runnerAudio } from './audio/RunnerAudio';
+import { humanVoice, VOICE_SCRIPT } from './audio/HumanVoice';
+import { getSchoolLevel, schoolLevels } from './game/content/levels';
+import { AnimalPortrait } from './ui/AnimalPortrait';
+import { VoiceStudio } from './ui/VoiceStudio';
 import { PhaserGame } from './PhaserGame';
 import { EventBus } from './game/EventBus';
 import type { RunnerSnapshot } from './game/content/runner';
@@ -8,15 +12,14 @@ import { localProgress, type LocalProgress } from './progress/LocalProgress';
 import { MascotGuide } from './ui/MascotGuide';
 import { RunnerIcon } from './ui/RunnerIcon';
 
-const EMPTY: RunnerSnapshot = { phase: 'ready', count: 0, choices: [], lane: 0, hinted: false, paused: false };
-const WORD = 'SAPO';
+const EMPTY: RunnerSnapshot = { levelId: 'forest-sapo', word: 'SAPO', phase: 'ready', count: 0, choices: [], lane: 0, hinted: false, paused: false };
 
 export default function RunnerApp()
 {
     const [state, setState] = useState<RunnerSnapshot>(EMPTY);
     const [ready, setReady] = useState(false);
     const [sound, setSound] = useState(true);
-    const [voice, setVoice] = useState(false);
+    const [voice, setVoice] = useState(0);
     const [announcement, setAnnouncement] = useState('');
     const [parentOpen, setParentOpen] = useState(false);
     const [progress, setProgress] = useState<LocalProgress>(() => localProgress.read());
@@ -28,6 +31,10 @@ export default function RunnerApp()
     const soundRef = useRef(true);
     const completeFocus = useRef<HTMLHeadingElement>(null);
     const phase = state.phase;
+    const level = getSchoolLevel(state.levelId);
+    const WORD = state.word;
+    const total = [...WORD].length;
+    const nextLevel = schoolLevels[schoolLevels.findIndex(({ id }) => id === level.id) + 1];
     const isPlaying = phase !== 'ready' && phase !== 'celebrate';
     const canChoose = phase === 'choose' && !state.paused;
     const target = WORD[state.count] ?? '';
@@ -38,30 +45,30 @@ export default function RunnerApp()
             snapshot.current = next; setState(next); setReady(true);
             if (next.phase === 'choose' && lastPhase !== 'choose')
             {
-                const letter = WORD[next.count];
+                const letter = next.word[next.count];
                 setAnnouncement(`Encontre a letra ${letter}. Escolha um caminho com esquerda e direita e avance com a seta para cima. Você também pode tocar na letra.`);
                 runnerAudio.prompt(letter);
             }
             if (next.phase === 'ready' || next.phase === 'celebrate') startGuard.current = false;
             lastPhase = next.phase;
         };
-        const started = () => { setProgress(localProgress.recordSessionStarted()); runnerAudio.introduction(); };
-        const collected = ({ letter, count }: { letter: string; count: number }) => {
+        const started = ({ word }: { word: string }) => { setProgress(localProgress.recordSessionStarted()); runnerAudio.introduction(word); };
+        const collected = ({ letter, count, total, word }: { letter: string; count: number; total: number; word: string }) => {
             setProgress(localProgress.recordCorrectLetter(letter));
-            setAnnouncement(`${letter} encontrada. ${count} de 4 letras.`);
-            runnerAudio.collected(letter, count === 4);
+            setAnnouncement(`${letter} encontrada. ${count} de ${total} letras.`);
+            runnerAudio.collected(letter, count === total, word);
         };
         const hint = ({ expected }: { expected: string }) => {
             setProgress(localProgress.recordHintAttempt(expected));
             setAnnouncement(`Vamos procurar ${expected}. O Pisco iluminou essa letra.`);
             runnerAudio.help(expected);
         };
-        const complete = () => {
-            setProgress(localProgress.recordLevelCompleted('forest-sapo'));
-            setAnnouncement('Você formou SAPO!');
+        const complete = ({ word }: { word: string }) => {
+            setProgress(localProgress.recordLevelCompleted(snapshot.current.levelId));
+            setAnnouncement(`Você formou ${word}!`);
         };
         const celebrate = () => runnerAudio.celebrate();
-        const voiceChanged = () => setVoice(runnerAudio.hasVoice());
+        const voiceChanged = () => setVoice(humanVoice.count);
         const visibility = () => {
             if (document.hidden && !['ready', 'celebrate'].includes(snapshot.current.phase))
             {
@@ -84,7 +91,8 @@ export default function RunnerApp()
         EventBus.on('celebration-ready', celebrate);
         EventBus.emit('runner-state-request');
         voiceChanged();
-        window.speechSynthesis?.addEventListener('voiceschanged', voiceChanged);
+        const unsubscribeVoice = humanVoice.subscribe(voiceChanged);
+        void humanVoice.init().catch(() => setVoice(0));
         document.addEventListener('visibilitychange', visibility);
         window.addEventListener('keydown', escape);
         return () => {
@@ -92,7 +100,7 @@ export default function RunnerApp()
             EventBus.off('letter-collected', collected); EventBus.off('letter-mismatch', hint);
             EventBus.off('runner-hint-used', hint); EventBus.off('word-completed', complete);
             EventBus.off('celebration-ready', celebrate);
-            window.speechSynthesis?.removeEventListener('voiceschanged', voiceChanged);
+            unsubscribeVoice();
             document.removeEventListener('visibilitychange', visibility);
             window.removeEventListener('keydown', escape);
             runnerAudio.stop();
@@ -108,12 +116,12 @@ export default function RunnerApp()
         if (phase === 'celebrate') completeFocus.current?.focus();
     }, [phase]);
 
-    const start = () => {
+    const start = (levelId = state.levelId) => {
         if (!ready || startGuard.current) return;
         startGuard.current = true;
         runnerAudio.unlock(); runnerAudio.setEnabled(soundRef.current);
-        setVoice(runnerAudio.hasVoice());
-        EventBus.emit('runner-start');
+        setVoice(humanVoice.count);
+        EventBus.emit('runner-start', levelId);
         document.getElementById('game-container')?.focus({ preventScroll: true });
     };
     const toggleSound = () => {
@@ -122,6 +130,7 @@ export default function RunnerApp()
         if (enabled && phase === 'choose') runnerAudio.prompt(target);
     };
     const openParent = () => {
+        runnerAudio.stop();
         wasPaused.current = state.paused;
         if (isPlaying) { EventBus.emit('runner-pause', true); runnerAudio.stop(); }
         setProgress(localProgress.read()); setParentOpen(true); parentDialog.current?.showModal();
@@ -131,13 +140,14 @@ export default function RunnerApp()
         if (isPlaying && !wasPaused.current) EventBus.emit('runner-pause', false);
     };
     const home = () => { runnerAudio.stop(); EventBus.emit('runner-home'); pauseDialog.current?.close(); };
+    const chooseLevel = (levelId: string) => { runnerAudio.stop(); EventBus.emit('runner-home', levelId); };
     const resume = () => {
         runnerAudio.unlock(); EventBus.emit('runner-pause', false);
         pauseDialog.current?.close();
         document.getElementById('game-container')?.focus({ preventScroll: true });
         if (phase === 'choose') runnerAudio.prompt(target);
     };
-    const mission = phase === 'collect' ? (state.count === 4 ? 'Você formou SAPO!' : 'Encontrou! Vamos em frente.')
+    const mission = phase === 'collect' ? (state.count === total ? `Você formou ${WORD}!` : 'Encontrou! Vamos em frente.')
         : phase === 'finish' ? 'Vamos levar a palavra ao laboratório!'
         : phase === 'approach' ? `Vamos até a letra ${state.choices[state.lane]}!`
         : state.hinted ? `Vamos juntos. Procure ${target}.`
@@ -165,15 +175,24 @@ export default function RunnerApp()
                     {phase === 'ready' && <motion.div className="expedition-start" key="start" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
                         <p className="expedition-eyebrow">UMA DESCOBERTA POR VEZ</p>
                         <h1>Expedição<br />das <span>letras.</span></h1>
-                        <p className="expedition-intro">Vamos encontrar letras<br className="desktop-break" /> e construir uma invenção?</p>
-                        <button className="expedition-primary start-button" onClick={start} disabled={!ready}><RunnerIcon name="play" /> {ready ? 'COMEÇAR' : 'PREPARANDO…'}</button>
+                        <p className="expedition-intro">Escolha um animal. Vamos encontrar<br className="desktop-break" /> suas letras pelo caminho!</p>
+                        <button className="expedition-primary start-button" onClick={() => start()} disabled={!ready}><RunnerIcon name="play" /> {ready ? `JOGAR · ${WORD}` : 'PREPARANDO…'}</button>
                         <p className="start-note">Jogue com as setas do teclado ou tocando na tela.</p>
                     </motion.div>}
                 </AnimatePresence>
 
-                {isPlaying && <div className="expedition-hud">
-                    <div className="word-heading"><span>VAMOS FORMAR</span><span>{state.count} de 4</span></div>
-                    <div className="expedition-word" aria-label={`Palavra SAPO. ${state.count} letras encontradas.`}>
+                {phase === 'ready' && <div className="mission-picker" role="group" aria-label="Escolha um animal para a aventura">
+                    {schoolLevels.map((item, index) => <button key={item.id} disabled={!ready} className="mission-choice" aria-pressed={item.id === state.levelId} onClick={() => chooseLevel(item.id)}>
+                        <span className="mission-number">{String(index + 1).padStart(2, '0')}</span>
+                        <AnimalPortrait animal={item.imageKey} />
+                        <strong>{item.word}</strong>
+                        <span className="mission-meta">{progress.completedLevels.includes(item.id) ? <><RunnerIcon name="check" size={14} /> Descoberto</> : `${item.word.length} letras`}</span>
+                    </button>)}
+                </div>}
+
+                {isPlaying && <div className="expedition-hud" style={{ '--letter-count': total } as CSSProperties}>
+                    <div className="word-heading"><span>VAMOS FORMAR</span><span>{state.count} de {total}</span></div>
+                    <div className="expedition-word" aria-label={`Palavra ${WORD}. ${state.count} letras encontradas.`}>
                         {[...WORD].map((letter, index) => <span className={index < state.count ? 'found' : index === state.count ? 'next' : ''} key={index} aria-label={`${letter}${index < state.count ? ', encontrada' : index === state.count ? ', próxima letra' : ''}`}>
                             {letter}{index < state.count && <RunnerIcon name="check" size={13} />}
                         </span>)}
@@ -185,16 +204,18 @@ export default function RunnerApp()
                     <div className="pisco-speech"><span>PISCO</span><p>{phase === 'ready' ? 'Eu vou com você!' : phase === 'celebrate' ? 'Olha o que você descobriu!' : mission}</p></div>
                 </div>
 
-                {isPlaying && <div className="equipment-note"><RunnerIcon name="flask" size={18} /><span>{state.count === 0 ? 'Sua invenção começa aqui' : `${state.count} de 4 partes da invenção`}</span></div>}
+                {isPlaying && <div className="equipment-note"><RunnerIcon name="flask" size={18} /><span>{state.count === 0 ? 'Sua invenção começa aqui' : `${state.count * 3} anéis no explorador`}</span></div>}
 
                 <AnimatePresence>
                     {phase === 'celebrate' && <motion.div className="expedition-complete" key="complete" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-                        <div className="completion-badge"><RunnerIcon name="check" size={34} /></div>
+                        <AnimalPortrait animal={level.imageKey} />
                         <p className="expedition-eyebrow">DESCOBERTA COMPLETA</p>
-                        <h2 ref={completeFocus} tabIndex={-1}>Você formou <strong>SAPO!</strong></h2>
-                        <p>Quatro letras. Uma nova descoberta.</p>
-                        <button className="word-listen" disabled={!voice || !sound} onClick={() => runnerAudio.word()}><RunnerIcon name="sound" size={19} /> Ouvir a palavra</button>
-                        <button className="expedition-primary" onClick={start}><RunnerIcon name="replay" /> BRINCAR DE NOVO</button>
+                        <h2 ref={completeFocus} tabIndex={-1}>Você formou <strong>{WORD}!</strong></h2>
+                        <p>{total} letras. Uma nova descoberta.</p>
+                        <button className="word-listen" disabled={!runnerAudio.hasWord(WORD) || !sound} onClick={() => runnerAudio.word(WORD)}><RunnerIcon name="sound" size={19} /> Ouvir a palavra</button>
+                        {nextLevel ? <button className="expedition-primary" onClick={() => start(nextLevel.id)}><RunnerIcon name="right" /> DESCOBRIR {nextLevel.word}</button>
+                            : <button className="expedition-primary" onClick={home}><RunnerIcon name="leaf" /> ESCOLHER OUTRO ANIMAL</button>}
+                        <button className="text-button" onClick={() => start()}>Brincar de novo com {WORD}</button>
                         <button className="text-button" onClick={home}>Por hoje, terminamos</button>
                     </motion.div>}
                 </AnimatePresence>
@@ -203,7 +224,7 @@ export default function RunnerApp()
             <div className="expedition-controls" data-phase={phase}>
                 {isPlaying ? <>
                     <div className="control-prompt"><span>{phase === 'choose' || phase === 'retry' ? 'QUAL CAMINHO?' : phase === 'approach' ? 'VAMOS EM FRENTE' : phase === 'collect' ? 'LETRA ENCONTRADA' : phase === 'finish' ? 'PALAVRA COMPLETA' : 'VAMOS EXPLORAR'}</span>
-                        <p>{phase === 'choose' || phase === 'retry' ? <>Procure <strong>{target}</strong></> : phase === 'approach' ? 'Indo até a letra…' : phase === 'collect' ? 'Muito bem!' : phase === 'finish' ? 'SAPO!' : 'A pista espera por você.'}</p>
+                        <p>{phase === 'choose' || phase === 'retry' ? <>Procure <strong>{target}</strong></> : phase === 'approach' ? 'Indo até a letra…' : phase === 'collect' ? 'Muito bem!' : phase === 'finish' ? `${WORD}!` : 'A pista espera por você.'}</p>
                     </div>
                     <div className="runner-inputs">
                         <div className="lane-buttons" role="group" aria-label="Toque em uma letra para avançar até ela">
@@ -218,7 +239,7 @@ export default function RunnerApp()
                         </div>
                     </div>
                     <div className="learning-actions">
-                        <button className="small-action" disabled={!voice || !sound || !canChoose} onClick={() => runnerAudio.prompt(target)} aria-label="Ouvir a letra procurada"><RunnerIcon name="sound" size={22} /><span>Ouvir</span></button>
+                        <button className="small-action" disabled={!runnerAudio.hasVoice(target) || !sound || !canChoose} onClick={() => runnerAudio.prompt(target)} aria-label="Ouvir a letra procurada"><RunnerIcon name="sound" size={22} /><span>Ouvir</span></button>
                         <button className="small-action" disabled={!canChoose || state.hinted} onClick={() => EventBus.emit('runner-hint')}><RunnerIcon name="help" size={22} /><span>Dica</span></button>
                     </div>
                     <p className="runner-control-help" id="runner-control-help"><span className="keyboard-help">← → escolhem o caminho · ↑ avança.</span><span className="touch-help">Toque nas setas e em AVANÇAR, ou toque na letra.</span></p>
@@ -235,11 +256,12 @@ export default function RunnerApp()
             <dialog ref={parentDialog} className="expedition-dialog parent-dialog" onCancel={(event) => { event.preventDefault(); closeParent(); }}>
                 <button className="dialog-close icon-button" aria-label="Fechar acompanhamento" onClick={closeParent}><RunnerIcon name="close" /></button>
                 <p className="expedition-eyebrow">PARA QUEM ACOMPANHA</p><h2>Pequenas descobertas</h2>
-                <p>Convide o Ben a dizer o nome da letra e a encontrá-la. Depois de formar SAPO, procurem juntos as mesmas letras fora da tela.</p>
+                <p>Convide o Ben a dizer o nome da letra e a encontrá-la. Depois de formar cada palavra, procurem juntos as mesmas letras na tarefa da escola.</p>
                 <div className="progress-summary"><div><strong>{progress.sessionCount}</strong><span>Sessões iniciadas</span></div><div><strong>{progress.completedLevels.length}</strong><span>Palavras concluídas</span></div><div><strong>{hintTotal}</strong><span>Dicas usadas</span></div></div>
                 {Object.keys(progress.letterStats).length > 0 && <table><caption>Letras praticadas</caption><thead><tr><th>Letra</th><th>Coletas</th><th>Com dica</th></tr></thead><tbody>{Object.entries(progress.letterStats).sort(([a], [b]) => a.localeCompare(b)).map(([letter, stats]) => <tr key={letter}><th>{letter}</th><td>{stats.correct}</td><td>{stats.hints}</td></tr>)}</tbody></table>}
                 <p className="parent-detail">{progress.lastPlayedAt ? `Última atividade: ${new Date(progress.lastPlayedAt).toLocaleString('pt-BR')}. ` : 'As descobertas aparecerão depois da primeira brincadeira. '}O progresso fica neste navegador. Coletas e dicas ajudam a observar a prática; não medem domínio de leitura.</p>
-                <div className="voice-status"><RunnerIcon name="sound" size={20} /><p>{voice ? 'Narração em português brasileiro pela voz do dispositivo. Confira a pronúncia antes de brincar; usamos nomes de letras, sem apresentar a síntese como fonemas.' : 'Este navegador não disponibilizou uma voz em português brasileiro. A pista funciona com pistas visuais; leia as letras junto com o Ben. O botão Ouvir será ativado se uma voz compatível ficar disponível.'}</p></div>
+                <div className="voice-status"><RunnerIcon name="sound" size={20} /><p>{voice === VOICE_SCRIPT.length ? 'Todos os trechos estão gravados. A aventura usa os áudios que você preparou.' : `${voice} de ${VOICE_SCRIPT.length} trechos gravados. Prepare as falas abaixo para ativar a narração humana. Enquanto isso, leia as letras junto com o Ben; os efeitos sonoros continuam disponíveis.`}</p></div>
+                {parentOpen && <VoiceStudio />}
                 <button className="expedition-primary" onClick={closeParent}>VOLTAR À AVENTURA</button>
             </dialog>
         </main>

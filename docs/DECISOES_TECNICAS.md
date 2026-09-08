@@ -142,3 +142,14 @@
 - A câmera da corrida acompanha explicitamente os eventos de redimensionamento; não depende de ainda ter as dimensões do menu.
 - No desktop com altura disponível, os controles ficam em uma linha, liberando 76 px de altura para a pista. A disposição de toque em telas menores é preservada.
 - `node tests/runner-viewport.cjs` reproduz a versão defeituosa e verifica a correção com o gerenciador de escala real do Phaser 4, incluindo as dimensões aproximadas do print, mudança de tamanho, retorno ao menu e rotação de tablet. O teste não renderiza pixels e não substitui a conferência no navegador.
+
+### Quatro missões, pilha no corpo e gravações — 2026-09-08
+
+- `schoolLevels` mantém o catálogo escolar separado do exemplo técnico PATO. `runner-start` e `runner-home` aceitam um `levelId`; o snapshot inclui identificador e palavra. HUD, instruções, contagem, conclusão e registro local consultam a fase ativa. A cedilha é preservada e as repetições de MACACO são coletadas individualmente.
+- `PlayerAvatar` possui duas camadas de anéis no próprio rig, uma atrás e outra à frente do tronco. A cabeça acompanha o crescimento até 18 anéis. Posição, escala e movimento reduzido são compartilhados; o equipamento lateral saiu de `RunnerWorld`. A escala reserva espaço entre rosto e letras nas telas baixas.
+- `HumanVoice` guarda Blobs em IndexedDB, base `laboratorio-human-voice`, versão 1. Nenhum áudio é enviado à rede. Erros de gravação/armazenamento são apresentados sem anunciar um salvamento que falhou. A área informa que os áudios precisam ser preparados em cada navegador.
+- `VoiceStudio` usa microfone somente após um clique em Gravar. A captura para ao sair da área, ao ocultar a página ou após 8 segundos. Upload permite MP3, M4A, WAV, OGG e WebM de até 2 MB e 10 segundos. O arquivo precisa decodificar antes de habilitar o salvamento. A pessoa pode ouvir e substituir cada trecho.
+- `RunnerAudio` usa apenas Howler e os áudios gravados. A fila cancela falas anteriores, ignora callbacks antigos e respeita pausa, mute e interação inicial. Letras ausentes não disparam convites incompletos. Não há fallback para Web Speech ou Flite.
+- A voz humana está **preparada para integração**, mas nenhum locutor ou pacote de gravações foi fornecido: não apresentar esta entrega como narração humana completa. O roteiro inclui 10 nomes de letras (incluindo cê cedilha), quatro palavras e duas frases.
+- `AnimalPortrait` contém quatro desenhos vetoriais originais. Seleção de missões e conclusão têm altura própria e podem rolar com a página; a pista mantém o redimensionamento corrigido anteriormente.
+- Verificação: build/lint/tipos; testes de invariantes, quatro ciclos da cena, viewport, geometria dos anéis e fila de áudio. A gravação de microfone, qualidade da pronúncia e renderização em tablet físico ainda precisam de conferência no preview acessível ao usuário.

@@ -2,6 +2,8 @@ import type { LevelDefinition } from './levels';
 
 export type RunnerPhase = 'ready' | 'travel' | 'choose' | 'approach' | 'retry' | 'collect' | 'finish' | 'celebrate';
 export type RunnerSnapshot = {
+    levelId: string;
+    word: string;
     phase: RunnerPhase;
     count: number;
     choices: string[];

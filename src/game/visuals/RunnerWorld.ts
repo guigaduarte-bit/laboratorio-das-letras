@@ -7,7 +7,6 @@ export class RunnerWorld
     private readonly sky: GameObjects.Graphics;
     private readonly road: GameObjects.Graphics;
     private readonly scenery: GameObjects.Graphics;
-    private readonly equipment: GameObjects.Graphics;
     private width = 0;
     private height = 0;
     private lastRender = '';
@@ -17,7 +16,6 @@ export class RunnerWorld
         this.sky = scene.add.graphics().setDepth(0);
         this.road = scene.add.graphics().setDepth(1);
         this.scenery = scene.add.graphics().setDepth(2);
-        this.equipment = scene.add.graphics().setDepth(71);
     }
 
     get center(): number { return this.width * (this.width >= 900 ? 0.58 : 0.5); }
@@ -45,10 +43,10 @@ export class RunnerWorld
         }
     }
 
-    render(distance: number, count: number, playerX: number, playerY: number, reduced: boolean, finish = 0): void
+    render(distance: number, reduced: boolean, finish = 0): void
     {
         // O mundo parado não precisa redesenhar centenas de formas a cada frame.
-        const renderKey = [this.width, this.height, reduced ? 0 : distance, count, playerX, playerY, finish].join(':');
+        const renderKey = [this.width, this.height, reduced ? 0 : distance, finish].join(':');
         if (renderKey === this.lastRender) return;
         this.lastRender = renderKey;
         const g = this.road;
@@ -93,7 +91,6 @@ export class RunnerWorld
             this.drawTree(x, p.y + 2, 0.22 + p.scale * 1.3, i);
         }
         this.drawLaboratory(finish);
-        this.drawEquipment(playerX, playerY, count, finish);
     }
 
     private drawBackdrop(): void
@@ -183,54 +180,6 @@ export class RunnerWorld
         g.lineBetween(x-7*s, y-128*s, x-7*s, y-113*s);
         g.lineBetween(x+7*s, y-128*s, x+7*s, y-113*s);
         g.strokeEllipse(x, y-110*s, 27*s, 17*s);
-        if (finish > 0.7) this.drawFrog(x, y-18*s, s * 0.62);
-    }
-
-    drawFrog(x: number, y: number, s: number): void
-    {
-        const g = this.scenery;
-        g.fillStyle(C.moss, 1);
-        g.fillEllipse(x-30*s, y+22*s, 38*s, 19*s);
-        g.fillEllipse(x+30*s, y+22*s, 38*s, 19*s);
-        g.fillEllipse(x, y, 73*s, 57*s);
-        g.fillCircle(x-22*s, y-26*s, 15*s);
-        g.fillCircle(x+22*s, y-26*s, 15*s);
-        g.fillStyle(C.leafLight, 1);
-        g.fillEllipse(x, y+9*s, 44*s, 32*s);
-        g.fillStyle(C.sand, 1);
-        g.fillCircle(x-22*s, y-27*s, 9*s);
-        g.fillCircle(x+22*s, y-27*s, 9*s);
-        g.fillStyle(C.ink, 1);
-        g.fillCircle(x-21*s, y-27*s, 4*s);
-        g.fillCircle(x+21*s, y-27*s, 4*s);
-        g.lineStyle(2.5*s, C.ink, 1);
-        g.beginPath();
-        g.arc(x, y-7*s, 13*s, 0.2, Math.PI-0.2);
-        g.strokePath();
-    }
-
-    private drawEquipment(x: number, y: number, count: number, finish: number): void
-    {
-        const g = this.equipment;
-        g.clear();
-        if (!count) return;
-        const s = Math.min(1.3, Math.max(0.76, this.width/760));
-        const cx = x+43*s, cy = y+15*s;
-        g.fillStyle(C.ink, 0.13);
-        g.fillEllipse(cx+5*s, cy+24*s, 75*s, 21*s);
-        g.fillStyle(C.deepMoss, 1);
-        g.fillRoundedRect(cx-29*s, cy+6*s, 58*s, 18*s, 8*s);
-        for (let i = 0; i < count * 3; i++)
-        {
-            const ey = cy-i*5.5*s;
-            g.lineStyle(5*s, [C.sun, C.clay, C.lagoon, C.leafLight][Math.floor(i/3) % 4], 1);
-            g.strokeEllipse(cx, ey, 50*s, 15*s);
-        }
-        if (finish > 0.5)
-        {
-            g.lineStyle(3*s, C.sun, 0.65);
-            g.strokeCircle(cx, cy-count*16*s, 17*s+(finish-0.5)*22);
-        }
     }
 
     private quad(g: GameObjects.Graphics, ...p: number[]): void

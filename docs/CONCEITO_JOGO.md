@@ -74,8 +74,18 @@ Adaptação original do ciclo de corrida, coleta e crescimento solicitado como r
 - Quatro letras completam a invenção. A criança escolhe repetir ou encerrar a sessão.
 - Pausa manual e pausa ao ocultar a página preservam a escolha atual.
 
-A raiz abre a nova experiência. O protótipo de plataformas permanece em `?mode=explore`. A entrega continua restrita a SAPO.
+A raiz abre a nova experiência. O protótipo de plataformas permanece em `?mode=explore`. Na entrega de 2026-09-05, o conteúdo era restrito a SAPO; a ampliação está registrada abaixo.
 
 ### Ajuste de jogabilidade — 2026-09-07
 
 A parada diante das alternativas permanece sem limite de tempo. O avanço até a letra torna a decisão visível: após uma escolha diferente da esperada, o personagem volta ao ponto de escolha e a dica permanece, preservando as letras já encontradas. O controle por toque funciona sem teclado conectado. A pista adapta sua altura para deixar os botões disponíveis na vertical e na horizontal.
+
+## Missões da escola e voz humana — 2026-09-08
+
+A pedido do usuário, a expedição agora inclui **SAPO, ONÇA, TUCANO e MACACO**, as quatro palavras registradas na atividade escolar em `PROJETO_LABORATORIO_DAS_LETRAS_BEN.md`. PATO continua apenas no protótipo técnico de plataformas.
+
+A criança escolhe um animal ilustrado, coleta as letras em ordem e vê novamente o animal com a palavra completa. Ao terminar, pode descobrir o próximo animal, repetir ou voltar ao início. Todas as fases estão disponíveis, sem bloqueios ou punições. O histórico identifica cada palavra separadamente.
+
+Cada letra acrescenta três anéis ao corpo do explorador. A pilha acompanha o personagem e o rosto sobe com ela. A escala considera a altura da tela para preservar o espaço das letras.
+
+A síntese do navegador foi retirada da corrida. A área de acompanhamento permite ao responsável gravar ou carregar os 16 trechos do roteiro, ouvi-los e salvá-los. **Ainda não há um pacote humano pré-gravado incorporado.** Somente os trechos preparados no navegador são narrados; os demais mantêm apoio visual e efeitos. As gravações ficam no aparelho, sem envio a servidores.

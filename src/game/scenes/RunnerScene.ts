@@ -1,5 +1,5 @@
 import { GameObjects, Geom, Input, Scene } from 'phaser';
-import { getLevelById, type LevelDefinition } from '../content/levels';
+import { getInitialWordDisplay, getSchoolLevel, type LevelDefinition } from '../content/levels';
 import { lanePosition, makeRunnerChoices, type RunnerPhase, type RunnerSnapshot } from '../content/runner';
 import { EventBus } from '../EventBus';
 import { WordProgress } from '../systems/WordProgress';
@@ -11,7 +11,7 @@ type Gate = { root: GameObjects.Container; panel: GameObjects.Graphics; text: Ga
 
 export class RunnerScene extends Scene
 {
-    private level: LevelDefinition = getLevelById();
+    private level: LevelDefinition = getSchoolLevel();
     private progress!: WordProgress;
     private world!: RunnerWorld;
     private avatar!: PlayerAvatar;
@@ -55,13 +55,13 @@ export class RunnerScene extends Scene
         this.publish();
     }
 
-    private readonly reset = (): void =>
+    private readonly reset = (levelId?: string): void =>
     {
         this.phase = 'ready'; this.count = 0; this.elapsed = 0; this.distance = 0;
         this.pointerStart = undefined;
         this.paused = false; this.hinted = false; this.playerLane = 0; this.selectedLane = 0;
         this.tweens.resumeAll();
-        this.level = getLevelById();
+        this.level = getSchoolLevel(levelId ?? this.level.id);
         this.progress = new WordProgress(this.level.word);
         this.avatar?.destroy();
         this.avatar = new PlayerAvatar(this, 0, 0);
@@ -69,13 +69,13 @@ export class RunnerScene extends Scene
         this.publish();
     };
 
-    private readonly startRun = (): void =>
+    private readonly startRun = (levelId?: string): void =>
     {
         if (this.phase !== 'ready' && this.phase !== 'celebrate') return;
-        this.reset();
+        this.reset(levelId);
         this.phase = 'travel';
         EventBus.emit('level-started', {
-            levelId: this.level.id, word: this.level.word, display: this.level.word[0] + ' _ _ _'
+            levelId: this.level.id, word: this.level.word, display: getInitialWordDisplay(this.level.word)
         });
         this.publish();
     };
@@ -258,11 +258,12 @@ export class RunnerScene extends Scene
         this.world.resize();
         const approach = this.phase === 'approach' ? Math.min(1, this.elapsed/650)
             : this.phase === 'retry' || this.phase === 'collect' ? 1 - Math.min(1, this.elapsed/500) : 0;
-        const p = this.world.project(this.playerLane, 0.16 + approach * 0.17);
-        const playerScale = Math.min(1.4, Math.max(0.82, this.scale.width/740)) * (1 - approach * 0.16);
+        const p = this.world.project(this.playerLane, 0.10 + approach * 0.23);
+        this.avatar.setRingCount(this.count * 3);
+        const playerScale = this.avatar.getRunnerScale(this.scale.width, this.scale.height, approach);
         const py = p.y - 35 * playerScale;
         const finish = this.phase === 'celebrate' ? 1 : this.phase === 'finish' ? Math.min(1, this.elapsed/3300) : 0;
-        this.world.render(this.distance, this.count, p.x, py, this.reduced, finish);
+        this.world.render(this.distance, this.reduced, finish);
         this.avatar.syncPosition(p.x, py);
         this.avatar.setRunnerPose(moving, playerScale, this.reduced);
         this.drawGates();
@@ -312,6 +313,7 @@ export class RunnerScene extends Scene
     private readonly publish = (): void =>
     {
         const state: RunnerSnapshot = {
+            levelId: this.level.id, word: this.level.word,
             phase: this.phase, count: this.count, choices: [...this.choices],
             lane: this.selectedLane, hinted: this.hinted, paused: this.paused
         };

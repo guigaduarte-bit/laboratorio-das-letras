@@ -340,3 +340,17 @@ Status: **causa reproduzida e corrigida; build e testes aprovados para preview**
 - [x] Teste de regressão confirma as dimensões após início, redimensionamento, retorno ao menu e rotação.
 - [x] Build, tipos, lint e testes de jogabilidade executados após a correção.
 - [ ] Enquadramento conferido pelo usuário no novo preview.
+
+## Iteração de 2026-09-08 — palavras da escola, anéis e voz
+
+- [x] SAPO, ONÇA, TUCANO e MACACO com escolha ilustrada de missão, progressão, repetição e conclusão por palavra.
+- [x] HUD de quatro ou seis letras e registro por nível; Ç e letras repetidas preservados.
+- [x] Anéis empilhados no tronco, com cabeça e movimentos acompanhando a pilha.
+- [x] Escala do personagem considera a pilha e a altura disponível sob as letras.
+- [x] Síntese do navegador substituída por reprodução de gravações no Howler.
+- [x] Área para gravar/carregar, conferir e salvar cada trecho localmente.
+- [x] Roteiro de 16 falas e tratamento de microfone indisponível, arquivo inválido e armazenamento bloqueado.
+- [x] Build, tipos e testes automatizados do ciclo de jogo, viewport e áudio.
+- [ ] Gravar ou receber os trechos humanos; conferir pronúncia e volume.
+- [ ] Conferir interface e microfone no computador/tablet do usuário.
+- [ ] Publicação em produção (não autorizada nesta iteração).

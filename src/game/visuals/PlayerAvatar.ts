@@ -19,6 +19,11 @@ export class PlayerAvatar
     private readonly leftLeg: GameObjects.Graphics;
     private readonly rightLeg: GameObjects.Graphics;
     private readonly antennaGlow: GameObjects.Arc;
+    private readonly upper: GameObjects.Container;
+    private readonly ringBack: GameObjects.Graphics;
+    private readonly ringFront: GameObjects.Graphics;
+    private readonly neck: GameObjects.Graphics;
+    private ringCount = -1;
     private currentState?: PlayerVisualState;
     private facing: -1 | 1 = 1;
     private lockedUntil = 0;
@@ -51,23 +56,26 @@ export class PlayerAvatar
         const footLeft = scene.add.ellipse(-11, 32, 18, 8, ART_COLORS.ink);
         const footRight = scene.add.ellipse(11, 32, 18, 8, ART_COLORS.ink);
 
+        this.ringBack = scene.add.graphics();
+        this.ringFront = scene.add.graphics();
+        this.neck = scene.add.graphics();
+        this.upper = scene.add.container(0, 0, [antennaStem, this.antennaGlow, this.head, visor, leftEye, rightEye]);
+
         this.rig.add([
             shadow,
             this.leftLeg,
             this.rightLeg,
             footLeft,
             footRight,
+            this.ringBack,
+            this.neck,
             this.leftArm,
             this.rightArm,
             body,
             bodyPanel,
             badge,
-            antennaStem,
-            this.antennaGlow,
-            this.head,
-            visor,
-            leftEye,
-            rightEye
+            this.ringFront,
+            this.upper
         ]);
         this.root.add(this.rig);
         this.applyState('idle');
@@ -121,6 +129,38 @@ export class PlayerAvatar
         this.root.setPosition(x, y);
     }
 
+    /** Metades atrás e à frente do tronco pertencem ao mesmo rig: nunca ficam ao lado. */
+    setRingCount(count: number): void
+    {
+        const rings = Math.max(0, Math.min(18, Math.floor(count)));
+        if (rings === this.ringCount) return;
+        this.ringCount = rings;
+        const growth = Math.max(0, rings - 6) * 3.2;
+        this.upper.setY(-growth);
+        this.neck.clear();
+        this.neck.fillStyle(ART_COLORS.deepMoss, 1);
+        this.neck.fillRoundedRect(-8, -19-growth, 16, 30+growth, 6);
+        this.ringBack.clear(); this.ringFront.clear();
+        for (let index = 0; index < rings; index++)
+        {
+            const y = 19 - index * 3.2;
+            const color = [ART_COLORS.sun, ART_COLORS.clay, ART_COLORS.lagoon, ART_COLORS.leafLight][Math.floor(index / 3) % 4];
+            for (const [g, start] of [[this.ringBack, Math.PI], [this.ringFront, 0]] as const)
+            {
+                g.lineStyle(3.6, color, 1);
+                g.beginPath();
+                for (let step = 0; step <= 20; step++)
+                {
+                    const angle = start + step * Math.PI / 20;
+                    const x = Math.cos(angle) * 30;
+                    const py = y + Math.sin(angle) * 7;
+                    if (step === 0) g.moveTo(x, py); else g.lineTo(x, py);
+                }
+                g.strokePath();
+            }
+        }
+    }
+
     setRunnerPose(moving: boolean, scale: number, reducedMotion: boolean): void
     {
         this.root.setScale(scale).setDepth(70);
@@ -134,6 +174,14 @@ export class PlayerAvatar
         {
             this.applyState(moving ? 'walk' : 'idle');
         }
+    }
+
+    getRunnerScale(width: number, height: number, approach: number): number
+    {
+        const growth = Math.max(0, this.ringCount - 6) * 3.2;
+        // Reserva espaço sob as letras quando a pilha cresce em uma tela baixa.
+        const belowLetters = (height * 0.264 + 6) / (79 + growth);
+        return Math.min(1.4, Math.max(0.82, width / 740), belowLetters) * (1 - approach * 0.16);
     }
 
     playCollect(): void

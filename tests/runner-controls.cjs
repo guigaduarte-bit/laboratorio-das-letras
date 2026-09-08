@@ -48,6 +48,8 @@ class Avatar {
     playCelebrate() {}
     syncPosition(x, y) { this.x = x; this.y = y; }
     setRunnerPose() {}
+    setRingCount(count) { this.rings = count; }
+    getRunnerScale(width, height, approach) { return Math.min(1.4, Math.max(.82, width/740)) * (1-approach*.16); }
 }
 class World {
     resize() {}
@@ -60,7 +62,7 @@ const { WordProgress } = load('src/game/systems/WordProgress.ts', busImport);
 const content = load('src/game/content/runner.ts', {});
 const { RunnerScene } = load('src/game/scenes/RunnerScene.ts', {
     ...busImport, phaser: { Scene, Geom: { Rectangle } },
-    '../content/levels': { getLevelById: () => ({ id: 'forest-sapo', word: 'SAPO' }) },
+    '../content/levels': load('src/game/content/levels.ts', {}),
     '../content/runner': content, '../systems/WordProgress': { WordProgress },
     '../visuals/PlayerAvatar': { PlayerAvatar: Avatar },
     '../visuals/RunnerWorld': { RunnerWorld: World },
@@ -167,7 +169,32 @@ tick(650); tick(4600);
 assert.equal(state.phase, 'celebrate'); assert.equal(collected, 4); assert.equal(completed, 1);
 EventBus.emit('runner-start');
 assert.equal(state.count, 0); assert.equal(state.phase, 'travel');
+// The same scene must complete every school word, including cedilla and repeated letters.
+const { schoolLevels } = load('src/game/content/levels.ts', {});
+assert.equal(schoolLevels.map(({ word }) => word).join(','), 'SAPO,ONÇA,TUCANO,MACACO');
+for (const level of schoolLevels) {
+    EventBus.emit('runner-home', level.id);
+    assert.equal(state.phase, 'ready'); assert.equal(state.word, level.word);
+    EventBus.emit('runner-start', level.id);
+    assert.equal(state.levelId, level.id); assert.equal(state.count, 0);
+    EventBus.emit('runner-start', 'forest-sapo');
+    assert.equal(state.levelId, level.id, 'Cannot change a level during an active run');
+    for (const [index, letter] of [...level.word].entries()) {
+        tick(2700);
+        assert.equal(state.phase, 'choose');
+        assert.equal(state.count, index);
+        select(state.choices.indexOf(letter));
+        EventBus.emit('runner-advance'); tick(650);
+        assert.equal(state.count, index + 1);
+        assert.equal(scene.avatar.rings, (index + 1) * 3);
+        tick(1300);
+    }
+    tick(3300);
+    assert.equal(state.phase, 'celebrate'); assert.equal(state.count, level.word.length);
+}
+EventBus.emit('runner-home', 'unknown');
+assert.equal(state.word, 'SAPO', 'An unknown mission safely falls back to the school default');
 scene.cleanup();
 for (const event of ['runner-start', 'runner-move', 'runner-advance', 'runner-choose']) assert.equal(EventBus.listenerCount(event), 0);
 assert.equal(scene.input.listenerCount('pointerup'), 0);
-console.log('PASS: arrows, focused buttons, physical advance, touch targets, tap/swipe, multitouch, pause, retry and full SAPO cycle.');
+console.log('PASS: arrows, focused buttons, physical advance, touch targets, tap/swipe, multitouch, pause, retry and all four school words, repeated letters, cedilla and ring counts.');
