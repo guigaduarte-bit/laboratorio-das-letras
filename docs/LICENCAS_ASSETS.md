@@ -118,3 +118,17 @@ Não foram usados modelos, texturas ou personagens do jogo de referência. Áudi
 | Mata Atlântica, Pantanal, Cerrado e Amazônia | Geometria original do projeto em `BiomeWorld3D.ts`; sem mídia externa | Cenário da respectiva palavra |
 | Aceno do explorador e respostas dos animais | Animação original dos rigs em `Explorer3D.ts` e `Animals3D.ts` | Encontro ao completar a palavra |
 | Associação de habitats | Referências públicas listadas em `BIOMAS_EXPEDICAO.md`, sem copiar conteúdo ou incorporar arquivos | Direção visual dos cenários |
+
+## Trilha e efeitos da expedição — 2026-09-08
+
+| Asset em `public/assets/audio/expedition/` | Origem | Uso |
+| --- | --- | --- |
+| `adventure-loop.mp3` | Composição e síntese instrumental originais, geradas por `scripts/generate-expedition-audio.py`; sem samples externos | Música alegre em loop, 120 BPM, 16 compassos/32 segundos |
+| `collect-chime.mp3` | Síntese original de três notas metálicas ascendentes | Acerto de letra e coleta de anéis |
+| `retry-cue.mp3` | Síntese original de duas notas graves com timbre de madeira | Outra tentativa, sem punição |
+| `discovery-fanfare.mp3` | Composição original curta com percussão e notas ascendentes | Encontro com o animal |
+| Roteiro de 19 falas | Textos próprios em `HumanVoice.ts` e `ROTEIRO_NARRACAO.md` | Instruções, letras e palavras |
+
+Os quatro MP3 são assets próprios do projeto, cobertos pela licença MIT do repositório. A referência ao efeito de coleta do Sonic orienta somente o caráter breve, brilhante e metálico: nenhum áudio, sample ou transcrição musical da franquia foi incorporado. Geração local por código, NumPy e FFmpeg; hashes, durações e métricas de amplitude estão em `AUDIO_ASSETS_METRICS.json`.
+
+Nenhuma gravação humana externa foi obtida ou adicionada nesta entrega. O estúdio aceita gravação/upload local e permite exportar/importar os trechos entre aparelhos. Uma narração incorporada ao jogo publicado ainda depende de gravações autorizadas do roteiro; não há substituição automática por síntese de voz.

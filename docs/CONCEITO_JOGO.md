@@ -95,3 +95,9 @@ A síntese do navegador foi retirada da corrida. A área de acompanhamento permi
 Após a aprovação visual do 3D, cada palavra passa a levar a um ambiente próprio: lagoa na Mata Atlântica, Pantanal, Cerrado e Amazônia. O cenário muda com a missão e mantém a pista e as letras desobstruídas. As escolhas e referências estão em `BIOMAS_EXPEDICAO.md`.
 
 O final é um encontro: explorador e animal olham um para o outro, o explorador acena e o animal responde com seu gesto. O trajeto fica mais ágil, preservando a parada sem prazo para reconhecer cada letra. Áudio e narração permanecem adiados conforme o pedido do usuário.
+
+## Áudio da aventura — 2026-09-08
+
+A expedição ganha uma trilha instrumental original alegre, um brilho metálico ao acertar, um som grave breve para orientar outra tentativa e uma fanfarra no encontro final. O erro permanece sem punição. A música baixa enquanto uma pessoa fala as letras ou instruções e os volumes podem ser ajustados separadamente.
+
+O roteiro humano passa a 19 falas, com apresentação, convite, nomes das letras, palavras e reforços. Ainda é necessário receber ou gravar esses trechos: o jogo não apresenta voz sintetizada como humana. O estúdio permite levar as gravações ao tablet em um pacote, mantendo-as sob controle da pessoa que acompanha.

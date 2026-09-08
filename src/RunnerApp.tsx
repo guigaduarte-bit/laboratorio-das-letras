@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
-import { runnerAudio } from './audio/RunnerAudio';
+import { runnerAudio, DEFAULT_AUDIO_MIX, type AudioMix } from './audio/RunnerAudio';
 import { humanVoice, VOICE_SCRIPT } from './audio/HumanVoice';
 import { getSchoolLevel, schoolLevels } from './game/content/levels';
 import { getBiomeForLevel } from './game/content/biomes';
@@ -20,6 +20,7 @@ export default function RunnerApp()
     const [state, setState] = useState<RunnerSnapshot>(EMPTY);
     const [ready, setReady] = useState(false);
     const [sound, setSound] = useState(true);
+    const [audioMix, setAudioMix] = useState<AudioMix>(DEFAULT_AUDIO_MIX);
     const [voice, setVoice] = useState(0);
     const [announcement, setAnnouncement] = useState('');
     const [parentOpen, setParentOpen] = useState(false);
@@ -43,53 +44,58 @@ export default function RunnerApp()
 
     useEffect(() => {
         let lastPhase = 'ready';
+        setAudioMix(runnerAudio.loadMix());
         const sync = (next: RunnerSnapshot) => {
             snapshot.current = next; setState(next); setReady(true);
-            if (next.phase === 'choose' && lastPhase !== 'choose')
+            runnerAudio.setActive(next.phase !== 'ready' && !next.paused && !document.hidden && !parentDialog.current?.open);
+            if (next.phase === 'choose' && lastPhase !== 'choose' && !next.paused)
             {
                 const letter = next.word[next.count];
                 setAnnouncement(`Encontre a letra ${letter}. Escolha um caminho com esquerda e direita e avance com a seta para cima. Você também pode tocar na letra.`);
-                runnerAudio.prompt(letter);
+                if (lastPhase !== 'retry') runnerAudio.prompt(letter);
             }
             if (next.phase === 'ready' || next.phase === 'celebrate') startGuard.current = false;
             lastPhase = next.phase;
         };
-        const started = ({ word }: { word: string }) => { setProgress(localProgress.recordSessionStarted()); runnerAudio.introduction(word); };
-        const collected = ({ letter, count, total, word }: { letter: string; count: number; total: number; word: string }) => {
+        const started = ({ word }: { word: string }) => { setProgress(localProgress.recordSessionStarted()); runnerAudio.setActive(true); runnerAudio.introduction(word); };
+        const collected = ({ letter, count, total }: { letter: string; count: number; total: number; word: string }) => {
             setProgress(localProgress.recordCorrectLetter(letter));
             setAnnouncement(`${letter} encontrada. ${count} de ${total} letras.`);
-            runnerAudio.collected(letter, count === total, word);
+            runnerAudio.collected(letter);
         };
-        const hint = ({ expected }: { expected: string }) => {
+        const support = (expected: string) => {
             setProgress(localProgress.recordHintAttempt(expected));
             setAnnouncement(`Vamos procurar ${expected}. O Pisco iluminou essa letra.`);
-            runnerAudio.help(expected);
         };
+        const mismatch = ({ expected }: { expected: string }) => { support(expected); runnerAudio.retry(expected); };
+        const hint = ({ expected }: { expected: string }) => { support(expected); runnerAudio.help(expected); };
         const complete = ({ word }: { word: string }) => {
             setProgress(localProgress.recordLevelCompleted(snapshot.current.levelId));
             setAnnouncement(`Você formou ${word}!`);
         };
-        const celebrate = () => runnerAudio.celebrate();
-        const unavailable = () => { setReady(false); startGuard.current = false; };
+        const celebrate = ({ word }: { word: string }) => runnerAudio.celebrate(word);
+        const unavailable = () => { setReady(false); startGuard.current = false; runnerAudio.stop(); };
         const available = () => setReady(true);
         const voiceChanged = () => setVoice(humanVoice.count);
         const visibility = () => {
-            if (document.hidden && !['ready', 'celebrate'].includes(snapshot.current.phase))
-            {
-                EventBus.emit('runner-pause', true); runnerAudio.stop();
+            if (document.hidden) {
+                if (!['ready', 'celebrate'].includes(snapshot.current.phase)) EventBus.emit('runner-pause', true);
+                runnerAudio.setActive(false);
+            } else if (snapshot.current.phase === 'celebrate' && !parentDialog.current?.open) {
+                runnerAudio.setActive(true);
             }
         };
         const escape = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && !parentDialog.current?.open && !pauseDialog.current?.open
                 && !['ready', 'celebrate'].includes(snapshot.current.phase))
             {
-                EventBus.emit('runner-pause', true); runnerAudio.stop();
+                EventBus.emit('runner-pause', true); runnerAudio.setActive(false);
             }
         };
         EventBus.on('runner-state', sync);
         EventBus.on('level-started', started);
         EventBus.on('letter-collected', collected);
-        EventBus.on('letter-mismatch', hint);
+        EventBus.on('letter-mismatch', mismatch);
         EventBus.on('runner-hint-used', hint);
         EventBus.on('word-completed', complete);
         EventBus.on('celebration-ready', celebrate);
@@ -103,7 +109,7 @@ export default function RunnerApp()
         window.addEventListener('keydown', escape);
         return () => {
             EventBus.off('runner-state', sync); EventBus.off('level-started', started);
-            EventBus.off('letter-collected', collected); EventBus.off('letter-mismatch', hint);
+            EventBus.off('letter-collected', collected); EventBus.off('letter-mismatch', mismatch);
             EventBus.off('runner-hint-used', hint); EventBus.off('word-completed', complete);
             EventBus.off('celebration-ready', celebrate);
             EventBus.off('runner-unavailable', unavailable); EventBus.off('runner-ready', available);
@@ -134,17 +140,23 @@ export default function RunnerApp()
     const toggleSound = () => {
         const enabled = !soundRef.current;
         soundRef.current = enabled; setSound(enabled); runnerAudio.unlock(); runnerAudio.setEnabled(enabled);
-        if (enabled && phase === 'choose') runnerAudio.prompt(target);
+        if (enabled && canChoose && !parentOpen) runnerAudio.prompt(target);
+    };
+    const changeVolume = (channel: keyof AudioMix, value: number) => {
+        runnerAudio.setVolume(channel, value / 100); setAudioMix(runnerAudio.getMix());
     };
     const openParent = () => {
-        runnerAudio.stop();
+        runnerAudio.setActive(false);
         wasPaused.current = state.paused;
-        if (isPlaying) { EventBus.emit('runner-pause', true); runnerAudio.stop(); }
+        if (isPlaying) EventBus.emit('runner-pause', true);
         setProgress(localProgress.read()); setParentOpen(true); parentDialog.current?.showModal();
     };
     const closeParent = () => {
         parentDialog.current?.close(); setParentOpen(false);
-        if (isPlaying && !wasPaused.current) EventBus.emit('runner-pause', false);
+        if (isPlaying && !wasPaused.current) {
+            EventBus.emit('runner-pause', false);
+            if (phase === 'choose') runnerAudio.prompt(target);
+        } else if (phase === 'celebrate') runnerAudio.setActive(true);
     };
     const home = () => { runnerAudio.stop(); EventBus.emit('runner-home'); pauseDialog.current?.close(); };
     const chooseLevel = (levelId: string) => { runnerAudio.stop(); EventBus.emit('runner-home', levelId); };
@@ -169,7 +181,7 @@ export default function RunnerApp()
                     <span>laboratório<span>das letras</span></span>
                 </button>
                 <div className="header-actions">
-                    {isPlaying && <button className="icon-button" aria-label="Pausar jogo" onClick={() => { EventBus.emit('runner-pause', true); runnerAudio.stop(); }}><RunnerIcon name="pause" /></button>}
+                    {isPlaying && <button className="icon-button" aria-label="Pausar jogo" onClick={() => { EventBus.emit('runner-pause', true); runnerAudio.setActive(false); }}><RunnerIcon name="pause" /></button>}
                     <button className="icon-button" aria-label={sound ? 'Desligar som' : 'Ligar som'} aria-pressed={sound} onClick={toggleSound}><RunnerIcon name={sound ? 'sound' : 'muted'} /></button>
                     <button className="parent-button" onClick={openParent}>Para quem acompanha</button>
                 </div>
@@ -269,7 +281,15 @@ export default function RunnerApp()
                 <div className="progress-summary"><div><strong>{progress.sessionCount}</strong><span>Sessões iniciadas</span></div><div><strong>{progress.completedLevels.length}</strong><span>Palavras concluídas</span></div><div><strong>{hintTotal}</strong><span>Dicas usadas</span></div></div>
                 {Object.keys(progress.letterStats).length > 0 && <table><caption>Letras praticadas</caption><thead><tr><th>Letra</th><th>Coletas</th><th>Com dica</th></tr></thead><tbody>{Object.entries(progress.letterStats).sort(([a], [b]) => a.localeCompare(b)).map(([letter, stats]) => <tr key={letter}><th>{letter}</th><td>{stats.correct}</td><td>{stats.hints}</td></tr>)}</tbody></table>}
                 <p className="parent-detail">{progress.lastPlayedAt ? `Última atividade: ${new Date(progress.lastPlayedAt).toLocaleString('pt-BR')}. ` : 'As descobertas aparecerão depois da primeira brincadeira. '}O progresso fica neste navegador. Coletas e dicas ajudam a observar a prática; não medem domínio de leitura.</p>
-                <div className="voice-status"><RunnerIcon name="sound" size={20} /><p>{voice === VOICE_SCRIPT.length ? 'Todos os trechos estão gravados. A aventura usa os áudios que você preparou.' : `${voice} de ${VOICE_SCRIPT.length} trechos gravados. Prepare as falas abaixo para ativar a narração humana. Enquanto isso, leia as letras junto com o Ben; os efeitos sonoros continuam disponíveis.`}</p></div>
+                <fieldset className="audio-mixer">
+                    <legend>Som da aventura</legend>
+                    <p>A música baixa durante as falas para destacar cada letra.</p>
+                    {([['music', 'Música de fundo'], ['effects', 'Acertos e efeitos'], ['voice', 'Voz humana']] as const).map(([channel, label]) => <label key={channel}>
+                        <span>{label}<output>{Math.round(audioMix[channel] * 100)}%</output></span>
+                        <input type="range" min="0" max="100" step="1" value={Math.round(audioMix[channel] * 100)} aria-label={`Volume: ${label}`} aria-valuetext={`${Math.round(audioMix[channel] * 100)} por cento`} onChange={(event) => changeVolume(channel, Number(event.target.value))} />
+                    </label>)}
+                </fieldset>
+                <div className="voice-status"><RunnerIcon name="sound" size={20} /><p>{voice === VOICE_SCRIPT.length ? 'Todos os trechos estão gravados. A aventura usa os áudios que você preparou.' : `${voice} de ${VOICE_SCRIPT.length} trechos gravados. Prepare as falas abaixo para completar a narração humana. Enquanto isso, leia as letras junto com o Ben; a música e os efeitos já estão disponíveis.`}</p></div>
                 {parentOpen && <VoiceStudio />}
                 <button className="expedition-primary" onClick={closeParent}>VOLTAR À AVENTURA</button>
             </dialog>

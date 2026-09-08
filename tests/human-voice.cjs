@@ -33,6 +33,10 @@ function load(file, imports = {}, globals = {}) {
         constructor(options) { this.options = options; }
         play() { playing.push(this); return 1; }
         stop() { this.stopped = true; }
+        volume(value) { if (value !== undefined) this.gain = value; return this.gain ?? 0; }
+        state() { return 'loaded'; }
+        pause() { this.stopped = true; }
+        fade(from, to) { this.gain = to; }
         unload() { this.stopped = true; }
     }
     const clips = new Set(['prompt', 'letter-A', 'letter-Ç', 'word-ONÇA', 'complete']);

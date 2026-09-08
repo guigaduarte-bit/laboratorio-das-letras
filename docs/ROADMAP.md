@@ -377,3 +377,15 @@ Status: **causa reproduzida e corrigida; build e testes aprovados para preview**
 - [x] Testes de orientação, enquadramento, pausa, troca de destino e descarte de recursos.
 - [ ] Avaliação visual do novo encontro e do ritmo pelo usuário no computador/tablet.
 - [ ] Retomar narração após a avaliação de jogabilidade.
+
+## Iteração de áudio — 2026-09-08
+
+- [x] Trilha instrumental original animada em loop e três efeitos próprios.
+- [x] Acerto destacado, som distinto de outra tentativa e fanfarra final; dica não soa como erro.
+- [x] Música/efeitos/voz com volumes separados e música reduzida durante narração.
+- [x] Pausa, mute, aba oculta, retomada e carregamento tardio respeitados.
+- [x] Fila de falas preserva a apresentação; palavra completa no encontro com o animal.
+- [x] Roteiro de 19 falas, gravação guiada e pacote de vozes entre computador/tablet.
+- [x] Testes de mixer, Howler real, importação atômica, regras/controles e build.
+- [ ] Receber ou gravar narração humana completa; ainda não incorporada.
+- [ ] Conferir música, timbres, pronúncia e gravação no computador/tablet físico.
