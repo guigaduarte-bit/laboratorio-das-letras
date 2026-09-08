@@ -97,3 +97,16 @@ O arquivo de runtime tem SHA-256 `0e1671cb73c3937e4e4a6523d809b702e4036bda7fc26a
 | Gravações humanas | Ainda não fornecidas/incorporadas; gravação ou upload voluntário pelo responsável, somente no navegador | Reprodução local no Howler, sem redistribuição no repositório |
 
 A Web Speech API foi retirada da nova corrida nesta iteração. As fontes de áudio humano pesquisadas na Wikimedia não foram incorporadas, pois não foi obtido um conjunto completo para este roteiro. O protótipo antigo de plataformas mantém seus assets técnicos já registrados.
+
+## Expedição 3D — 2026-09-08
+
+| Elemento | Origem / licença | Uso |
+| --- | --- | --- |
+| Explorador, 18 anéis e rig animado | Geometria original do projeto, `src/game/three/Explorer3D.ts` | Personagem jogável |
+| Sapo, onça, tucano e macaco 3D | Geometria original do projeto, `src/game/three/Animals3D.ts` | Descobertas ao completar as palavras |
+| Bosque, laboratório, portais, vegetação e partículas | Geometria original do projeto, `src/game/three/RunnerWorld3D.ts` | Ambiente e objetos 3D |
+| Letras sobre os portais | Texturas geradas localmente com Lexend, OFL-1.1 já registrada | Letras legíveis em blocos com volume |
+| Three.js 0.185.1 e RoundedBoxGeometry | Three.js authors, MIT, licença em `node_modules/three/LICENSE` | Renderização 3D e geometria arredondada |
+| eventemitter3 5.0.4 | Primus, MIT, licença em `node_modules/eventemitter3/LICENSE` | Barramento independente de renderizador |
+
+Não foram usados modelos, texturas ou personagens do jogo de referência. Áudios permanecem como na iteração anterior.

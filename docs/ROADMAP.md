@@ -354,3 +354,15 @@ Status: **causa reproduzida e corrigida; build e testes aprovados para preview**
 - [ ] Gravar ou receber os trechos humanos; conferir pronúncia e volume.
 - [ ] Conferir interface e microfone no computador/tablet do usuário.
 - [ ] Publicação em produção (não autorizada nesta iteração).
+
+## Expedição com volume real — 2026-09-08
+
+- [x] Personagem, anéis no corpo, portais, bosque e laboratório em Three.js.
+- [x] Sapo, onça, tucano e macaco modelados em 3D como descobertas.
+- [x] Caminhada, crescimento, aproximação, desaceleração, animações do ambiente e transições.
+- [x] Câmera responsiva com reserva para HUD e personagem com 18 anéis.
+- [x] Regras de alfabetização, quatro palavras, teclado/toque e progresso preservados.
+- [x] Movimento reduzido, pausa, descarte de recursos e opção leve em falha de WebGL.
+- [x] Testes automáticos de regras, projeção e interação; tipos, lint e build.
+- [ ] Inspeção visual do preview autenticado e medição de fluidez no tablet físico.
+- [ ] Retomar gravações e narração depois da avaliação da jogabilidade, conforme solicitado.

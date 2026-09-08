@@ -26,7 +26,7 @@
 .expedition-stage[data-phase="ready"] { min-height: 570px; }
 .expedition-stage #game-container { position: absolute; inset: 0; width: auto; height: auto; min-width: 0; min-height: 0; aspect-ratio: auto; touch-action: none; }
 .expedition-stage #game-container:focus-visible { outline: 3px solid var(--exp-green); outline-offset: -5px; }
-.expedition-stage #game-container canvas { display: block; /* O ScaleManager é responsável pelas dimensões. */ }
+.expedition-stage #game-container canvas { display: block; /* Cada renderizador acompanha as dimensões do contêiner. */ }
 .world-label { position: absolute; top: 24px; left: 28px; display: flex; align-items: center; gap: 7px; padding: 8px 12px; background: #e8dcc77d; color: var(--exp-green); font-size: 13px; font-weight: 520; border-radius: 20px; pointer-events: none; }
 .expedition-start { position: absolute; top: 20%; left: 5%; width: 410px; z-index: 3; }
 .expedition-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 2px; margin: 0 0 17px; color: var(--exp-green); }
@@ -267,4 +267,35 @@
     .expedition-word > span { font-size: 26px; }
     .expedition-complete { top: 50%; padding: 18px 16px; }
     .expedition-stage[data-phase="celebrate"] { min-height: 620px; }
+}
+
+/* The 3D camera fits the full grown explorer and all choices inside this viewport. */
+.expedition-hud { left: 50%; }
+.runner-3d-container { position: absolute; inset: 0; overflow: hidden; touch-action: none; }
+.runner-3d-container canvas { display: block; width: 100%; height: 100%; }
+.runner-3d-status { position: absolute; inset: 0; z-index: 12; display: grid; place-items: center; padding: 26px; text-align: center; background: #d1dcc1; }
+.runner-3d-status-content { max-width: 400px; }
+.runner-3d-status-content p { line-height: 1.6; }
+.runner-3d-status .expedition-primary { margin: 20px auto 0; }
+.expedition-stage[data-phase="celebrate"]:has(.runner-3d-container) .expedition-pisco { display: none; }
+@media (min-width: 900px) {
+    .expedition-stage[data-phase="celebrate"]:has(.runner-3d-container) .expedition-complete { left: auto; right: 24px; transform: translateY(-50%) !important; width: min(360px, 42%); padding: 24px; }
+    .expedition-stage[data-phase="celebrate"]:has(.runner-3d-container) .expedition-complete > .animal-portrait { display: none; }
+}
+@media (max-width: 899px) {
+    .expedition-stage[data-phase="celebrate"]:has(.runner-3d-container) { height: auto; min-height: 0; padding: 320px 16px 22px; }
+    .expedition-stage[data-phase="celebrate"]:has(.runner-3d-container) #game-container { height: 320px; bottom: auto; }
+    .expedition-stage[data-phase="celebrate"]:has(.runner-3d-container) .expedition-complete { position: relative; inset: auto; transform: none !important; margin: 0 auto; width: min(430px, 100%); padding-top: 22px; }
+    .expedition-stage[data-phase="celebrate"]:has(.runner-3d-container) .expedition-complete > .animal-portrait { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+    .expedition-word > span { transition: background-color 250ms ease, color 250ms ease, border-color 250ms ease; }
+}
+
+.expedition-stage[data-phase="ready"]::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, #d1dcc1f5 0%, #d1dcc1b0 40%, #d1dcc120 85%); }
+.expedition-shell[data-playing="true"] .expedition-pisco { left: 10px; bottom: 10px; }
+.expedition-shell[data-playing="true"] .expedition-pisco .mascot-guide { width: 54px; height: 60px; }
+.expedition-shell[data-playing="true"] .pisco-speech { display: none; }
+@media (max-width: 899px) {
+    .expedition-stage[data-phase="ready"]::after { background: linear-gradient(#d1dcc1f0, #d1dcc1c0 40%, #d1dcc120); }
 }

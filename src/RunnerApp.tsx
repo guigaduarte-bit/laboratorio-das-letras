@@ -5,7 +5,7 @@ import { humanVoice, VOICE_SCRIPT } from './audio/HumanVoice';
 import { getSchoolLevel, schoolLevels } from './game/content/levels';
 import { AnimalPortrait } from './ui/AnimalPortrait';
 import { VoiceStudio } from './ui/VoiceStudio';
-import { PhaserGame } from './PhaserGame';
+import { RunnerGame3D } from './RunnerGame3D';
 import { EventBus } from './game/EventBus';
 import type { RunnerSnapshot } from './game/content/runner';
 import { localProgress, type LocalProgress } from './progress/LocalProgress';
@@ -68,6 +68,8 @@ export default function RunnerApp()
             setAnnouncement(`Você formou ${word}!`);
         };
         const celebrate = () => runnerAudio.celebrate();
+        const unavailable = () => { setReady(false); startGuard.current = false; };
+        const available = () => setReady(true);
         const voiceChanged = () => setVoice(humanVoice.count);
         const visibility = () => {
             if (document.hidden && !['ready', 'celebrate'].includes(snapshot.current.phase))
@@ -89,6 +91,8 @@ export default function RunnerApp()
         EventBus.on('runner-hint-used', hint);
         EventBus.on('word-completed', complete);
         EventBus.on('celebration-ready', celebrate);
+        EventBus.on('runner-unavailable', unavailable);
+        EventBus.on('runner-ready', available);
         EventBus.emit('runner-state-request');
         voiceChanged();
         const unsubscribeVoice = humanVoice.subscribe(voiceChanged);
@@ -100,6 +104,7 @@ export default function RunnerApp()
             EventBus.off('letter-collected', collected); EventBus.off('letter-mismatch', hint);
             EventBus.off('runner-hint-used', hint); EventBus.off('word-completed', complete);
             EventBus.off('celebration-ready', celebrate);
+            EventBus.off('runner-unavailable', unavailable); EventBus.off('runner-ready', available);
             unsubscribeVoice();
             document.removeEventListener('visibilitychange', visibility);
             window.removeEventListener('keydown', escape);
@@ -169,7 +174,7 @@ export default function RunnerApp()
             </header>
 
             <section className="expedition-stage" aria-label="Expedição das Letras" data-phase={phase}>
-                <PhaserGame word={WORD} mode="runner" />
+                <RunnerGame3D word={WORD} />
                 <div className="world-label"><RunnerIcon name="leaf" size={17} /> Bosque-laboratório</div>
                 <AnimatePresence>
                     {phase === 'ready' && <motion.div className="expedition-start" key="start" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
