@@ -60,3 +60,72 @@ Pisco será animado por uma máquina de estados Rive somente depois da aprovaç�
 O primeiro progresso persistente permanece restrito ao dispositivo e ao navegador usados pela criança. Não há conta, login, Supabase, identificação pessoal, ranking ou sincronização em nuvem.
 
 São registrados somente níveis concluídos, quantidade de sessões iniciadas, última atividade e contagens de acertos e dicas por letra. Esses dados servem para retomar o percurso e identificar letras que precisam de mais apoio, sem criar pontuação ou punição.
+
+## Expedição das Letras — 2026-09-05
+
+Adaptação original do ciclo de corrida, coleta e crescimento solicitado como referência. Lumi avança pela pista em perspectiva do Bosque-Laboratório e acumula anéis em seu equipamento ao encontrar as letras de SAPO. Pisco acompanha cada descoberta.
+
+- A pista para diante das alternativas, sem limite de tempo para escolher.
+- A primeira escolha tem duas alternativas; as seguintes têm três. As posições variam, mantendo todas as letras com a mesma aparência.
+- Esquerda/direita (ou A/D) escolhem o caminho; seta para cima (ou W, espaço/Enter) faz o personagem avançar até a letra. A coleta acontece na chegada.
+- No touchscreen, botões grandes de esquerda/direita e AVANÇAR reproduzem os controles do teclado. Também é possível tocar diretamente na letra ou deslizar para os lados e para cima.
+- Escolher outra letra preserva todas as descobertas e ilumina a letra esperada. Também é possível pedir dica.
+- A palavra modelo permanece visível. A atividade pratica reconhecimento e pareamento; não presume leitura autônoma nem mede domínio de alfabetização.
+- Quatro letras completam a invenção. A criança escolhe repetir ou encerrar a sessão.
+- Pausa manual e pausa ao ocultar a página preservam a escolha atual.
+
+A raiz abre a nova experiência. O protótipo de plataformas permanece em `?mode=explore`. Na entrega de 2026-09-05, o conteúdo era restrito a SAPO; a ampliação está registrada abaixo.
+
+### Ajuste de jogabilidade — 2026-09-07
+
+A parada diante das alternativas permanece sem limite de tempo. O avanço até a letra torna a decisão visível: após uma escolha diferente da esperada, o personagem volta ao ponto de escolha e a dica permanece, preservando as letras já encontradas. O controle por toque funciona sem teclado conectado. A pista adapta sua altura para deixar os botões disponíveis na vertical e na horizontal.
+
+## Missões da escola e voz humana — 2026-09-08
+
+A pedido do usuário, a expedição agora inclui **SAPO, ONÇA, TUCANO e MACACO**, as quatro palavras registradas na atividade escolar em `PROJETO_LABORATORIO_DAS_LETRAS_BEN.md`. PATO continua apenas no protótipo técnico de plataformas.
+
+A criança escolhe um animal ilustrado, coleta as letras em ordem e vê novamente o animal com a palavra completa. Ao terminar, pode descobrir o próximo animal, repetir ou voltar ao início. Todas as fases estão disponíveis, sem bloqueios ou punições. O histórico identifica cada palavra separadamente.
+
+Cada letra acrescenta três anéis ao corpo do explorador. A pilha acompanha o personagem e o rosto sobe com ela. A escala considera a altura da tela para preservar o espaço das letras.
+
+A síntese do navegador foi retirada da corrida. A área de acompanhamento permite ao responsável gravar ou carregar os 16 trechos do roteiro, ouvi-los e salvá-los. **Ainda não há um pacote humano pré-gravado incorporado.** Somente os trechos preparados no navegador são narrados; os demais mantêm apoio visual e efeitos. As gravações ficam no aparelho, sem envio a servidores.
+
+## Habitats e encontro com os animais — 2026-09-08
+
+Após a aprovação visual do 3D, cada palavra passa a levar a um ambiente próprio: lagoa na Mata Atlântica, Pantanal, Cerrado e Amazônia. O cenário muda com a missão e mantém a pista e as letras desobstruídas. As escolhas e referências estão em `BIOMAS_EXPEDICAO.md`.
+
+O final é um encontro: explorador e animal olham um para o outro, o explorador acena e o animal responde com seu gesto. O trajeto fica mais ágil, preservando a parada sem prazo para reconhecer cada letra. Áudio e narração permanecem adiados conforme o pedido do usuário.
+
+## Áudio da aventura — 2026-09-08
+
+A expedição ganha uma trilha instrumental original alegre, um brilho metálico ao acertar, um som grave breve para orientar outra tentativa e uma fanfarra no encontro final. O erro permanece sem punição. A música baixa enquanto uma pessoa fala as letras ou instruções e os volumes podem ser ajustados separadamente.
+
+O roteiro humano passa a 19 falas, com apresentação, convite, nomes das letras, palavras e reforços. Ainda é necessário receber ou gravar esses trechos: o jogo não apresenta voz sintetizada como humana. O estúdio permite levar as gravações ao tablet em um pacote, mantendo-as sob controle da pessoa que acompanha.
+
+## Narração recebida — 2026-09-12
+
+O roteiro gravado enviado pelo usuário passa a acompanhar a expedição em 19 trechos: apresentação, convite, 11 nomes de letras, quatro palavras e dois reforços. Funciona em um navegador novo, sem importar ou gravar novamente. A pessoa pode substituir falas localmente e restaurar a voz incluída.
+
+## Novas descobertas e escolha de explorador — 2026-09-12
+
+A expedição passa a ter oito fases: **SAPO, ONÇA, TUCANO, MACACO, PREGUIÇA, SUCURI, CAPIVARA e ARARA**. As quatro primeiras preservam o conteúdo da tarefa escolar; as quatro novas atendem ao pedido de ampliar os animais. A fase do bicho-preguiça forma a palavra **PREGUIÇA**. Todas ficam disponíveis desde o início, com reconhecimento de letras em ordem, dica e tempo livre para escolher.
+
+Antes de começar, a criança pode escolher **Lumi, Unicórnio ou Cachorro**. O explorador escolhido participa da mesma coleta, cresce com até 24 anéis e interage com o animal no final. A preferência fica no navegador, separada do progresso de aprendizagem. Os três personagens estão disponíveis tanto no mundo 3D quanto na versão leve.
+
+Pisco sai da expedição principal: a orientação continua no texto acessível, nas letras e na narração. O personagem e os registros antigos permanecem no protótipo de plataformas em `?mode=explore` como parte do histórico do projeto.
+
+Os novos encontros mantêm gestos breves e amistosos: a preguiça levanta o braço devagar, a sucuri inclina a cabeça, a capivara responde com a cabeça e uma pata e a arara abre as asas. Os habitats escolhidos para essas fases estão em `BIOMAS_EXPEDICAO.md`.
+
+As 19 falas humanas aprovadas continuam incluídas. O roteiro completo agora tem 27 trechos; ainda faltam **G, I, R, V, PREGUIÇA, SUCURI, CAPIVARA e ARARA**. Os demais áudios, a música e os efeitos continuam funcionando. Esses oito trechos não são substituídos por voz sintética; o roteiro complementar está em `ROTEIRO_NOVAS_FASES.md`.
+
+## Narração complementar recebida — 2026-09-12
+
+A segunda gravação completa as oito falas pendentes: G, I, R, V, PREGUIÇA, SUCURI, CAPIVARA e ARARA. As oito fases passam a ter todas as 27 falas humanas incluídas, sem configuração por aparelho. A gravação anterior, a música e os efeitos foram preservados.
+
+## Dancinha da vitória — 2026-09-12
+
+Ao concluir uma fase, Lumi, Unicórnio ou Cachorro faz uma comemoração de quatro segundos: passos alternados, balanço do corpo, braços ou patas animados e um pequeno pulinho. O personagem mantém a direção do animal e depois retoma o cumprimento. A dança acontece uma vez por conclusão, acompanha a pausa e não impede avançar para outra fase. Com movimento reduzido, fica uma pose amistosa estática. A versão leve também recebe a comemoração.
+
+## Comemoração de frente e passos definidos — 2026-09-12
+
+Depois do encontro, explorador e animal se voltam para o jogador e permanecem de frente na conclusão. A dança do explorador agora tem seis segundos com uma sequência definida: virar, passo-junta de um lado e do outro, toques alternados dos pés com gestos de braços/patas, preparação, pulinho e pose aberta de vitória. A sequência termina sem repetir e respeita pausa e movimento reduzido. O botão para continuar permanece disponível.

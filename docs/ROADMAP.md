@@ -294,4 +294,151 @@ Não são armazenados nome, idade, perfil, pontuação, tempo detalhado de jogo 
 
 ## Próximo passo recomendado
 
-**Validar o Marco 6 em preview.** Concluir uma sessão, recarregar a página e confirmar que os dados permanecem na chave `laboratorio-das-letras:progress:v1`. Nenhuma publicação em produção deve ocorrer antes dessa validação.
+**Validar a Expedição das Letras em preview.** Conferir o ciclo de SAPO, uma tentativa com dica, pausa, repetição e persistência do marco 6. Observar se o Ben identifica a letra antes de escolher o caminho. Nenhuma publicação em produção ocorre antes da aprovação do preview.
+
+## Expedição das Letras — referência de corrida/coleta
+
+Status: **publicada em preview; build e invariantes validados; acesso visual protegido pela autenticação da Vercel**.
+
+Entrega solicitada em 2026-09-05:
+
+- [x] Pista 2.5D no Bosque-Laboratório; Lumi, Pisco e anéis acumulados por letra.
+- [x] Avanço entre escolhas e parada sem cronômetro diante das letras.
+- [x] Duas alternativas no início; três nas seguintes, com posições variáveis.
+- [x] Palavra modelo, dica voluntária e feedback sem perda de progresso.
+- [x] Toque nos cartões, botões acessíveis, teclado e deslizar para selecionar.
+- [x] Pausa, retomada, pausa ao sair da página, repetição e encerramento.
+- [x] Voz pt-BR condicional do dispositivo e efeitos Howler após interação.
+- [x] Acompanhamento com sessões, palavras, coletas, dicas e última atividade.
+- [x] Progresso do marco 6 preservado; plataformas disponíveis em `?mode=explore`.
+- [x] Testes de alvo único, posições variadas, letras repetidas, escolha incorreta, conclusão única, persistência e armazenamento indisponível.
+- [x] Typecheck, lint e build estático bem-sucedidos.
+- [ ] Fluxo visual completo conferido no navegador de preview.
+- [ ] Pronúncia, toque e conforto do movimento conferidos no iPhone/iPad do Ben.
+
+## Jogabilidade por setas e touchscreen — 2026-09-07
+
+Status: **implementada e validada automaticamente; preparada para atualizar o preview existente**.
+
+- [x] Seta para cima avança até a letra selecionada; esquerda/direita escolhem o caminho.
+- [x] Movimento de aproximação antes da coleta e retorno suave após outra escolha, sem perder progresso.
+- [x] Setas continuam disponíveis após tocar nos botões da interface; diálogos preservam o foco.
+- [x] Botões grandes de direção e AVANÇAR, toque direto e gestos de deslizar.
+- [x] Área de toque alinhada aos cartões; gestos cancelados e segundo dedo não causam escolhas acidentais.
+- [x] Layout adaptado à orientação e à altura da tela; canvas acompanha mudanças do contêiner.
+- [x] Build estático, tipos, lint, invariantes e testes de controles concluídos com sucesso.
+- [ ] Partida conferida no tablet físico e no navegador com acesso ao preview.
+
+## Correção do recorte no computador — 2026-09-07
+
+Status: **causa reproduzida e corrigida; build e testes aprovados para preview**.
+
+- [x] Falha de sincronização reproduzida no ScaleManager real: moldura menor com canvas mantendo a altura do menu.
+- [x] Medidas do contêiner relidas antes de atualizar canvas, câmera e coordenadas de toque.
+- [x] Contêiner independente do tamanho intrínseco do canvas.
+- [x] Controles em uma linha no desktop para aumentar a altura do cenário.
+- [x] Teste de regressão confirma as dimensões após início, redimensionamento, retorno ao menu e rotação.
+- [x] Build, tipos, lint e testes de jogabilidade executados após a correção.
+- [ ] Enquadramento conferido pelo usuário no novo preview.
+
+## Iteração de 2026-09-08 — palavras da escola, anéis e voz
+
+- [x] SAPO, ONÇA, TUCANO e MACACO com escolha ilustrada de missão, progressão, repetição e conclusão por palavra.
+- [x] HUD de quatro ou seis letras e registro por nível; Ç e letras repetidas preservados.
+- [x] Anéis empilhados no tronco, com cabeça e movimentos acompanhando a pilha.
+- [x] Escala do personagem considera a pilha e a altura disponível sob as letras.
+- [x] Síntese do navegador substituída por reprodução de gravações no Howler.
+- [x] Área para gravar/carregar, conferir e salvar cada trecho localmente.
+- [x] Roteiro de 16 falas e tratamento de microfone indisponível, arquivo inválido e armazenamento bloqueado.
+- [x] Build, tipos e testes automatizados do ciclo de jogo, viewport e áudio.
+- [ ] Gravar ou receber os trechos humanos; conferir pronúncia e volume.
+- [ ] Conferir interface e microfone no computador/tablet do usuário.
+- [ ] Publicação em produção (não autorizada nesta iteração).
+
+## Expedição com volume real — 2026-09-08
+
+- [x] Personagem, anéis no corpo, portais, bosque e laboratório em Three.js.
+- [x] Sapo, onça, tucano e macaco modelados em 3D como descobertas.
+- [x] Caminhada, crescimento, aproximação, desaceleração, animações do ambiente e transições.
+- [x] Câmera responsiva com reserva para HUD e personagem com 18 anéis.
+- [x] Regras de alfabetização, quatro palavras, teclado/toque e progresso preservados.
+- [x] Movimento reduzido, pausa, descarte de recursos e opção leve em falha de WebGL.
+- [x] Testes automáticos de regras, projeção e interação; tipos, lint e build.
+- [ ] Inspeção visual do preview autenticado e medição de fluidez no tablet físico.
+- [ ] Retomar gravações e narração depois da avaliação da jogabilidade, conforme solicitado.
+
+## Refinamento dos destinos e da comemoração — 2026-09-08
+
+- [x] Orientação do explorador corrigida para olhar para o animal.
+- [x] Aceno e resposta diferentes para sapo, onça, tucano e macaco.
+- [x] Ritmo das animações cerca de 25% mais rápido; escolha sem prazo preservada.
+- [x] Quatro habitats com geometrias, vegetação, água, paletas e iluminação próprias.
+- [x] Nome do bioma na seleção e na conclusão.
+- [x] Testes de orientação, enquadramento, pausa, troca de destino e descarte de recursos.
+- [ ] Avaliação visual do novo encontro e do ritmo pelo usuário no computador/tablet.
+- [ ] Retomar narração após a avaliação de jogabilidade.
+
+## Iteração de áudio — 2026-09-08
+
+- [x] Trilha instrumental original animada em loop e três efeitos próprios.
+- [x] Acerto destacado, som distinto de outra tentativa e fanfarra final; dica não soa como erro.
+- [x] Música/efeitos/voz com volumes separados e música reduzida durante narração.
+- [x] Pausa, mute, aba oculta, retomada e carregamento tardio respeitados.
+- [x] Fila de falas preserva a apresentação; palavra completa no encontro com o animal.
+- [x] Roteiro de 19 falas, gravação guiada e pacote de vozes entre computador/tablet.
+- [x] Testes de mixer, Howler real, importação atômica, regras/controles e build.
+- [ ] Receber ou gravar narração humana completa; ainda não incorporada.
+- [ ] Conferir música, timbres, pronúncia e gravação no computador/tablet físico.
+
+## Narração humana integrada — 2026-09-12
+
+- [x] Roteiro gravado recebido e dividido em 19 falas.
+- [x] Volumes equilibrados, pausas externas reduzidas e MP3 compactos.
+- [x] Voz incluída em computador/tablet sem preparação por aparelho.
+- [x] Substituição local opcional e restauração da narração incluída.
+- [x] Testes de assets/armazenamento/mixagem e build aprovados.
+- [ ] Conferência auditiva das letras e do equilíbrio com a trilha no aparelho do usuário.
+
+## Oito animais e três exploradores — 2026-09-12
+
+Status: **implementado, com build e testes automatizados aprovados; preparado para atualizar a prévia**.
+
+- [x] Fases de PREGUIÇA, SUCURI, CAPIVARA e ARARA acrescentadas às quatro anteriores.
+- [x] Novos animais em 3D e retratos vetoriais próprios na seleção e conclusão.
+- [x] Habitats das novas fases: Mata Atlântica, Pantanal, Pantanal e Cerrado, respectivamente.
+- [x] Escolha inicial entre Lumi, Unicórnio e Cachorro, persistida no navegador.
+- [x] Três rigs na expedição 3D e na versão leve, com coleta, crescimento e animação.
+- [x] Capacidade ampliada para 24 anéis e enquadramento ajustado para palavras de até oito letras e chifre do unicórnio.
+- [x] Respostas próprias dos novos animais no encontro final, preservando pausa e movimento reduzido.
+- [x] Pisco retirado da expedição principal; protótipo `?mode=explore` e histórico preservados.
+- [x] As 19 gravações já incluídas permanecem disponíveis; roteiro ampliado para 27 trechos.
+- [x] Roteiro complementar das oito falas ausentes em `ROTEIRO_NOVAS_FASES.md`.
+- [x] Build, tipos e testes de regras, controles, geometria, enquadramento e descarte de recursos.
+- [ ] Receber e integrar G, I, R, V e as quatro palavras novas em voz humana.
+- [ ] Conferir aparência, áudio e fluidez no computador/tablet do usuário após atualizar a prévia.
+- [ ] Publicação em produção.
+
+Os testes de geometria e controle não equivalem a inspeção de pixels, medição de FPS ou teste em aparelho físico. O acesso do navegador de verificação à prévia continua pedindo autenticação da Vercel.
+
+## Narração das oito fases — 2026-09-12
+
+- [x] Segunda gravação recebida, cortada e nivelada em oito MP3.
+- [x] As 27 falas do roteiro incluídas, com os 19 arquivos anteriores preservados.
+- [x] Testes de disponibilidade, hashes, personalização/restauração e mixagem.
+- [ ] Conferência auditiva final no computador/tablet do usuário.
+
+## Dancinha da vitória — 2026-09-12
+
+- [x] Comemoração original de quatro segundos para os três exploradores em 3D e na versão leve.
+- [x] Transição suave de volta ao cumprimento, mantendo os anéis no corpo e a direção do animal.
+- [x] Relógio da fase respeita pausa, reinício e movimento reduzido, sem atrasar o botão de próxima fase.
+- [x] Testes de poses, enquadramento, controles e descarte de recursos.
+- [ ] Conferência visual da animação no computador/tablet do usuário; navegador de verificação exige autenticação da Vercel.
+
+## Coreografia frontal — 2026-09-12
+
+- [x] Explorador e animal viram para o jogador depois do encontro e mantêm a vista frontal.
+- [x] Sequência de seis segundos com passo-junta, toques alternados, gestos de braços/patas, preparação, pulinho e pose de vitória.
+- [x] Mesma sequência nos três exploradores e na versão leve, respeitando pausa e movimento reduzido.
+- [x] Pés da versão leve acompanham as pernas; testes de coreografia, orientação, enquadramento e controles, tipos, lint e build aprovados.
+- [ ] Conferência visual da nova coreografia no aparelho do usuário.

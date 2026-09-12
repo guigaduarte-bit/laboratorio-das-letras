@@ -16,6 +16,11 @@ export class MenuScene extends Scene
 
     create(): void
     {
+        if (this.registry.get('game-mode') === 'runner')
+        {
+            this.scene.start('RunnerScene');
+            return;
+        }
         drawForestLabBackground(this, { menu: true });
         EventBus.on('start-game', this.handleStart);
         EventBus.on('request-menu-ready', this.handleReadyRequest);

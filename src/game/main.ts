@@ -4,6 +4,7 @@ import { CelebrationScene } from './scenes/CelebrationScene';
 import { LevelScene } from './scenes/LevelScene';
 import { MenuScene } from './scenes/MenuScene';
 import { PreloadScene } from './scenes/PreloadScene';
+import { RunnerScene } from './scenes/RunnerScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
@@ -32,9 +33,16 @@ const config: Phaser.Types.Core.GameConfig = {
         antialias: true,
         roundPixels: true
     },
-    scene: [BootScene, PreloadScene, MenuScene, LevelScene, CelebrationScene]
+    scene: [BootScene, PreloadScene, MenuScene, LevelScene, CelebrationScene, RunnerScene]
 };
 
-const StartGame = (parent: string) => new Game({ ...config, parent });
+const StartGame = (parent: string, mode: 'explore' | 'runner' = 'explore') => new Game({
+    ...config,
+    parent,
+    ...(mode === 'runner' ? {
+        scale: { mode: Scale.RESIZE, width: '100%', height: '100%', expandParent: false },
+        callbacks: { preBoot: (game: Game) => game.registry.set('game-mode', 'runner') }
+    } : {})
+});
 
 export default StartGame;

@@ -10,15 +10,15 @@ Antes de realizar qualquer alteração, leia:
 
 ## Arquitetura
 
-- Usar Phaser 4 para personagem, mundo, plataformas, letras, partículas, câmera e colisões.
+- A expedição principal usa Three.js para personagem, mundo, letras, partículas e câmera 3D, conforme a evolução solicitada pelo usuário em 2026-09-08. Usar Phaser 4 no modo de plataformas e na versão leve de compatibilidade.
 - Usar React para menus, configurações e elementos externos ao canvas.
-- Usar o EventBus do template para comunicação entre React e Phaser.
+- Usar o EventBus compartilhado para comunicação entre React, regras de jogo e renderizadores.
 - Usar Motion somente em menus, botões, barra da palavra, transições React e cartões de missão.
-- Nunca usar Motion para animar elementos dentro do canvas; usar tweens, sprites e partículas do Phaser.
+- Nunca usar Motion para animar elementos dentro do canvas; usar o loop do renderizador 3D ou tweens, sprites e partículas do Phaser na versão leve.
 - Usar Howler para voz, fonemas, efeitos sonoros e música ambiente.
 - Usar Rive somente no React para o mascote, instruções ou pequenas sequências externas ao canvas.
-- Manter o personagem explorador e toda a jogabilidade sob responsabilidade do Phaser.
-- Comunicar eventos do Phaser ao mascote Rive por `Phaser → EventBus → React → máquina de estados`.
+- Manter a lógica da expedição em RunnerController, independente do renderizador. O personagem 3D pertence ao RunnerWorld3D; o personagem da versão leve e o modo de plataformas pertencem ao Phaser.
+- Comunicar eventos do jogo ao mascote por `jogo → EventBus → React → máquina de estados`.
 - Liberar o áudio somente após uma interação explícita, atualmente o botão `COMEÇAR`.
 - Usar a fonte Lexend, via Fontsource, na interface React.
 - Usar TypeScript.
