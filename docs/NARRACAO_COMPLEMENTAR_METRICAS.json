@@ -1,0 +1,95 @@
+{
+  "source_sha256": "9c1e6efe316fcf197e19424c907ba121f9d66980885effc2951e5d164eabae5d",
+  "source_duration_seconds": 22.036,
+  "method": "User-supplied script order; cuts in silent margins; 70 Hz high-pass; constant gain per clip; 10/20 ms edge fades; no TTS or voice cloning.",
+  "clips": [
+    {
+      "id": "letter-G",
+      "file": "assets/audio/narration/recorded-v2/letter-g.mp3",
+      "source_start": 1.26,
+      "source_end": 2.36,
+      "duration": 1.1,
+      "gain_db": -1.88,
+      "peak_dbfs": -5.01,
+      "bytes": 13869,
+      "sha256": "c487c88ba6c1448c3cab65f3a756b98d3f23ffeca5ec817a6fa698eff50a56c3"
+    },
+    {
+      "id": "letter-I",
+      "file": "assets/audio/narration/recorded-v2/letter-i.mp3",
+      "source_start": 3.78,
+      "source_end": 4.64,
+      "duration": 0.86,
+      "gain_db": -4.0,
+      "peak_dbfs": -10.29,
+      "bytes": 10989,
+      "sha256": "6bface14334bfa86c285e365a3f4597465262f4f487ceafe791eaa44c11783fc"
+    },
+    {
+      "id": "letter-R",
+      "file": "assets/audio/narration/recorded-v2/letter-r.mp3",
+      "source_start": 6.1,
+      "source_end": 7.1,
+      "duration": 1.0,
+      "gain_db": -0.84,
+      "peak_dbfs": -6.8,
+      "bytes": 12717,
+      "sha256": "908bb170741fd2b2595a25ee18393f004fee7ae61b19bbb68968a29c1e3a1fa5"
+    },
+    {
+      "id": "letter-V",
+      "file": "assets/audio/narration/recorded-v2/letter-v.mp3",
+      "source_start": 8.3,
+      "source_end": 9.26,
+      "duration": 0.96,
+      "gain_db": -1.03,
+      "peak_dbfs": -5.94,
+      "bytes": 12141,
+      "sha256": "93ac7b109bdc12e60b20ce47973310bfa522b85c8911ddd5ca87c47559b11196"
+    },
+    {
+      "id": "word-PREGUIÇA",
+      "file": "assets/audio/narration/recorded-v2/word-preguica.mp3",
+      "source_start": 10.67,
+      "source_end": 12.12,
+      "duration": 1.45,
+      "gain_db": -2.99,
+      "peak_dbfs": -4.66,
+      "bytes": 18189,
+      "sha256": "f56527051d03975df4f34797d3c72732c32bdaa0ceaa5d9ba48eb58a98f4058a"
+    },
+    {
+      "id": "word-SUCURI",
+      "file": "assets/audio/narration/recorded-v2/word-sucuri.mp3",
+      "source_start": 13.08,
+      "source_end": 14.47,
+      "duration": 1.39,
+      "gain_db": -2.63,
+      "peak_dbfs": -7.0,
+      "bytes": 17325,
+      "sha256": "e345b54037ce91198864b57035f48acb4c7d7a8b1b47955c581b38827b62c043"
+    },
+    {
+      "id": "word-CAPIVARA",
+      "file": "assets/audio/narration/recorded-v2/word-capivara.mp3",
+      "source_start": 16.1,
+      "source_end": 18.17,
+      "duration": 2.07,
+      "gain_db": -2.31,
+      "peak_dbfs": -2.96,
+      "bytes": 25677,
+      "sha256": "5c1aa76d01daad2b95740c7f5e6fff775d9f2ea0e499e61e11ca98b7bb49d260"
+    },
+    {
+      "id": "word-ARARA",
+      "file": "assets/audio/narration/recorded-v2/word-arara.mp3",
+      "source_start": 18.65,
+      "source_end": 19.77,
+      "duration": 1.12,
+      "gain_db": -0.89,
+      "peak_dbfs": -5.41,
+      "bytes": 14157,
+      "sha256": "86b8ec204043459aeec1b4cf13b104e9cbec89808fddbcdc5b3534fba747e2ae"
+    }
+  ]
+}

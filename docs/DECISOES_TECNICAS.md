@@ -204,3 +204,9 @@
 - `RunnerApp` retira Pisco da expedição principal e mantém as instruções textuais/acessíveis e a narração. `App` e o modo `?mode=explore` preservam o mascote histórico.
 - `HumanVoice` separa o roteiro gravado de 19 trechos do roteiro ampliado de 27. `BUNDLED_VOICE` continua apontando somente para os 19 MP3 existentes. G, I, R, V e as quatro palavras novas ficam pendentes de gravação, sem URLs fictícias ou síntese automática. O estúdio aceita os novos IDs e conserva a prioridade de substituições locais.
 - Build aprovado e testes de controle com as oito palavras, seleção de personagem, geometria dos rigs/anéis, enquadramento, encontros e descarte de recursos. A prévia pede login da Vercel no navegador de verificação; os testes não comprovam pixels, FPS, pronúncia nem comportamento em tablet físico.
+
+## Segundo pacote humano — 2026-09-12
+
+O suplemento `recorded-v2` contém oito MP3 mono/48 kHz/96 kbps (~125 KB), derivados do segundo áudio enviado para o jogo. Reutiliza o processamento offline de `prepare-recorded-narration.py --supplement`, com hash de origem, cortes nas pausas, filtro de 70 Hz, ganho constante e fades de borda. A fala intermediária fora do roteiro, antes de CAPIVARA, foi excluída dos assets; o original não foi modificado nem incluído no repositório. Sem alteração de velocidade/altura e sem síntese/clonagem.
+
+`BUNDLED_VOICE` resolve os 19 IDs antigos em `recorded-v1` e os oito novos em `recorded-v2`. Os 27 trechos funcionam sem IndexedDB; personalizações locais continuam prioritárias e sua remoção restaura a gravação incluída. Métricas/hashes em `NARRACAO_COMPLEMENTAR_METRICAS.json`. Transcrição automática local confirma a sequência geral do roteiro, mas não substitui avaliação auditiva/pedagógica no aparelho.

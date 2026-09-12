@@ -419,3 +419,10 @@ Status: **implementado, com build e testes automatizados aprovados; preparado pa
 - [ ] Publicação em produção.
 
 Os testes de geometria e controle não equivalem a inspeção de pixels, medição de FPS ou teste em aparelho físico. O acesso do navegador de verificação à prévia continua pedindo autenticação da Vercel.
+
+## Narração das oito fases — 2026-09-12
+
+- [x] Segunda gravação recebida, cortada e nivelada em oito MP3.
+- [x] As 27 falas do roteiro incluídas, com os 19 arquivos anteriores preservados.
+- [x] Testes de disponibilidade, hashes, personalização/restauração e mixagem.
+- [ ] Conferência auditiva final no computador/tablet do usuário.

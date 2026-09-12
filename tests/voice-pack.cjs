@@ -125,11 +125,11 @@ const packFile = (clips) => new Blob([packText(clips)], { type: 'application/jso
     assert.equal(await roundTrip.find(({ id }) => id === 'letter-A').blob.text(), 'new-A');
     await humanVoice.save('letter-A');
     assert.ok(humanVoice.get('letter-A').src.endsWith('/letter-a.mp3'), 'Deleting a personal recording restores the included voice');
-    assert.equal(humanVoice.availableCount, 19);
+    assert.equal(humanVoice.availableCount, 27);
     await humanVoice.importPack(packFile([clip('letter-G'), clip('word-PREGUIÇA')]), async () => {});
-    assert.equal(humanVoice.availableCount, 21, 'New recordings add coverage beyond the original nineteen');
+    assert.equal(humanVoice.availableCount, 27, 'Custom recordings override the included supplement without double-counting');
     await humanVoice.save('letter-G');
-    assert.equal(humanVoice.get('letter-G'), undefined, 'Removing a new recording never invents a bundled fallback');
-    assert.equal(humanVoice.availableCount, 20);
+    assert.ok(humanVoice.get('letter-G').src.endsWith('/recorded-v2/letter-g.mp3'), 'Removing a custom recording restores the supplement');
+    assert.equal(humanVoice.availableCount, 27);
     console.log('PASS: 27-line script, strict pack schema/base64/limits, decode-before-write, atomic transaction failure, preserved clips, new-word coverage and portable export/import round trip.');
 })().catch((error) => { console.error(error); process.exitCode = 1; });

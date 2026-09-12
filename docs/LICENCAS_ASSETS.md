@@ -153,3 +153,7 @@ Processamento: divisão em pausas do roteiro, mono, filtro passa-altas em 70 Hz,
 Os novos elementos visuais são assets próprios do projeto, gerados por código/SVG, sem mídia de terceiros e sem novas dependências. A retirada de Pisco da expedição principal não apaga seus arquivos nem os registros históricos.
 
 As 19 gravações humanas anteriores continuam com o escopo de uso já registrado. Nenhum áudio novo foi produzido ou incorporado para as oito falas pendentes nesta entrega; a expansão do roteiro não significa disponibilidade dessas gravações e não autoriza síntese ou clonagem da voz.
+
+## Narração complementar fornecida — 2026-09-12
+
+Os oito MP3 de `public/assets/audio/narration/recorded-v2/` derivam de `Lab letras 2.m4a`, fornecido nesta conversa em resposta ao roteiro complementar para integração à mesma prévia. Uso restrito ao projeto solicitado; direitos da gravação permanecem com seu titular. Não se presume licença geral de reutilização da voz nem autorização de clonagem. A licença MIT do código não amplia esse escopo. Original fora do repositório; somente as oito falas do jogo são distribuídas. Hashes e tratamento registrados em `NARRACAO_COMPLEMENTAR_METRICAS.json`.

@@ -17,9 +17,10 @@ export const VOICE_SCRIPT = [
 ];
 
 /** Gravação do roteiro enviada para o jogo em 12/09/2026. */
-export const BUNDLED_VOICE: Readonly<Record<string, string>> = Object.fromEntries(RECORDED_SCRIPT.map(({ id }) => {
+export const BUNDLED_VOICE: Readonly<Record<string, string>> = Object.fromEntries(VOICE_SCRIPT.map(({ id }) => {
     const filename = id === 'letter-Ç' ? 'letter-cedilha' : id.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    return [id, `/assets/audio/narration/recorded-v1/${filename}.mp3`];
+    const pack = RECORDED_SCRIPT.some(line => line.id === id) ? 'recorded-v1' : 'recorded-v2';
+    return [id, `/assets/audio/narration/${pack}/${filename}.mp3`];
 }));
 
 export function voiceFormat(type: string): string | undefined

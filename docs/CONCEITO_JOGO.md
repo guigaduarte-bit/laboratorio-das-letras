@@ -117,3 +117,7 @@ Pisco sai da expedição principal: a orientação continua no texto acessível,
 Os novos encontros mantêm gestos breves e amistosos: a preguiça levanta o braço devagar, a sucuri inclina a cabeça, a capivara responde com a cabeça e uma pata e a arara abre as asas. Os habitats escolhidos para essas fases estão em `BIOMAS_EXPEDICAO.md`.
 
 As 19 falas humanas aprovadas continuam incluídas. O roteiro completo agora tem 27 trechos; ainda faltam **G, I, R, V, PREGUIÇA, SUCURI, CAPIVARA e ARARA**. Os demais áudios, a música e os efeitos continuam funcionando. Esses oito trechos não são substituídos por voz sintética; o roteiro complementar está em `ROTEIRO_NOVAS_FASES.md`.
+
+## Narração complementar recebida — 2026-09-12
+
+A segunda gravação completa as oito falas pendentes: G, I, R, V, PREGUIÇA, SUCURI, CAPIVARA e ARARA. As oito fases passam a ter todas as 27 falas humanas incluídas, sem configuração por aparelho. A gravação anterior, a música e os efeitos foram preservados.

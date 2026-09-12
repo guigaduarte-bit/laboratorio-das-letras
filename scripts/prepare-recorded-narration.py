@@ -1,5 +1,5 @@
 """Split the supplied 19-line recording without speech synthesis.
-Usage: python scripts/prepare-recorded-narration.py /path/to/recording.m4a
+Usage: python scripts/prepare-recorded-narration.py /path/to/recording.m4a [--supplement]
 Requires FFmpeg and NumPy for offline preparation only.
 """
 import hashlib
@@ -22,6 +22,13 @@ CUTS = [
     ('word-MACACO', 43.83, 45.16), ('retry', 46.70, 49.14),
     ('complete', 50.56, 53.16),
 ]
+SUPPLEMENT_CUTS = [
+    ('letter-G', 1.26, 2.36), ('letter-I', 3.78, 4.64),
+    ('letter-R', 6.10, 7.10), ('letter-V', 8.30, 9.26),
+    ('word-PREGUIÇA', 10.67, 12.12), ('word-SUCURI', 13.08, 14.47),
+    # Omit the unrelated utterance at 14.8–15.3 s; keep the complete word.
+    ('word-CAPIVARA', 16.10, 18.17), ('word-ARARA', 18.65, 19.77),
+]
 
 def run(args, data=None):
     return subprocess.run(['ffmpeg', '-v', 'error', *args], input=data, stdout=subprocess.PIPE, check=True).stdout
@@ -29,12 +36,16 @@ def run(args, data=None):
 def main():
     import unicodedata
     source = Path(sys.argv[1])
-    output = ROOT / 'public/assets/audio/narration/recorded-v1'
+    supplement = '--supplement' in sys.argv[2:]
+    if supplement:
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == '9c1e6efe316fcf197e19424c907ba121f9d66980885effc2951e5d164eabae5d', 'Cuts apply only to the supplied second recording'
+    cuts = SUPPLEMENT_CUTS if supplement else CUTS
+    output = ROOT / 'public/assets/audio/narration' / ('recorded-v2' if supplement else 'recorded-v1')
     output.mkdir(parents=True, exist_ok=True)
     pcm = np.frombuffer(run(['-i', str(source), '-ac', '1', '-ar', '48000', '-af', 'highpass=f=70', '-f', 'f32le', '-']), dtype='<f4')
     report = {'source_sha256': hashlib.sha256(source.read_bytes()).hexdigest(), 'source_duration_seconds': len(pcm)/48000,
               'method': 'User-supplied script order; cuts in silent margins; 70 Hz high-pass; constant gain per clip; 10/20 ms edge fades; no TTS or voice cloning.', 'clips': []}
-    for id, start, end in CUTS:
+    for id, start, end in cuts:
         clip = pcm[round(start*48000):round(end*48000)].copy()
         windows = clip[:len(clip)//960*960].reshape(-1, 960)
         energy = np.mean(windows**2, axis=1)
@@ -54,7 +65,8 @@ def main():
         report['clips'].append({'id': id, 'file': str(target.relative_to(ROOT/'public')), 'source_start': start, 'source_end': end,
                               'duration': len(decoded)/48000, 'gain_db': round(float(20*np.log10(gain)),2), 'peak_dbfs': round(20*np.log10(peak),2),
                               'bytes': target.stat().st_size, 'sha256': hashlib.sha256(target.read_bytes()).hexdigest()})
-    (ROOT/'docs/NARRACAO_GRAVADA_METRICAS.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
+    report_file = 'NARRACAO_COMPLEMENTAR_METRICAS.json' if supplement else 'NARRACAO_GRAVADA_METRICAS.json'
+    (ROOT/'docs'/report_file).write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
     print(json.dumps({'clips':len(report['clips']), 'bytes':sum(c['bytes'] for c in report['clips']), 'peak_dbfs':max(c['peak_dbfs'] for c in report['clips'])}))
 
 if __name__ == '__main__': main()

@@ -178,7 +178,7 @@ export function VoiceStudio()
 
     return <section className="voice-studio" aria-labelledby="voice-studio-title">
         <h3 id="voice-studio-title">Uma voz humana na aventura</h3>
-        <p>As primeiras quatro fases já têm narração humana. Grave as letras e palavras das novas fases ou personalize uma fala existente. Os áudios ficam neste navegador e podem ser levados ao tablet em um pacote.</p>
+        <p>As oito fases já têm narração humana. Se quiser, personalize uma fala existente. Suas gravações ficam neste navegador e podem ser levadas ao tablet em um pacote.</p>
         <p className="voice-count">{savedCount} de {VOICE_SCRIPT.length} trechos personalizados · {savedCount === VOICE_SCRIPT.length ? 'Todas as falas personalizadas' : `${humanVoice.availableCount} falas disponíveis`}</p>
         <label htmlFor="voice-line">Escolha o trecho</label>
         <select id="voice-line" value={selected} disabled={recording || busy} onChange={(event) => { stopPreview(); setSelected(event.target.value); setDraft(undefined); setMessage(''); }}>
