@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { getSchoolLevel } from '../content/levels';
+import { getSchoolLevel, schoolLevels } from '../content/levels';
+import { type CharacterId, readCharacter } from '../content/characters';
 import { getBiomeForLevel } from '../content/biomes';
 import { RUNNER_SPEED } from '../content/runnerPace';
 import { lanePosition } from '../content/runner';
@@ -79,7 +80,8 @@ export class RunnerWorld3D {
             this.setBiome('forest-sapo');
             this.buildLaboratory();
             this.buildGates();
-            for (const kind of ['sapo', 'onca', 'tucano', 'macaco']) {
+            this.explorer.setCharacter(readCharacter());
+            for (const kind of schoolLevels.map(level => level.imageKey)) {
                 const animal = createAnimal3D(kind);
                 animal.visible = false;
                 this.animals.set(kind, animal);
@@ -193,6 +195,11 @@ export class RunnerWorld3D {
         return texture;
     }
 
+    setCharacter(id: CharacterId): void {
+        // The controller validates ready state; the last rendered frame can lag behind the menu.
+        if (!this.disposed) this.explorer.setCharacter(id);
+    }
+
     resize(width: number, height: number): void {
         if (this.disposed) return;
         this.width = Math.max(1, width);
@@ -236,10 +243,11 @@ export class RunnerWorld3D {
             : phase === 'collect' ? 1 : (phase === 'travel' && frame.count > 0) || phase === 'finish' ? 1 - ease(frame.elapsed / 750) : 0;
         const encounter = sampleAnimalEncounter(phase, frame.elapsed, this.sidePanel);
         const completing = encounter.progress;
-        const x = THREE.MathUtils.lerp(frame.lane * 3.4, encounter.explorerX, completing);
+        const x = phase === 'ready' ? 3.2 : THREE.MathUtils.lerp(frame.lane * 3.4, encounter.explorerX, completing);
         const targetZ = THREE.MathUtils.lerp(4.5 - approach * 6.1, encounter.explorerZ, completing);
         this.explorer.root.position.x = THREE.MathUtils.damp(this.explorer.root.position.x, x, 12, dt);
         this.explorer.root.position.z = THREE.MathUtils.damp(this.explorer.root.position.z, targetZ, 16, dt);
+        this.explorer.root.scale.setScalar(phase === 'ready' ? 1.25 : 1);
         const towardAnimal = facingPartner(this.explorer.root.position.x, this.explorer.root.position.z, encounter.animalX, encounter.animalZ);
         const yaw = phase === 'ready' ? -0.25 : completing > 0.34 ? towardAnimal : Math.PI;
         this.explorer.root.rotation.y = dampFacing(this.explorer.root.rotation.y, yaw, dt);

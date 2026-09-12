@@ -108,13 +108,17 @@ export const levels: LevelDefinition[] = [
 
 export const DEFAULT_LEVEL_ID = levels[0].id;
 
-/** Palavras da atividade escolar: PROJETO_LABORATORIO_DAS_LETRAS_BEN.md. */
+/** Quatro palavras da escola seguidas das novas descobertas solicitadas para a expedição. */
 export const schoolLevels: LevelDefinition[] = [
     levels[0],
     ...[
         ['onca', 'ONÇA', 'Onça'],
         ['tucano', 'TUCANO', 'Tucano'],
-        ['macaco', 'MACACO', 'Macaco']
+        ['macaco', 'MACACO', 'Macaco'],
+        ['preguica', 'PREGUIÇA', 'Bicho-preguiça'],
+        ['sucuri', 'SUCURI', 'Sucuri'],
+        ['capivara', 'CAPIVARA', 'Capivara'],
+        ['arara', 'ARARA', 'Arara']
     ].map(([slug, word, displayName]) => ({
         id: `forest-${slug}`, word, displayName, imageKey: slug,
         wordAudio: '', instructionAudio: '',

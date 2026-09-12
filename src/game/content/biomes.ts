@@ -48,7 +48,11 @@ const LEVEL_BIOMES: Record<string, BiomeId> = {
     'forest-sapo': 'mata-atlantica',
     'forest-onca': 'pantanal',
     'forest-tucano': 'cerrado',
-    'forest-macaco': 'amazonia'
+    'forest-macaco': 'amazonia',
+    'forest-preguica': 'mata-atlantica',
+    'forest-sucuri': 'pantanal',
+    'forest-capivara': 'pantanal',
+    'forest-arara': 'cerrado'
 };
 
 export function getBiomeForLevel(levelId: string): BiomeDefinition {

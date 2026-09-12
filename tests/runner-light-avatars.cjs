@@ -1,0 +1,104 @@
+/* Actual vector-rig logic with recorded drawing calls; no GPU/pixel assertions. */
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const ts = require('typescript');
+function load(file, imports = {}) {
+    const module = { exports: {} };
+    const source = ts.transpileModule(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), {
+        compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 }
+    }).outputText;
+    vm.runInNewContext(source, { module, exports: module.exports, require: (name) => {
+        assert.ok(name in imports, `Unexpected import ${name}`); return imports[name];
+    } });
+    return module.exports;
+}
+const { ART_COLORS } = load('src/game/visuals/palette.ts');
+const { PlayerAvatar } = load('src/game/visuals/PlayerAvatar.ts', { './palette': { ART_COLORS } });
+let allocations = 0;
+const activeTargets = new Set();
+function display(x = 0, y = 0, children = []) {
+    allocations++;
+    const item = { x, y, children, commands: [], visible: true, scaleX: 1, scaleY: 1,
+        add(parts) { this.children.push(...(Array.isArray(parts) ? parts : [parts])); return this; },
+        setPosition(x, y) { this.x = x; this.y = y; return this; },
+        setY(y) { this.y = y; return this; },
+        setVisible(visible) { this.visible = visible; return this; },
+        setScale(x, y = x) { this.scaleX = x; this.scaleY = y; return this; },
+        setAngle(angle) { this.angle = angle; return this; },
+        clear() { this.commands = []; return this; },
+        destroy() { this.destroyed = true; for (const child of this.children) child.destroy(); }
+    };
+    for (const name of ['setDepth', 'setAlpha', 'fillStyle', 'fillRoundedRect', 'strokeRoundedRect',
+        'lineStyle', 'beginPath', 'moveTo', 'lineTo', 'strokePath', 'fillEllipse', 'fillCircle',
+        'fillTriangle', 'lineBetween']) item[name] = (...args) => { item.commands.push([name, ...args]); return item; };
+    return item;
+}
+const scene = {
+    add: { container: display, graphics: (options = {}) => display(options.x, options.y),
+        ellipse: (x, y) => display(x, y), circle: (x, y) => display(x, y), rectangle: (x, y) => display(x, y) },
+    tweens: {
+        add({ targets }) { for (const target of Array.isArray(targets) ? targets : [targets]) activeTargets.add(target); },
+        chain({ targets }) { activeTargets.add(targets); },
+        killTweensOf(target) { activeTargets.delete(target); }
+    }, time: { now: 0 }
+};
+const avatar = new PlayerAvatar(scene, 0, 0);
+const allocatedRig = allocations;
+assert.equal(avatar.character, 'lumi', 'Platform mode starts with the existing Lumi rig');
+let checks = 0;
+for (const character of ['unicorn', 'dog', 'lumi', 'dog', 'unicorn', 'lumi']) {
+    avatar.setCharacter(character);
+    assert.equal(allocations, allocatedRig, 'Switches reuse rig parts without accumulating display objects');
+    assert.equal(avatar.character, character);
+    assert.ok(avatar.robotParts.every((part) => part.visible === (character === 'lumi')));
+    if (character === 'unicorn') {
+        assert.ok(avatar.animalFace.commands.some(([name, ...p]) => name === 'fillTriangle' && p.includes(-68)), 'The unicorn includes a raised horn');
+        assert.ok(avatar.tail.commands.some(([name]) => name === 'fillEllipse'), 'The unicorn includes a mane-colored tail');
+    } else if (character === 'dog') {
+        assert.ok(avatar.animalFace.commands.some(([name, x, y, w, h]) => name === 'fillEllipse' && x === -23 && h === 35), 'Dog has a distinct floppy ear silhouette');
+        assert.ok(avatar.animalFace.commands.some(([name, x, y, w, h]) => name === 'fillEllipse' && y === -21 && w === 9 && h === 6), 'Dog has a nose on its muzzle');
+    } else {
+        assert.equal(avatar.animalFace.commands.length, 0);
+        assert.equal(avatar.tail.commands.length, 0, 'Returning to Lumi clears animal-only anatomy');
+    }
+    for (let letters = 0; letters <= 8; letters++) {
+        avatar.setRingCount(letters * 3);
+        assert.equal(avatar.ringCount, letters * 3);
+        assert.equal(avatar.ringFront.commands.filter(([name]) => name === 'strokePath').length, letters * 3);
+        const growth = -avatar.upper.y;
+        for (const [width, height] of [[300, 300], [600, 270], [900, 360], [1280, 580], [1800, 650]]) {
+            for (const approach of [0, 1]) {
+                const scale = avatar.getRunnerScale(width, height, approach);
+                const footY = height * .24 + height * .83 * Math.pow(1 - (.10 + approach * .23), 1.6);
+                const rootY = footY - 35 * scale;
+                const top = character === 'unicorn' ? 68 : character === 'dog' ? 50 : 58;
+                assert.ok(Number.isFinite(scale) && scale > 0);
+                assert.ok(rootY - (top + growth) * scale > 0, `${character} head stays visible with ${letters} letters`);
+                assert.ok(rootY + 36 * scale < height, 'Feet remain inside the stage');
+                if (!approach) {
+                    const gateScale = Math.min(1.22, Math.max(.52, width / 860));
+                    const glyphBottom = height * .24 + height * .83 * Math.pow(.67, 1.6) - 28 * gateScale;
+                    assert.ok(rootY - (44 + growth) * scale > glyphBottom, 'The face preserves space for the letter choices');
+                }
+                checks++;
+            }
+        }
+        avatar.setRunnerPose(true, 1, false);
+        avatar.setRunnerPose(false, 1, true);
+        assert.equal(activeTargets.size, 0, 'Reduced motion also stops the animal tail');
+        assert.equal(avatar.upper.y, -growth, 'Reduced motion preserves the stack and head attachment');
+    }
+}
+avatar.setRingCount(999);
+assert.equal(avatar.ringCount, 24, 'Oversized values stay within the designed ring capacity');
+avatar.setRingCount(NaN);
+assert.equal(avatar.ringCount, 0, 'Non-finite values cannot poison the display coordinates');
+avatar.setCharacter('unknown');
+assert.equal(avatar.character, 'lumi', 'An invalid runtime character leaves the current rig intact');
+avatar.setCharacter('dog');
+avatar.destroy();
+assert.equal(activeTargets.size, 0, 'Destroying the rig releases its tail and limb tweens');
+assert.ok(avatar.root.destroyed && avatar.tail.destroyed && avatar.animalFace.destroyed);
+console.log(`PASS: three original fallback rigs, reversible selection, ${checks} framing checks up to 24 rings, reduced motion and tween disposal.`);

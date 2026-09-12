@@ -22,7 +22,7 @@ function includeBox(minX: number, maxX: number, minY: number, maxY: number, minZ
 // Three letter blocks, including their thickness. The two-choice arrangement fits inside this volume.
 includeBox(-RUNNER_LANE_SPACING - 1.175, RUNNER_LANE_SPACING + 1.175, 0.2, 3.7, -3.1, -2.5);
 // The full-grown explorer can occupy any lane and any point of the approach, including its depth.
-includeBox(-RUNNER_LANE_SPACING - 0.9, RUNNER_LANE_SPACING + 0.9, 0, 3.2, -2.5, 5.4);
+includeBox(-RUNNER_LANE_SPACING - 0.9, RUNNER_LANE_SPACING + 0.9, 0, 3.25, -2.5, 5.4);
 
 /** Frame the complete action without changing the viewing angle during play or screen rotation. */
 export function configureRunnerCamera(camera: THREE.PerspectiveCamera, width: number, height: number): void {

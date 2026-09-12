@@ -89,3 +89,17 @@ A pista de brinquedo em areia atravessa água em lagoa e ilhas arredondadas, man
 Cada letra encontrada acrescenta três anéis ao equipamento de Lumi. Sua cor é uma recompensa após a coleta e não indica a alternativa correta. As escolhas usam letra em tinta sobre areia; apenas a dica reforça a borda do alvo e acrescenta um sinal de confirmação.
 
 Pisco permanece no React com o fallback já aprovado. Não são incorporados personagens, imagens, sons ou gráficos da referência externa.
+
+## Direção atual da expedição — 2026-09-12
+
+As seções anteriores registram as etapas do projeto. A expedição principal agora usa mundo e personagens em 3D, com uma versão vetorial leve de compatibilidade. A linguagem continua arredondada, com materiais suaves e letras em Lexend sobre superfícies claras.
+
+O menu apresenta três exploradores com retratos próprios: **Lumi**, **Unicórnio** e **Cachorro**. Lumi conserva visor e antena; o unicórnio usa corpo claro, chifre dourado e crina/cauda em tons lilás e rosa; o cachorro tem tons quentes, focinho claro e orelhas reconhecíveis. As diferenças de silhueta aparecem também na versão leve. Todos usam o mesmo percurso e acumulam os anéis no corpo, sem deslocar a pilha para o lado.
+
+Até oito letras podem produzir 24 anéis. A câmera e a escala reservam espaço para o crescimento e para o chifre, preservando rosto, pés e leitura das escolhas. O movimento reduzido mantém a identidade e a anatomia sem depender da animação contínua.
+
+**Pisco deixa a interface da expedição principal.** A orientação fica nas letras, no texto e na voz; a interação visual se concentra no explorador escolhido e no animal descoberto. O protótipo de plataformas mantém os elementos históricos.
+
+PREGUIÇA, SUCURI, CAPIVARA e ARARA ampliam a seleção para oito animais. Os novos modelos têm silhuetas próprias: braços longos e máscara facial da preguiça, corpo enrolado e cabeça elevada da sucuri, corpo arredondado e focinho largo da capivara, bico curvo e cauda longa da arara. Os cumprimentos respeitam essas formas e permanecem suaves, com intervalos de descanso. A associação de cada fase a um ambiente está em `BIOMAS_EXPEDICAO.md`.
+
+Modelos, movimentos e retratos SVG são originais, feitos por código, sem incorporar mídia ou personagens externos e sem acrescentar dependências.

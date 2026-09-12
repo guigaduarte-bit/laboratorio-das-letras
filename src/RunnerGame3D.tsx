@@ -4,6 +4,7 @@ import { EventBus } from './game/EventBus';
 import type { RunnerSnapshot } from './game/content/runner';
 import { RunnerController } from './game/systems/RunnerController';
 import type { RunnerWorld3D } from './game/three/RunnerWorld3D';
+import type { CharacterId } from './game/content/characters';
 
 const LightGame = dynamic(() => import('./PhaserGame').then(({ PhaserGame }) => PhaserGame), {
     ssr: false,
@@ -130,6 +131,9 @@ export function RunnerGame3D({ word }: { word: string })
         const cancelOnState = (state: RunnerSnapshot) => {
             if (state.paused || state.phase !== 'choose') clearGesture();
         };
+        const selectCharacter = (id: CharacterId) => {
+            if (controller?.snapshot.phase === 'ready') world?.setCharacter(id);
+        };
         const contextLost = (event: Event) => {
             event.preventDefault();
             fail('A cena em 3D foi interrompida. Você pode recomeçar a fase na versão leve.');
@@ -202,6 +206,7 @@ export function RunnerGame3D({ word }: { word: string })
                 canvas.addEventListener('pointercancel', pointerCancel);
                 canvas.addEventListener('lostpointercapture', pointerCancel);
                 EventBus.on('runner-state', cancelOnState);
+                EventBus.on('runner-character', selectCharacter);
                 removeListeners.push(
                     () => window.removeEventListener('resize', resize),
                     () => window.removeEventListener('keydown', handleKey),
@@ -211,7 +216,8 @@ export function RunnerGame3D({ word }: { word: string })
                     () => canvas.removeEventListener('pointerup', pointerUp),
                     () => canvas.removeEventListener('pointercancel', pointerCancel),
                     () => canvas.removeEventListener('lostpointercapture', pointerCancel),
-                    () => EventBus.off('runner-state', cancelOnState)
+                    () => EventBus.off('runner-state', cancelOnState),
+                    () => EventBus.off('runner-character', selectCharacter)
                 );
                 setLoading(false);
                 EventBus.emit('runner-ready');

@@ -138,3 +138,18 @@ Nenhuma gravação humana externa foi obtida ou adicionada nesta entrega. O est�
 Os 19 arquivos de `public/assets/audio/narration/recorded-v1/` derivam do áudio fornecido nesta conversa para integrar a narração ao Laboratório das Letras. O envio sucede a solicitação explícita do roteiro para esse fim e autoriza seu processamento e uso nesta prévia do jogo. Não foi presumida uma licença geral de reutilização da voz, nem autorização de clonagem. Os direitos da gravação permanecem com seu titular; a licença MIT do código não amplia esse escopo.
 
 Processamento: divisão em pausas do roteiro, mono, filtro passa-altas em 70 Hz, ganho constante por trecho, fades de borda e MP3 96 kbps. Sem voz sintética, transposição ou mudança de velocidade. Os hashes e intervalos estão em `NARRACAO_GRAVADA_METRICAS.json`. O original não foi incluído no repositório.
+
+## Novos animais e exploradores — 2026-09-12
+
+| Elemento | Origem e escopo | Uso |
+| --- | --- | --- |
+| Unicórnio e cachorro 3D; ampliação para 24 anéis | Geometria e animação originais do projeto em `src/game/three/Explorer3D.ts`; sem modelos ou texturas externos | Exploradores selecionáveis e crescimento |
+| Unicórnio e cachorro na versão leve | Formas vetoriais e tweens originais em `src/game/visuals/PlayerAvatar.ts` | Compatibilidade Phaser, com Lumi preservado |
+| Preguiça, sucuri, capivara e arara 3D | Modelagem e gestos originais em `src/game/three/Animals3D.ts` | Novos encontros ao concluir palavras |
+| Retratos dos animais e exploradores | SVG original escrito no projeto em `src/ui/AnimalPortrait.tsx` e `src/ui/CharacterPortrait.tsx` | Seleção inicial e conclusão |
+| Ambientes das novas fases | Reutilização da geometria própria de Mata Atlântica, Pantanal e Cerrado, já registrada | Cenário das novas palavras |
+| Roteiro complementar de oito falas | Textos próprios em `HumanVoice.ts` e `docs/ROTEIRO_NOVAS_FASES.md` | G, I, R, V, PREGUIÇA, SUCURI, CAPIVARA e ARARA |
+
+Os novos elementos visuais são assets próprios do projeto, gerados por código/SVG, sem mídia de terceiros e sem novas dependências. A retirada de Pisco da expedição principal não apaga seus arquivos nem os registros históricos.
+
+As 19 gravações humanas anteriores continuam com o escopo de uso já registrado. Nenhum áudio novo foi produzido ou incorporado para as oito falas pendentes nesta entrega; a expansão do roteiro não significa disponibilidade dessas gravações e não autoriza síntese ou clonagem da voz.

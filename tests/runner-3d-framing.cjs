@@ -52,13 +52,13 @@ for (const [width, height] of sizes) {
         }
         for (const lane of [...lanes, -1.7, 1.7]) {
             for (const z of [4.5, 3, 1, -1.6]) {
-                inside(boxCorners([lane, 1.6, z], [0.9, 1.6, 0.9]), 'explorer during an approach');
+                inside(boxCorners([lane, 1.625, z], [0.9, 1.625, 0.9]), 'explorer during an approach');
             }
         }
     }
 
     // At the waiting point, even the tallest ring stack must stay below the letter glyphs.
-    const explorerTop = Math.min(...boxCorners([0, 1.6, 4.5], [0.9, 1.6, 0.9])
+    const explorerTop = Math.min(...boxCorners([0, 1.625, 4.5], [0.9, 1.625, 0.9])
         .map((point) => pixel(point, camera, width, height).y));
     const glyphBottom = Math.max(...boxCorners([0, 2.5, -2.48], [0.7, 0.7, 0.02])
         .map((point) => pixel(point, camera, width, height).y));

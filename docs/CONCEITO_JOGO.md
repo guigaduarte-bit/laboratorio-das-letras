@@ -105,3 +105,15 @@ O roteiro humano passa a 19 falas, com apresentação, convite, nomes das letras
 ## Narração recebida — 2026-09-12
 
 O roteiro gravado enviado pelo usuário passa a acompanhar a expedição em 19 trechos: apresentação, convite, 11 nomes de letras, quatro palavras e dois reforços. Funciona em um navegador novo, sem importar ou gravar novamente. A pessoa pode substituir falas localmente e restaurar a voz incluída.
+
+## Novas descobertas e escolha de explorador — 2026-09-12
+
+A expedição passa a ter oito fases: **SAPO, ONÇA, TUCANO, MACACO, PREGUIÇA, SUCURI, CAPIVARA e ARARA**. As quatro primeiras preservam o conteúdo da tarefa escolar; as quatro novas atendem ao pedido de ampliar os animais. A fase do bicho-preguiça forma a palavra **PREGUIÇA**. Todas ficam disponíveis desde o início, com reconhecimento de letras em ordem, dica e tempo livre para escolher.
+
+Antes de começar, a criança pode escolher **Lumi, Unicórnio ou Cachorro**. O explorador escolhido participa da mesma coleta, cresce com até 24 anéis e interage com o animal no final. A preferência fica no navegador, separada do progresso de aprendizagem. Os três personagens estão disponíveis tanto no mundo 3D quanto na versão leve.
+
+Pisco sai da expedição principal: a orientação continua no texto acessível, nas letras e na narração. O personagem e os registros antigos permanecem no protótipo de plataformas em `?mode=explore` como parte do histórico do projeto.
+
+Os novos encontros mantêm gestos breves e amistosos: a preguiça levanta o braço devagar, a sucuri inclina a cabeça, a capivara responde com a cabeça e uma pata e a arara abre as asas. Os habitats escolhidos para essas fases estão em `BIOMAS_EXPEDICAO.md`.
+
+As 19 falas humanas aprovadas continuam incluídas. O roteiro completo agora tem 27 trechos; ainda faltam **G, I, R, V, PREGUIÇA, SUCURI, CAPIVARA e ARARA**. Os demais áudios, a música e os efeitos continuam funcionando. Esses oito trechos não são substituídos por voz sintética; o roteiro complementar está em `ROTEIRO_NOVAS_FASES.md`.

@@ -1,6 +1,6 @@
 # Habitats da Expedição das Letras
 
-Os quatro destinos são escolhas visuais para esta aventura. Não representam uma distribuição exclusiva dos animais: sapos, onças, tucanos e macacos podem ocorrer em outros ambientes. Os modelos são personagens estilizados; a atividade principal permanece o reconhecimento de letras.
+Os oito destinos são escolhas visuais para esta aventura. Não representam uma distribuição exclusiva dos animais. Os modelos são personagens estilizados; a atividade principal permanece o reconhecimento de letras.
 
 | Palavra | Bioma da fase | Elementos próprios do cenário |
 | --- | --- | --- |
@@ -8,6 +8,10 @@ Os quatro destinos são escolhas visuais para esta aventura. Não representam um
 | ONÇA | Pantanal | Águas rasas nas duas margens, ilhas de vegetação, capim e palmeiras |
 | TUCANO | Cerrado | Solo ocre, árvores baixas de troncos retorcidos, pedras e buritis na vereda |
 | MACACO | Amazônia | Árvores altas, raízes aparentes, cipós, folhas largas e igarapé |
+| PREGUIÇA | Mata Atlântica | Copas arredondadas, bromélias e lagoa do ambiente existente |
+| SUCURI | Pantanal | Águas rasas, ilhas de vegetação e margens com capim |
+| CAPIVARA | Pantanal | Margens de água rasa, capim e palmeiras |
+| ARARA | Cerrado | Árvores baixas, solo ocre e buritis do ambiente existente |
 
 ## Referências para a escolha dos ambientes
 
@@ -23,3 +27,9 @@ Referências consultadas em 8 de setembro de 2026. Nenhum texto, foto, som ou mo
 O explorador se aproxima, olha para o animal e acena. O animal se vira para ele e responde: o sapo dá um pequeno salto, a onça levanta uma pata, o tucano abre as asas e o macaco acena. Os gestos se alternam e têm intervalo de descanso, em uma cena de fantasia sem pontuação ou nova tarefa.
 
 A preferência de movimento reduzido mantém poses amistosas estáveis. A pausa congela o relógio dos dois personagens e do cenário.
+
+## Ampliação de destinos — 2026-09-12
+
+PREGUIÇA, SUCURI, CAPIVARA e ARARA reutilizam os ambientes indicados na tabela. Essas associações são decisões de direção visual para as novas fases; as referências de 8 de setembro acima documentam a seleção original dos quatro ambientes e não constituem uma nova pesquisa zoológica sobre os quatro animais acrescentados.
+
+O explorador pode ser Lumi, Unicórnio ou Cachorro. Nos novos encontros 3D, a preguiça levanta o braço devagar, a sucuri inclina a cabeça mantendo o corpo enrolado no chão, a capivara responde com a cabeça e uma pata e a arara abre as asas. O gesto se dirige ao explorador e compartilha as mesmas regras de pausa, descanso e movimento reduzido dos encontros anteriores.

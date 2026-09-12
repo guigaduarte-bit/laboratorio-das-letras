@@ -55,7 +55,7 @@ const packFile = (clips) => new Blob([packText(clips)], { type: 'application/jso
 (async () => {
     const state = storage();
     const { humanVoice, parseVoicePack, VOICE_SCRIPT, MAX_VOICE_BYTES, MAX_VOICE_PACK_BYTES } = load(state);
-    assert.equal(VOICE_SCRIPT.length, 19);
+    assert.equal(VOICE_SCRIPT.length, 27);
     assert.ok(VOICE_SCRIPT.some(({ id }) => id === 'letter-E'));
     assert.ok(VOICE_SCRIPT.some(({ id }) => id === 'introduction'));
     assert.ok(VOICE_SCRIPT.some(({ id }) => id === 'retry'));
@@ -126,5 +126,10 @@ const packFile = (clips) => new Blob([packText(clips)], { type: 'application/jso
     await humanVoice.save('letter-A');
     assert.ok(humanVoice.get('letter-A').src.endsWith('/letter-a.mp3'), 'Deleting a personal recording restores the included voice');
     assert.equal(humanVoice.availableCount, 19);
-    console.log('PASS: 19-line script, strict pack schema/base64/limits, decode-before-write, atomic transaction failure, preserved clips, single notification and portable export/import round trip.');
+    await humanVoice.importPack(packFile([clip('letter-G'), clip('word-PREGUIÇA')]), async () => {});
+    assert.equal(humanVoice.availableCount, 21, 'New recordings add coverage beyond the original nineteen');
+    await humanVoice.save('letter-G');
+    assert.equal(humanVoice.get('letter-G'), undefined, 'Removing a new recording never invents a bundled fallback');
+    assert.equal(humanVoice.availableCount, 20);
+    console.log('PASS: 27-line script, strict pack schema/base64/limits, decode-before-write, atomic transaction failure, preserved clips, new-word coverage and portable export/import round trip.');
 })().catch((error) => { console.error(error); process.exitCode = 1; });

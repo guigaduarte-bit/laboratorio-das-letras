@@ -16,7 +16,7 @@ function load(file, imports = {}, globals = {}) {
 
 (async () => {
     const { VOICE_SCRIPT, voiceFormat, humanVoice } = load('src/audio/HumanVoice.ts');
-    for (const word of ['SAPO', 'ONÇA', 'TUCANO', 'MACACO']) {
+    for (const word of ['SAPO', 'ONÇA', 'TUCANO', 'MACACO', 'PREGUIÇA', 'SUCURI', 'CAPIVARA', 'ARARA']) {
         assert.ok(VOICE_SCRIPT.some(({ id }) => id === `word-${word}`));
         for (const letter of word) assert.ok(VOICE_SCRIPT.some(({ id }) => id === `letter-${letter}`));
     }

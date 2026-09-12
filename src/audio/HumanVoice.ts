@@ -1,5 +1,5 @@
 /** Nomes das letras, não fonemas isolados. */
-export const VOICE_SCRIPT = [
+const RECORDED_SCRIPT = [
     { id: 'introduction', label: 'Início da missão', text: 'Vamos encontrar as letras da palavra' },
     { id: 'prompt', label: 'Convite', text: 'Encontre a letra' },
     ...Object.entries({ A: 'á', C: 'cê', Ç: 'cê cedilha', E: 'é', M: 'eme', N: 'ene', O: 'ó', P: 'pê', S: 'esse', T: 'tê', U: 'u' })
@@ -9,8 +9,15 @@ export const VOICE_SCRIPT = [
     { id: 'complete', label: 'Comemoração', text: 'Você encontrou todas as letras!' }
 ];
 
+export const VOICE_SCRIPT = [
+    ...RECORDED_SCRIPT,
+    ...Object.entries({ G: 'gê', I: 'i', R: 'erre', V: 'vê' })
+        .map(([letter, text]) => ({ id: `letter-${letter}`, label: letter, text })),
+    ...['PREGUIÇA', 'SUCURI', 'CAPIVARA', 'ARARA'].map((word) => ({ id: `word-${word}`, label: word, text: word.toLocaleLowerCase('pt-BR') }))
+];
+
 /** Gravação do roteiro enviada para o jogo em 12/09/2026. */
-export const BUNDLED_VOICE: Readonly<Record<string, string>> = Object.fromEntries(VOICE_SCRIPT.map(({ id }) => {
+export const BUNDLED_VOICE: Readonly<Record<string, string>> = Object.fromEntries(RECORDED_SCRIPT.map(({ id }) => {
     const filename = id === 'letter-Ç' ? 'letter-cedilha' : id.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     return [id, `/assets/audio/narration/recorded-v1/${filename}.mp3`];
 }));

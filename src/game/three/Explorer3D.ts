@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { getCharacter, type CharacterId } from '../content/characters';
+import { CompanionExplorer3D, groundExplorerFeet } from './CompanionExplorer3D';
 
 export type ExplorerFrame = {
     /** Seconds. The parent can freeze time and delta while the game is paused. */
@@ -20,12 +22,13 @@ export type ExplorerFrame = {
     reducedMotion: boolean;
 };
 
-const MAX_RINGS = 18;
-const RING_SPACING = 0.069;
+const MAX_RINGS = 24;
+const RING_SPACING = 0.055;
 const clamp = THREE.MathUtils.clamp;
+const lumiFoot = new THREE.Box3(new THREE.Vector3(-0.165, -0.58, -0.165), new THREE.Vector3(0.165, -0.262, 0.325));
 
 /** Original toy explorer. Feet are at y=0 and the face points toward +Z. */
-export class Explorer3D {
+class LumiExplorer3D {
     readonly root = new THREE.Group();
 
     private readonly rig = new THREE.Group();
@@ -55,6 +58,7 @@ export class Explorer3D {
     constructor() {
         this.root.name = 'Lumi • explorador do bosque';
         this.rig.name = 'explorer-body';
+        this.rig.scale.setScalar(0.92);
         this.head.name = 'explorer-head';
         this.root.add(this.rig);
         this.sphere = this.track(new THREE.SphereGeometry(1, 20, 14));
@@ -168,11 +172,11 @@ export class Explorer3D {
         stem.position.y = 0.104;
         this.ball(this.antenna, this.beacon, 0.073, 0.073, 0.073, 0, 0.235, 0);
 
-        const ringGeometry = this.track(new THREE.TorusGeometry(0.416, 0.055, 10, 40));
+        const ringGeometry = this.track(new THREE.TorusGeometry(0.416, 0.047, 10, 40));
         const ringPalette = [0xe9b849, 0xe4a082, 0x81b9a9, 0xb9c67f, 0xf1ce73, 0xc9a2b6];
         const ringMaterials = ringPalette.map((color) => this.material(color, 0.30, 0.17));
         for (let i = 0; i < MAX_RINGS; i += 1) {
-            const ring = this.mesh(this.rig, ringGeometry, ringMaterials[Math.floor(i / 3)]);
+            const ring = this.mesh(this.rig, ringGeometry, ringMaterials[Math.floor(i / 3) % ringMaterials.length]);
             ring.name = `Anel ${i + 1}`;
             ring.rotation.x = -Math.PI / 2;
             ring.position.y = 0.66 + i * RING_SPACING;
@@ -184,7 +188,7 @@ export class Explorer3D {
     update(frame: ExplorerFrame): void {
         if (this.disposed) return;
         const delta = clamp(Number.isFinite(frame.delta) ? frame.delta : 0, 0, 0.05);
-        const ringCount = clamp(Math.floor(frame.ringCount || 0), 0, MAX_RINGS);
+        const ringCount = clamp(Math.floor(Number.isFinite(frame.ringCount) ? frame.ringCount : 0), 0, MAX_RINGS);
         const reduced = frame.reducedMotion;
         const greeting = clamp(Number.isFinite(frame.greeting) ? frame.greeting! : 0, 0, 1);
         // A short call followed by the animal's reply, then a quiet pause. The encounter
@@ -261,6 +265,7 @@ export class Explorer3D {
             leg.rotation.x = reduced ? 0 : Math.sin(phase) * this.movement * 0.43 * (1 - celebration);
             leg.position.y = 0.58 + (reduced ? 0 : Math.max(0, -Math.sin(phase)) * this.movement * 0.06);
         });
+        groundExplorerFeet(this.rig, this.legs, lumiFoot);
 
         for (let i = 0; i < MAX_RINGS; i += 1) {
             const ring = this.rings[i];
@@ -279,6 +284,10 @@ export class Explorer3D {
             ring.rotation.x = -Math.PI / 2 + remaining * 0.28;
             ring.rotation.z = reduced ? 0 : remaining * (i % 2 ? -0.16 : 0.16);
         }
+    }
+
+    getHeight(): number {
+        return (2.21 + this.growth) * 0.92 + this.rig.position.y;
     }
 
     dispose(): void {
@@ -329,5 +338,57 @@ export class Explorer3D {
         mesh.scale.set(width, height, depth);
         mesh.position.set(x, y, z);
         return mesh;
+    }
+}
+
+/** Stable placement node: switching an explorer never changes the world's facing or position. */
+export class Explorer3D {
+    readonly root = new THREE.Group();
+    private character: CharacterId;
+    private model: LumiExplorer3D | CompanionExplorer3D;
+    private lastFrame?: ExplorerFrame;
+    private disposed = false;
+
+    constructor(character: CharacterId = 'lumi') {
+        this.character = getCharacter(character).id;
+        this.model = this.createModel(this.character);
+        this.root.name = `Explorador • ${getCharacter(this.character).name}`;
+        this.root.add(this.model.root);
+    }
+
+    setCharacter(id: CharacterId): void {
+        const character = getCharacter(id).id;
+        if (this.disposed || character === this.character) return;
+        const next = this.createModel(character);
+        this.model.dispose();
+        this.model = next;
+        this.character = character;
+        this.root.name = `Explorador • ${getCharacter(character).name}`;
+        this.root.add(next.root);
+        if (this.lastFrame) {
+            // If a renderer restores a preference mid-session, preserve its current ring stack.
+            next.update({ ...this.lastFrame, delta: 0, reducedMotion: true });
+            next.update({ ...this.lastFrame, delta: 0 });
+        }
+    }
+
+    update(frame: ExplorerFrame): void {
+        if (this.disposed) return;
+        this.lastFrame = frame;
+        this.model.update(frame);
+    }
+
+    getHeight(): number { return this.model.getHeight(); }
+
+    dispose(): void {
+        if (this.disposed) return;
+        this.disposed = true;
+        this.model.dispose();
+        this.root.removeFromParent();
+        this.root.clear();
+    }
+
+    private createModel(character: CharacterId): LumiExplorer3D | CompanionExplorer3D {
+        return character === 'lumi' ? new LumiExplorer3D() : new CompanionExplorer3D(character);
     }
 }

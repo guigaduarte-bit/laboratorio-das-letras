@@ -1,5 +1,6 @@
 import { GameObjects, Geom, Input, Scene } from 'phaser';
 import { getInitialWordDisplay, getSchoolLevel, type LevelDefinition } from '../content/levels';
+import { readCharacter, type CharacterId } from '../content/characters';
 import { lanePosition, makeRunnerChoices, type RunnerPhase, type RunnerSnapshot } from '../content/runner';
 import { RUNNER_TIMINGS } from '../content/runnerPace';
 import { EventBus } from '../EventBus';
@@ -16,6 +17,7 @@ export class RunnerScene extends Scene
     private progress!: WordProgress;
     private world!: RunnerWorld;
     private avatar!: PlayerAvatar;
+    private character: CharacterId = 'lumi';
     private gates: Gate[] = [];
     private phase: RunnerPhase = 'ready';
     private count = 0;
@@ -37,7 +39,7 @@ export class RunnerScene extends Scene
         this.world = new RunnerWorld(this);
         this.scale.on('resize', this.resizeViewport);
         this.resizeViewport();
-        this.avatar = new PlayerAvatar(this, 0, 0);
+        this.character = readCharacter();
         this.reset();
         EventBus.on('runner-start', this.startRun);
         EventBus.on('runner-state-request', this.publish);
@@ -47,6 +49,7 @@ export class RunnerScene extends Scene
         EventBus.on('runner-hint', this.showHint);
         EventBus.on('runner-pause', this.setPaused);
         EventBus.on('runner-home', this.reset);
+        EventBus.on('runner-character', this.selectCharacter);
         this.input.keyboard?.on('keydown', this.handleKey);
         this.input.on('pointerdown', this.pointerDown);
         this.input.on('pointerup', this.pointerUp);
@@ -66,8 +69,16 @@ export class RunnerScene extends Scene
         this.progress = new WordProgress(this.level.word);
         this.avatar?.destroy();
         this.avatar = new PlayerAvatar(this, 0, 0);
+        this.avatar.setCharacter(this.character);
         this.createChoices();
         this.publish();
+    };
+
+    private readonly selectCharacter = (character: CharacterId): void =>
+    {
+        if (this.phase !== 'ready' || !['lumi', 'unicorn', 'dog'].includes(character)) return;
+        this.character = character;
+        this.avatar.setCharacter(character);
     };
 
     private readonly startRun = (levelId?: string): void =>
@@ -334,6 +345,7 @@ export class RunnerScene extends Scene
         EventBus.off('runner-hint', this.showHint);
         EventBus.off('runner-pause', this.setPaused);
         EventBus.off('runner-home', this.reset);
+        EventBus.off('runner-character', this.selectCharacter);
         this.input.keyboard?.off('keydown', this.handleKey);
         this.input.off('pointerdown', this.pointerDown);
         this.input.off('pointerup', this.pointerUp);

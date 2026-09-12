@@ -14,7 +14,8 @@ const { humanVoice, VOICE_SCRIPT, BUNDLED_VOICE } = mod.exports;
     assert.equal(humanVoice.availableCount, 19);
     await assert.rejects(humanVoice.init(), /salvar gravações/);
     assert.equal(humanVoice.availableCount, 19, 'Included narration works even if IndexedDB is unavailable');
-    for (const { id } of VOICE_SCRIPT) {
+    assert.equal(VOICE_SCRIPT.length, 27);
+    for (const id of Object.keys(BUNDLED_VOICE)) {
         assert.ok(humanVoice.has(id), id);
         assert.equal(humanVoice.hasCustom(id), false);
         const clip = humanVoice.get(id);
@@ -22,6 +23,9 @@ const { humanVoice, VOICE_SCRIPT, BUNDLED_VOICE } = mod.exports;
         assert.equal(clip.src, BUNDLED_VOICE[id]);
         assert.ok(fs.statSync(path.join(root, 'public', clip.src)).size > 1000, `${id} must ship with a real file`);
     }
+    const missing = VOICE_SCRIPT.filter(({ id }) => !humanVoice.has(id)).map(({ id }) => id);
+    assert.deepEqual(Array.from(missing), ['letter-G', 'letter-I', 'letter-R', 'letter-V', 'word-PREGUIÇA', 'word-SUCURI', 'word-CAPIVARA', 'word-ARARA']);
+    for (const id of missing) assert.equal(humanVoice.get(id), undefined, 'Unrecorded lines must never resolve to nonexistent MP3s');
     for (const id of ['unknown', '__proto__', 'constructor']) assert.equal(humanVoice.get(id), undefined);
     assert.equal(new Set(Object.values(BUNDLED_VOICE)).size, 19, 'Cedilla must not collide with C');
     console.log('PASS: 19 actual bundled recordings, fresh-browser availability, no storage dependency, safe lookup, unique cedilla and separate personal count.');

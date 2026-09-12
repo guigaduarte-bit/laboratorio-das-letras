@@ -23,7 +23,8 @@ function display(x = 0, y = 0, children = []) {
         strokePath() { this.paths++; return this; }
     };
     for (const name of ['setDepth', 'setScale', 'setAngle', 'setAlpha', 'fillStyle', 'fillRoundedRect',
-        'strokeRoundedRect', 'lineStyle', 'beginPath', 'destroy']) item[name] = () => item;
+        'strokeRoundedRect', 'lineStyle', 'beginPath', 'destroy', 'setVisible', 'fillEllipse',
+        'fillTriangle', 'fillCircle', 'lineBetween']) item[name] = () => item;
     return item;
 }
 const scene = { add: { container: display, graphics: () => display(), ellipse: display, circle: display, rectangle: display },
@@ -32,7 +33,7 @@ const { PlayerAvatar } = load('src/game/visuals/PlayerAvatar.ts', { './palette':
 const avatar = new PlayerAvatar(scene, 0, 0);
 assert.ok(avatar.rig.children.indexOf(avatar.ringBack) < avatar.rig.children.indexOf(avatar.ringFront));
 assert.ok(avatar.rig.children.indexOf(avatar.ringFront) < avatar.rig.children.indexOf(avatar.upper), 'The face stays in front of the stack');
-for (let letters = 0; letters <= 6; letters++) {
+for (let letters = 0; letters <= 8; letters++) {
     avatar.setRingCount(letters * 3);
     assert.equal(avatar.ringBack.paths, letters * 3); assert.equal(avatar.ringFront.paths, letters * 3);
     for (const g of [avatar.ringBack, avatar.ringFront]) {
@@ -62,4 +63,4 @@ for (let letters = 0; letters <= 6; letters++) {
     }
 }
 avatar.setRingCount(0); assert.equal(Math.abs(avatar.upper.y), 0); assert.equal(avatar.ringFront.paths, 0);
-console.log('PASS: rings wrap around the avatar, move with its rig, stack up to six letters, preserve the face and stay within the game viewport.');
+console.log('PASS: rings wrap around the avatar, move with its rig, stack up to eight letters, preserve the face and stay within the game viewport.');

@@ -153,7 +153,7 @@ tick(2000);
 assert.equal(collections.length, 1, 'No pending result survives returning to the menu');
 
 // Every approved word follows the same rules, including Ç and both repetitions in MACACO.
-assert.equal(content.schoolLevels.map(({ word }) => word).join(','), 'SAPO,ONÇA,TUCANO,MACACO');
+assert.equal(content.schoolLevels.map(({ word }) => word).join(','), 'SAPO,ONÇA,TUCANO,MACACO,PREGUIÇA,SUCURI,CAPIVARA,ARARA');
 for (const level of content.schoolLevels) {
     EventBus.emit('runner-home', level.id);
     const initialCollections = collections.length;
@@ -208,7 +208,7 @@ for (const level of content.schoolLevels) {
 }
 
 EventBus.emit('runner-start');
-assert.equal(controller.snapshot.word, 'MACACO', 'Replay keeps the selected school word');
+assert.equal(controller.snapshot.word, 'ARARA', 'Replay keeps the selected final mission');
 assert.equal(controller.snapshot.count, 0);
 assert.equal(controller.snapshot.phase, 'travel');
 const beforeInvalidClock = JSON.stringify(controller.frame);
@@ -239,4 +239,4 @@ EventBus.emit('runner-start');
 EventBus.emit('runner-state-request');
 assert.equal(JSON.stringify(controller.frame), destroyedState);
 assert.equal(publications, destroyedPublications, 'Unmounted controllers stop publishing');
-console.log('PASS: renderer-independent rules, all four words, cedilla/repetitions, indefinite choices, smooth lanes, approach, pause, retries, hint/input deduplication, reset and cleanup.');
+console.log('PASS: renderer-independent rules, all eight words, cedilla/repetitions, indefinite choices, smooth lanes, approach, pause, retries, hint/input deduplication, reset and cleanup.');

@@ -20,6 +20,7 @@ async function main() {
             require(name) {
                 if (name === 'three') return THREE;
                 if (name === 'three/addons/geometries/RoundedBoxGeometry.js') return roundedBox;
+                if (name.startsWith('.')) return load(path.resolve(path.dirname(absolute), `${name}.ts`));
                 throw new Error(`Unexpected model dependency: ${name}`);
             },
         }, { filename: absolute });

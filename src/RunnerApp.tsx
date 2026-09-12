@@ -4,13 +4,14 @@ import { runnerAudio, DEFAULT_AUDIO_MIX, type AudioMix } from './audio/RunnerAud
 import { humanVoice, VOICE_SCRIPT } from './audio/HumanVoice';
 import { getSchoolLevel, schoolLevels } from './game/content/levels';
 import { getBiomeForLevel } from './game/content/biomes';
+import { characters, getCharacter, readCharacter, writeCharacter, type CharacterId } from './game/content/characters';
 import { AnimalPortrait } from './ui/AnimalPortrait';
+import { CharacterPortrait } from './ui/CharacterPortrait';
 import { VoiceStudio } from './ui/VoiceStudio';
 import { RunnerGame3D } from './RunnerGame3D';
 import { EventBus } from './game/EventBus';
 import type { RunnerSnapshot } from './game/content/runner';
 import { localProgress, type LocalProgress } from './progress/LocalProgress';
-import { MascotGuide } from './ui/MascotGuide';
 import { RunnerIcon } from './ui/RunnerIcon';
 
 const EMPTY: RunnerSnapshot = { levelId: 'forest-sapo', word: 'SAPO', phase: 'ready', count: 0, choices: [], lane: 0, hinted: false, paused: false };
@@ -22,6 +23,7 @@ export default function RunnerApp()
     const [sound, setSound] = useState(true);
     const [audioMix, setAudioMix] = useState<AudioMix>(DEFAULT_AUDIO_MIX);
     const [voice, setVoice] = useState(0);
+    const [character, setCharacter] = useState<CharacterId>('lumi');
     const [announcement, setAnnouncement] = useState('');
     const [parentOpen, setParentOpen] = useState(false);
     const [progress, setProgress] = useState<LocalProgress>(() => localProgress.read());
@@ -44,6 +46,7 @@ export default function RunnerApp()
 
     useEffect(() => {
         let lastPhase = 'ready';
+        setCharacter(readCharacter());
         setAudioMix(runnerAudio.loadMix());
         const sync = (next: RunnerSnapshot) => {
             snapshot.current = next; setState(next); setReady(true);
@@ -65,7 +68,7 @@ export default function RunnerApp()
         };
         const support = (expected: string) => {
             setProgress(localProgress.recordHintAttempt(expected));
-            setAnnouncement(`Vamos procurar ${expected}. O Pisco iluminou essa letra.`);
+            setAnnouncement(`Vamos procurar ${expected}. Essa letra está iluminada.`);
         };
         const mismatch = ({ expected }: { expected: string }) => { support(expected); runnerAudio.retry(expected); };
         const hint = ({ expected }: { expected: string }) => { support(expected); runnerAudio.help(expected); };
@@ -135,7 +138,12 @@ export default function RunnerApp()
         runnerAudio.unlock(); runnerAudio.setEnabled(soundRef.current);
         setVoice(humanVoice.availableCount);
         EventBus.emit('runner-start', levelId);
-        document.getElementById('game-container')?.focus({ preventScroll: true });
+        // Starting below the mission grid must bring the board back into view on touch screens.
+        requestAnimationFrame(() => {
+            const game = document.getElementById('game-container');
+            game?.focus({ preventScroll: true });
+            game?.closest('section')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+        });
     };
     const toggleSound = () => {
         const enabled = !soundRef.current;
@@ -160,17 +168,17 @@ export default function RunnerApp()
     };
     const home = () => { runnerAudio.stop(); EventBus.emit('runner-home'); pauseDialog.current?.close(); };
     const chooseLevel = (levelId: string) => { runnerAudio.stop(); EventBus.emit('runner-home', levelId); };
+    const chooseCharacter = (id: CharacterId) => {
+        if (phase !== 'ready') return;
+        const selected = getCharacter(id).id;
+        writeCharacter(selected); setCharacter(selected); EventBus.emit('runner-character', selected);
+    };
     const resume = () => {
         runnerAudio.unlock(); EventBus.emit('runner-pause', false);
         pauseDialog.current?.close();
         document.getElementById('game-container')?.focus({ preventScroll: true });
         if (phase === 'choose') runnerAudio.prompt(target);
     };
-    const mission = phase === 'collect' ? (state.count === total ? `Você formou ${WORD}!` : 'Encontrou! Vamos em frente.')
-        : phase === 'finish' ? 'Vamos levar a palavra ao laboratório!'
-        : phase === 'approach' ? `Vamos até a letra ${state.choices[state.lane]}!`
-        : state.hinted ? `Vamos juntos. Procure ${target}.`
-        : phase === 'travel' ? `A próxima descoberta é ${target}.` : `Encontre a letra ${target}`;
     const hintTotal = Object.values(progress.letterStats).reduce((sum, item) => sum + item.hints, 0);
 
     return <MotionConfig reducedMotion="user">
@@ -192,23 +200,13 @@ export default function RunnerApp()
                 <div className="world-label"><RunnerIcon name="leaf" size={17} /> {biome.name}</div>
                 <AnimatePresence>
                     {phase === 'ready' && <motion.div className="expedition-start" key="start" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
-                        <p className="expedition-eyebrow">UMA DESCOBERTA POR VEZ</p>
+                        <p className="expedition-eyebrow">{getCharacter(character).name} · {level.displayName}</p>
                         <h1>Expedição<br />das <span>letras.</span></h1>
-                        <p className="expedition-intro">Escolha um animal. Vamos encontrar<br className="desktop-break" /> suas letras pelo caminho!</p>
+                        <p className="expedition-intro">Escolha quem vai com você<br className="desktop-break" /> e qual animal quer descobrir.</p>
                         <button className="expedition-primary start-button" onClick={() => start()} disabled={!ready}><RunnerIcon name="play" /> {ready ? `JOGAR · ${WORD}` : 'PREPARANDO…'}</button>
                         <p className="start-note">Jogue com as setas do teclado ou tocando na tela.</p>
                     </motion.div>}
                 </AnimatePresence>
-
-                {phase === 'ready' && <div className="mission-picker" role="group" aria-label="Escolha um animal para a aventura">
-                    {schoolLevels.map((item, index) => <button key={item.id} disabled={!ready} className="mission-choice" aria-pressed={item.id === state.levelId} onClick={() => chooseLevel(item.id)}>
-                        <span className="mission-number">{String(index + 1).padStart(2, '0')}</span>
-                        <AnimalPortrait animal={item.imageKey} />
-                        <strong>{item.word}</strong>
-                        <span className="mission-biome">{getBiomeForLevel(item.id).name}</span>
-                        <span className="mission-meta">{progress.completedLevels.includes(item.id) ? <><RunnerIcon name="check" size={14} /> Descoberto</> : `${item.word.length} letras`}</span>
-                    </button>)}
-                </div>}
 
                 {isPlaying && <div className="expedition-hud" style={{ '--letter-count': total } as CSSProperties}>
                     <div className="word-heading"><span>VAMOS FORMAR</span><span>{state.count} de {total}</span></div>
@@ -219,18 +217,13 @@ export default function RunnerApp()
                     </div>
                 </div>}
 
-                <div className="expedition-pisco" data-phase={phase}>
-                    <MascotGuide phase={phase === 'ready' ? 'menu' : phase === 'celebrate' ? 'celebrating' : 'playing'} />
-                    <div className="pisco-speech"><span>PISCO</span><p>{phase === 'ready' ? 'Eu vou com você!' : phase === 'celebrate' ? 'Olha o que você descobriu!' : mission}</p></div>
-                </div>
-
                 {isPlaying && <div className="equipment-note"><RunnerIcon name="flask" size={18} /><span>{state.count === 0 ? 'Sua invenção começa aqui' : `${state.count * 3} anéis no explorador`}</span></div>}
 
                 <AnimatePresence>
                     {phase === 'celebrate' && <motion.div className="expedition-complete" key="complete" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
                         <AnimalPortrait animal={level.imageKey} />
                         <p className="expedition-eyebrow">DESCOBERTA COMPLETA</p>
-                        <h2 ref={completeFocus} tabIndex={-1}>Você formou <strong>{WORD}!</strong></h2>
+                        <h2 ref={completeFocus} tabIndex={-1}>Você formou <strong style={{ '--complete-letters': total } as CSSProperties}>{WORD}!</strong></h2>
                         <p>{total} letras. Um novo amigo!</p>
                         <p className="completion-habitat"><RunnerIcon name="leaf" size={15} /> {biome.name}</p>
                         <button className="word-listen" disabled={!runnerAudio.hasWord(WORD) || !sound} onClick={() => runnerAudio.word(WORD)}><RunnerIcon name="sound" size={19} /> Ouvir a palavra</button>
@@ -241,6 +234,31 @@ export default function RunnerApp()
                     </motion.div>}
                 </AnimatePresence>
             </section>
+
+            {phase === 'ready' && <section className="expedition-setup" aria-label="Prepare sua aventura">
+                <div className="setup-characters">
+                    <h2>Quem vai explorar?</h2>
+                    <div className="character-picker" role="group" aria-label="Escolha seu personagem">
+                        {characters.map(item => <button key={item.id} className="character-choice" aria-pressed={character === item.id} onClick={() => chooseCharacter(item.id)}>
+                            <CharacterPortrait character={item.id} /><strong>{item.name}</strong>
+                            <span>{character === item.id ? <><RunnerIcon name="check" size={14} /> Escolhido</> : 'Escolher'}</span>
+                        </button>)}
+                    </div>
+                </div>
+                <div className="setup-missions">
+                    <h2>Qual animal vamos encontrar?</h2>
+                    <div className="mission-grid" role="group" aria-label="Escolha um animal para a aventura">
+                        {schoolLevels.map(item => <button key={item.id} disabled={!ready} className="mission-choice" aria-pressed={item.id === state.levelId} onClick={() => chooseLevel(item.id)}>
+                            <AnimalPortrait animal={item.imageKey} /><strong>{item.word}</strong>
+                            <span className="mission-biome">{getBiomeForLevel(item.id).name}</span>
+                            <span className="mission-meta">{progress.completedLevels.includes(item.id) ? <><RunnerIcon name="check" size={14} /> Descoberto</> : `${item.word.length} letras`}</span>
+                        </button>)}
+                    </div>
+                </div>
+                <div className="setup-launch"><p><strong>{getCharacter(character).name}</strong> vai descobrir <strong>{WORD}</strong>.</p>
+                    <button className="expedition-primary" onClick={() => start()} disabled={!ready}><RunnerIcon name="play" /> {ready ? `JOGAR · ${WORD}` : 'PREPARANDO…'}</button>
+                </div>
+            </section>}
 
             <div className="expedition-controls" data-phase={phase}>
                 {isPlaying ? <>
@@ -264,7 +282,7 @@ export default function RunnerApp()
                         <button className="small-action" disabled={!canChoose || state.hinted} onClick={() => EventBus.emit('runner-hint')}><RunnerIcon name="help" size={22} /><span>Dica</span></button>
                     </div>
                     <p className="runner-control-help" id="runner-control-help"><span className="keyboard-help">← → escolhem o caminho · ↑ avança.</span><span className="touch-help">Toque nas setas e em AVANÇAR, ou toque na letra.</span></p>
-                </> : <div className="expedition-footer"><span>Uma aventura com Lumi e Pisco</span><span>Reconhecer · Coletar · Descobrir</span></div>}
+                </> : <div className="expedition-footer"><span>Uma aventura com {getCharacter(character).name}</span><span>Reconhecer · Coletar · Descobrir</span></div>}
             </div>
 
             <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
@@ -289,7 +307,7 @@ export default function RunnerApp()
                         <input type="range" min="0" max="100" step="1" value={Math.round(audioMix[channel] * 100)} aria-label={`Volume: ${label}`} aria-valuetext={`${Math.round(audioMix[channel] * 100)} por cento`} onChange={(event) => changeVolume(channel, Number(event.target.value))} />
                     </label>)}
                 </fieldset>
-                <div className="voice-status"><RunnerIcon name="sound" size={20} /><p>{voice === VOICE_SCRIPT.length ? 'A narração humana já está incluída: letras, instruções e as quatro palavras. Você pode personalizar as falas abaixo.' : `${voice} de ${VOICE_SCRIPT.length} trechos gravados. Prepare as falas abaixo para completar a narração humana. Enquanto isso, leia as letras junto com o Ben; a música e os efeitos já estão disponíveis.`}</p></div>
+                <div className="voice-status"><RunnerIcon name="sound" size={20} /><p>{voice === VOICE_SCRIPT.length ? 'Todas as letras, instruções e palavras têm narração humana.' : `A narração das quatro primeiras fases está pronta. Para completar as novas, faltam: ${VOICE_SCRIPT.filter(line => !humanVoice.has(line.id)).map(line => line.label).join(', ')}. Você pode gravar esses trechos abaixo e ler as letras novas junto com o Ben.`}</p></div>
                 {parentOpen && <VoiceStudio />}
                 <button className="expedition-primary" onClick={closeParent}>VOLTAR À AVENTURA</button>
             </dialog>

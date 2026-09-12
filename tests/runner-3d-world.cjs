@@ -119,7 +119,11 @@ async function main() {
             remaining -= step;
         }
     }
-    const visibleRings = () => world.explorer.rings.filter((ring) => ring.visible).length;
+    const visibleRings = () => {
+        let count = 0;
+        world.explorer.root.traverseVisible((object) => { if (/^Anel /.test(object.name)) count++; });
+        return count;
+    };
     const visibleAnimals = () => [...world.animals].filter(([, animal]) => animal.visible).map(([kind]) => kind);
     function screenPoint(object, local = new THREE.Vector3()) {
         const point = object.localToWorld(local.clone()).project(world.camera);
@@ -226,12 +230,27 @@ async function main() {
     assert.equal(world.gates.some((gate) => gate.root.visible), false);
     assert.equal(world.pick(200, 200), null);
 
-    for (const level of schoolLevels) {
+    // A menu click can run after controller reset but before the next rendered frame.
+    // The renderer must honor the selection authorized by the ready controller.
+    EventBus.emit('runner-start');
+    render(0.016);
+    EventBus.emit('runner-home');
+    assert.equal(controller.snapshot.phase, 'ready');
+    assert.equal(world.lastFrame.phase, 'travel', 'The reproduction retains the previous rendered phase');
+    world.setCharacter('dog');
+    assert.equal(world.explorer.character, 'dog', 'Returning home and choosing before RAF must replace the visible explorer');
+    world.setCharacter('lumi');
+    render();
+
+    for (const [levelIndex, level] of schoolLevels.entries()) {
         const previousBiome = world.biomeWorld;
         const replaced = previousBiome.root.userData.biomeId !== getBiomeForLevel(level.id).id;
         const checkReplaced = replaced ? observeBiomeDisposal(previousBiome) : null;
         EventBus.emit('runner-home', level.id);
+        const character = ['lumi', 'unicorn', 'dog'][levelIndex % 3];
+        world.setCharacter(character);
         render();
+        assert.equal(world.explorer.character, character, 'The next mission uses the newly chosen explorer');
         checkReplaced?.();
         assert.equal(world.biomeWorld.root.userData.biomeId, getBiomeForLevel(level.id).id);
         assert.equal(world.scene.children.filter(child => child.userData.biomeId).length, 1, 'Exactly one destination is mounted');
@@ -356,7 +375,7 @@ async function main() {
     assert.equal(world.pick(200, 200), null);
     controller.destroy();
     assert.equal(regressions.size, 0, [...regressions].join('\n'));
-    console.log(`PASS: real Three world, ${picks} face picks, ${encounters} mutual-facing meetings, shared-clock transition/pause/replay, viewport/card framing, four active biomes, ${replacedResources} replaced + ${resources.size} final disposed resources (no pixel rendering).`);
+    console.log(`PASS: real Three world, ${schoolLevels.length} animals, three explorers, selection before RAF, ${picks} face picks, ${encounters} mutual-facing meetings, shared-clock transition/pause/replay, viewport/card framing, four active biomes, ${replacedResources} replaced + ${resources.size} final disposed resources (no pixel rendering).`);
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; });

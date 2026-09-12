@@ -24,7 +24,7 @@ const colors = {
 };
 
 /** Original toy animals. Every resource belongs to this model and can be disposed by traversal. */
-export function createAnimal3D(kind: 'sapo' | 'onca' | 'tucano' | 'macaco' | string): THREE.Group {
+export function createAnimal3D(kind: string): THREE.Group {
     const root = new THREE.Group();
     root.name = `animal-${kind}`;
     const body = new THREE.Group();
@@ -54,9 +54,9 @@ export function createAnimal3D(kind: 'sapo' | 'onca' | 'tucano' | 'macaco' | str
         parent.add(mesh);
         return mesh;
     };
-    const curve = (parent: THREE.Object3D, color: string, points: Point[], radius: number) => {
+    const curve = (parent: THREE.Object3D, color: string, points: Point[], radius: number, segments = 24) => {
         const path = new THREE.CatmullRomCurve3(points.map((point) => new THREE.Vector3(...point)));
-        const mesh = new THREE.Mesh(new THREE.TubeGeometry(path, 24, radius, 8, false), material(color));
+        const mesh = new THREE.Mesh(new THREE.TubeGeometry(path, segments, radius, 8, false), material(color));
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         parent.add(mesh);
@@ -188,6 +188,145 @@ export function createAnimal3D(kind: 'sapo' | 'onca' | 'tucano' | 'macaco' | str
             [0.96, 0.53, 0.03], [0.71, 0.8, 0.09], [0.5, 0.63, 0.11], [0.59, 0.47, 0.12]], 0.085);
         oval(tail, colors.brown, [0.59, 0.47, 0.12], [0.09, 0.09, 0.09]);
         rig.tail = tail;
+    } else if (kind === 'preguica') {
+        const fur = '#96816B';
+        const mask = '#5B493B';
+        oval(body, fur, [0, 0.63, -0.015], [0.45, 0.58, 0.36]);
+        oval(body, '#C9B89A', [0, 0.63, 0.28], [0.29, 0.36, 0.095]);
+        for (const side of [-1, 1]) {
+            oval(body, fur, [side * 0.3, 0.17, 0.17], [0.24, 0.17, 0.29]);
+            const arm = new THREE.Group();
+            arm.name = side < 0 ? 'sloth-resting-arm' : 'animal-greeting-arm';
+            arm.position.set(side * 0.39, 1.02, 0.05);
+            body.add(arm);
+            curve(arm, fur, [[0, 0, 0], [side * 0.09, -0.22, 0.025],
+                [side * 0.14, -0.47, 0.085], [side * 0.08, -0.66, 0.2]], 0.13);
+            oval(arm, fur, [side * 0.07, -0.68, 0.21], [0.16, 0.14, 0.17]);
+            // Three short rounded claws, with no sharp tips.
+            for (const toe of [-1, 0, 1]) {
+                oval(arm, colors.cream, [side * 0.07 + toe * 0.08, -0.72, 0.345], [0.037, 0.095, 0.065]);
+                oval(body, colors.cream, [side * 0.3 + toe * 0.085, 0.075, 0.4], [0.04, 0.06, 0.1]);
+            }
+            if (side > 0) rig.greetingLimb = arm;
+        }
+        head.position.set(0, 1.36, 0.035);
+        oval(head, fur, [0, 0, 0], [0.5, 0.43, 0.37]);
+        oval(head, '#E1D2B4', [0, -0.035, 0.245], [0.42, 0.35, 0.18]);
+        for (const side of [-1, 1]) {
+            const patch = oval(head, mask, [side * 0.24, -0.035, 0.379], [0.205, 0.093, 0.046]);
+            patch.name = side < 0 ? 'sloth-mask-left' : 'sloth-mask-right';
+            patch.rotation.z = side * -0.42;
+            eye(head, side * 0.19, 0.005, 0.424, 0.05, mask);
+        }
+        oval(head, colors.ink, [0, -0.08, 0.44], [0.095, 0.061, 0.048]);
+        smile(head, -0.19, 0.412, 0.17);
+        oval(head, fur, [-0.03, 0.397, -0.02], [0.17, 0.12, 0.14]);
+    } else if (kind === 'sucuri') {
+        const olive = '#879A50';
+        const coilPoints: Point[] = [];
+        for (let i = 0; i <= 48; i++) {
+            const progress = i / 48;
+            const angle = progress * Math.PI * 3.8;
+            const radius = 0.7 - progress * 0.24;
+            coilPoints.push([Math.cos(angle) * radius, 0.19 + progress * 0.24,
+                Math.sin(angle) * radius - 0.12]);
+        }
+        const coils = curve(body, olive, coilPoints, 0.18, 96);
+        coils.name = 'snake-coiled-body';
+        oval(body, olive, coilPoints[0], [0.18, 0.18, 0.18]);
+        const last = coilPoints[coilPoints.length - 1];
+        const neck = curve(body, olive, [last, [0.22, 0.65, -0.13], [0.04, 0.87, 0.08],
+            [0, 1.15, 0.28]], 0.17, 32);
+        neck.name = 'snake-raised-neck';
+        for (let i = 2; i < coilPoints.length - 2; i += 4) {
+            const [x, y, z] = coilPoints[i];
+            oval(body, '#586C3C', [x, y + 0.168, z], [0.082, 0.027, 0.11]);
+        }
+        head.position.set(0, 1.26, 0.35);
+        oval(head, olive, [0, 0, 0], [0.34, 0.26, 0.42]);
+        oval(head, '#D6D9A3', [0, -0.16, 0.14], [0.29, 0.11, 0.32]);
+        for (const side of [-1, 1]) {
+            eye(head, side * 0.215, 0.07, 0.27, 0.062, colors.sun);
+            oval(head, '#586C3C', [side * 0.105, -0.005, 0.401], [0.024, 0.018, 0.025]);
+        }
+        smile(head, -0.108, 0.425, 0.17);
+    } else if (kind === 'capivara') {
+        const fur = '#A77D53';
+        oval(body, fur, [0, 0.61, -0.15], [0.58, 0.49, 0.71]);
+        oval(body, '#BC9467', [0, 0.49, 0.35], [0.43, 0.28, 0.24]);
+        for (const side of [-1, 1]) {
+            for (const z of [-0.47, 0.39]) {
+                const leg = new THREE.Group();
+                leg.position.set(side * 0.39, 0.46, z);
+                body.add(leg);
+                oval(leg, fur, [0, -0.17, 0], [0.17, 0.23, 0.19]);
+                oval(leg, '#775A41', [0, -0.35, 0.075], [0.2, 0.11, 0.25]);
+                for (const toe of [-1, 1]) {
+                    oval(leg, '#CBAC82', [toe * 0.064, -0.355, 0.273], [0.022, 0.025, 0.035]);
+                }
+                if (side < 0 && z > 0) {
+                    leg.name = 'animal-greeting-paw';
+                    rig.greetingLimb = leg;
+                }
+            }
+        }
+        head.position.set(0, 1.04, 0.38);
+        oval(head, fur, [0, 0, 0.075], [0.45, 0.36, 0.51]);
+        const muzzle = oval(head, '#BC9467', [0, -0.1, 0.39], [0.395, 0.245, 0.33]);
+        muzzle.name = 'capybara-broad-muzzle';
+        for (const side of [-1, 1]) {
+            oval(head, fur, [side * 0.32, 0.31, -0.105], [0.13, 0.15, 0.105]);
+            oval(head, '#D6B68C', [side * 0.32, 0.327, -0.02], [0.075, 0.088, 0.024]);
+            eye(head, side * 0.31, 0.12, 0.366, 0.05, fur);
+            oval(head, '#654E3C', [side * 0.17, -0.004, 0.689], [0.039, 0.026, 0.026]);
+        }
+        smile(head, -0.205, 0.679, 0.175);
+    } else if (kind === 'arara') {
+        const red = '#CB5945';
+        const blue = '#397EAD';
+        oval(body, red, [0, 0.8, -0.065], [0.43, 0.58, 0.36]);
+        oval(body, '#DC7658', [0, 0.83, 0.23], [0.31, 0.43, 0.14]);
+        for (const side of [-1, 1]) {
+            const wing = new THREE.Group();
+            wing.name = side < 0 ? 'animal-wing-left' : 'animal-wing-right';
+            wing.position.set(side * 0.35, 1.06, -0.05);
+            body.add(wing);
+            oval(wing, red, [side * 0.025, -0.13, 0], [0.16, 0.29, 0.28]);
+            oval(wing, colors.sun, [side * 0.07, -0.29, 0.035], [0.145, 0.235, 0.23]);
+            for (const feather of [-1, 0, 1]) {
+                const tip = oval(wing, blue, [side * (0.03 + (feather + 1) * 0.03), -0.48,
+                    feather * 0.1 - 0.005], [0.07, 0.24, 0.095]);
+                tip.rotation.x = feather * -0.14;
+            }
+            rig.wings.push(wing);
+            oval(body, '#6B6960', [side * 0.19, 0.095, 0.13], [0.155, 0.095, 0.23]);
+            for (const toe of [-1, 1]) {
+                oval(body, '#8B8777', [side * 0.19 + toe * 0.065, 0.065, 0.295], [0.045, 0.04, 0.125]);
+            }
+        }
+        head.position.set(0, 1.41, 0.08);
+        oval(head, red, [0, 0, 0], [0.36, 0.36, 0.34]);
+        for (const side of [-1, 1]) {
+            oval(head, colors.cream, [side * 0.235, -0.018, 0.235], [0.125, 0.205, 0.13]);
+            eye(head, side * 0.235, 0.065, 0.345, 0.052);
+            for (let stripe = 0; stripe < 2; stripe++) {
+                oval(head, red, [side * 0.24, -0.05 - stripe * 0.065, 0.353], [0.066, 0.012, 0.015]);
+            }
+        }
+        const bill = oval(head, '#D4C8AA', [0, -0.026, 0.378], [0.18, 0.2, 0.24]);
+        bill.name = 'macaw-hooked-bill';
+        oval(head, colors.ink, [0, -0.14, 0.54], [0.116, 0.19, 0.104]);
+        oval(head, '#716B5D', [0, -0.21, 0.377], [0.11, 0.08, 0.145]);
+        const tail = new THREE.Group();
+        tail.name = 'macaw-long-tail';
+        tail.position.set(0, 0.53, -0.34);
+        body.add(tail);
+        for (const side of [-1, 0, 1]) {
+            const feather = oval(tail, side === 0 ? red : blue, [side * 0.11, -0.04, -0.32],
+                [0.075, 0.105, 0.49 - Math.abs(side) * 0.07]);
+            feather.rotation.y = side * -0.09;
+        }
+        rig.tail = tail;
     } else {
         oval(body, colors.moss, [0, 0.6, 0], [0.62, 0.54, 0.48]);
         oval(body, colors.sand, [0, 0.56, 0.36], [0.43, 0.36, 0.16]);
@@ -265,6 +404,31 @@ export function animateAnimal3D(root: THREE.Group, timeSeconds: number, reducedM
         }
         rig.head.rotation.z += response * -0.09;
         if (rig.tail) rig.tail.rotation.y += response * sway * 0.12;
+    } else if (rig.kind === 'preguica') {
+        if (rig.greetingLimb) {
+            // A sloth's unhurried greeting has one smooth raise and no fast waving.
+            rig.greetingLimb.rotation.z = response * 0.84;
+            rig.greetingLimb.rotation.x = response * -0.35;
+        }
+        rig.head.rotation.z += response * -0.12;
+        rig.head.rotation.x = response * 0.06;
+    } else if (rig.kind === 'sucuri') {
+        // The grounded coils stay in place while the raised head gently acknowledges the explorer.
+        rig.head.rotation.x = response * 0.14;
+        rig.head.rotation.z += response * (0.07 + sway * 0.025);
+    } else if (rig.kind === 'capivara') {
+        rig.head.rotation.x = response * (0.13 + sway * 0.025);
+        rig.head.rotation.z += response * 0.045;
+        if (rig.greetingLimb) rig.greetingLimb.rotation.x = -response * 0.22;
+    } else if (rig.kind === 'arara') {
+        rig.wings.forEach((wing, index) => {
+            const side = index === 0 ? -1 : 1;
+            wing.rotation.z = side * response * (0.72 + sway * 0.1);
+            wing.rotation.x = response * -0.1;
+        });
+        rig.head.rotation.z += response * 0.09;
+        rig.head.rotation.x = response * 0.08;
+        if (rig.tail) rig.tail.rotation.y += response * sway * 0.05;
     } else {
         // One small landing in place. Squash is anchored at the feet; no root movement.
         const jumpProgress = THREE.MathUtils.clamp((encounter - 1.4) / 0.75, 0, 1);

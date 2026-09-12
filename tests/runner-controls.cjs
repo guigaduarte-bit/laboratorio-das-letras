@@ -43,6 +43,7 @@ class Scene {
     }
 }
 class Avatar {
+    setCharacter(character) { this.character = character; }
     destroy() {}
     playCollect() {}
     playCelebrate() {}
@@ -65,6 +66,7 @@ const { RUNNER_TIMINGS: times } = pace;
 const { RunnerScene } = load('src/game/scenes/RunnerScene.ts', {
     ...busImport, phaser: { Scene, Geom: { Rectangle } },
     '../content/levels': load('src/game/content/levels.ts', {}),
+    '../content/characters': { readCharacter: () => 'unicorn' },
     '../content/runner': content, '../systems/WordProgress': { WordProgress },
     '../content/runnerPace': pace,
     '../visuals/PlayerAvatar': { PlayerAvatar: Avatar },
@@ -96,7 +98,14 @@ function select(index, method = 'keyboard') {
     }
 }
 scene.create();
+assert.equal(scene.avatar.character, 'unicorn', 'Fallback honors the character saved before renderer startup');
+EventBus.emit('runner-character', 'dog');
+assert.equal(scene.avatar.character, 'dog', 'Menu selection updates the fallback model');
+EventBus.emit('runner-character', 'unknown');
+assert.equal(scene.avatar.character, 'dog', 'Invalid selection cannot replace the model');
 EventBus.emit('runner-start');
+EventBus.emit('runner-character', 'lumi');
+assert.equal(scene.avatar.character, 'dog', 'Character changes are locked during the run');
 assert.equal(key('ArrowUp').prevented, true, 'An early arrow must not scroll the page');
 tick(times.travel - 1);
 assert.equal(state.phase, 'travel', 'Travel lasts until arrival, even at the faster pace');
@@ -178,12 +187,14 @@ EventBus.emit('runner-start');
 assert.equal(state.count, 0); assert.equal(state.phase, 'travel');
 // The same scene must complete every school word, including cedilla and repeated letters.
 const { schoolLevels } = load('src/game/content/levels.ts', {});
-assert.equal(schoolLevels.map(({ word }) => word).join(','), 'SAPO,ONÇA,TUCANO,MACACO');
+assert.equal(schoolLevels.slice(0, 4).map(({ word }) => word).join(','), 'SAPO,ONÇA,TUCANO,MACACO');
 for (const level of schoolLevels) {
     EventBus.emit('runner-home', level.id);
+    EventBus.emit('runner-character', level.word.length > 6 ? 'unicorn' : 'dog');
     assert.equal(state.phase, 'ready'); assert.equal(state.word, level.word);
     EventBus.emit('runner-start', level.id);
     assert.equal(state.levelId, level.id); assert.equal(state.count, 0);
+    assert.equal(scene.avatar.character, level.word.length > 6 ? 'unicorn' : 'dog');
     EventBus.emit('runner-start', 'forest-sapo');
     assert.equal(state.levelId, level.id, 'Cannot change a level during an active run');
     for (const [index, letter] of [...level.word].entries()) {
@@ -202,6 +213,6 @@ for (const level of schoolLevels) {
 EventBus.emit('runner-home', 'unknown');
 assert.equal(state.word, 'SAPO', 'An unknown mission safely falls back to the school default');
 scene.cleanup();
-for (const event of ['runner-start', 'runner-move', 'runner-advance', 'runner-choose']) assert.equal(EventBus.listenerCount(event), 0);
+for (const event of ['runner-start', 'runner-move', 'runner-advance', 'runner-choose', 'runner-character']) assert.equal(EventBus.listenerCount(event), 0);
 assert.equal(scene.input.listenerCount('pointerup'), 0);
-console.log('PASS: arrows, focused buttons, physical advance, touch targets, tap/swipe, multitouch, pause, retry and all four school words, repeated letters, cedilla and ring counts.');
+console.log(`PASS: arrows, focused buttons, physical advance, touch targets, tap/swipe, multitouch, pause, retry, ${schoolLevels.length} words, repeated letters, cedilla, ring counts and character selection.`);

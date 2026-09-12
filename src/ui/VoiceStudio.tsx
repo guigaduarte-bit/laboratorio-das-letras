@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Howl } from 'howler';
-import { humanVoice, MAX_VOICE_BYTES, VOICE_SCRIPT, voiceFormat } from '../audio/HumanVoice';
+import { BUNDLED_VOICE, humanVoice, MAX_VOICE_BYTES, VOICE_SCRIPT, voiceFormat } from '../audio/HumanVoice';
 
 export function VoiceStudio()
 {
-    const [selected, setSelected] = useState(VOICE_SCRIPT[0].id);
+    const [selected, setSelected] = useState(() => (VOICE_SCRIPT.find(item => !humanVoice.has(item.id)) ?? VOICE_SCRIPT[0]).id);
     const [draft, setDraft] = useState<Blob>();
     const [recording, setRecording] = useState(false);
     const [busy, setBusy] = useState(false);
@@ -139,9 +139,9 @@ export function VoiceStudio()
             await humanVoice.save(selected, remove ? undefined : draft);
             if (!active.current) return;
             setDraft(undefined);
-            const next = VOICE_SCRIPT.find((item) => !humanVoice.hasCustom(item.id));
+            const next = VOICE_SCRIPT.find((item) => !humanVoice.has(item.id));
             if (!remove && next) setSelected(next.id);
-            setMessage(remove ? 'Voz incluída restaurada.' : next ? 'Trecho salvo. Se quiser, personalize outra fala.' : 'Todos os trechos estão salvos. Você já pode ouvir a narração no jogo.');
+            setMessage(remove ? BUNDLED_VOICE[selected] ? 'Voz incluída restaurada.' : 'Gravação removida.' : next ? 'Trecho salvo. Vamos gravar a próxima fala que falta.' : 'A narração está completa neste aparelho. Você já pode ouvi-la no jogo.');
         } catch (error) { if (active.current) setMessage((error as Error).message); }
         finally { if (active.current) setBusy(false); }
     };
@@ -169,20 +169,20 @@ export function VoiceStudio()
                 await checkClip(blob);
             });
             if (!active.current) return;
-            const next = VOICE_SCRIPT.find((item) => !humanVoice.hasCustom(item.id));
+            const next = VOICE_SCRIPT.find((item) => !humanVoice.has(item.id));
             if (next) setSelected(next.id);
-            setMessage(`${count} trechos carregados. ${next ? 'As outras falas continuam com a narração incluída.' : 'A narração está pronta neste aparelho.'}`);
+            setMessage(`${count} trechos carregados. ${next ? 'Os demais trechos foram mantidos.' : 'A narração está pronta neste aparelho.'}`);
         } catch (error) { if (active.current) setMessage((error as Error).message); }
         finally { if (active.current) setBusy(false); }
     };
 
     return <section className="voice-studio" aria-labelledby="voice-studio-title">
         <h3 id="voice-studio-title">Uma voz humana na aventura</h3>
-        <p>O jogo já inclui uma narração humana completa. Se quiser trocar alguma fala, grave ou carregue seu áudio aqui. Suas substituições ficam neste navegador e podem ser levadas ao tablet em um pacote.</p>
-        <p className="voice-count">{savedCount} de {VOICE_SCRIPT.length} trechos personalizados · {savedCount === VOICE_SCRIPT.length ? 'Todas as falas personalizadas' : `${VOICE_SCRIPT.length - savedCount} usam a narração incluída`}</p>
+        <p>As primeiras quatro fases já têm narração humana. Grave as letras e palavras das novas fases ou personalize uma fala existente. Os áudios ficam neste navegador e podem ser levados ao tablet em um pacote.</p>
+        <p className="voice-count">{savedCount} de {VOICE_SCRIPT.length} trechos personalizados · {savedCount === VOICE_SCRIPT.length ? 'Todas as falas personalizadas' : `${humanVoice.availableCount} falas disponíveis`}</p>
         <label htmlFor="voice-line">Escolha o trecho</label>
         <select id="voice-line" value={selected} disabled={recording || busy} onChange={(event) => { stopPreview(); setSelected(event.target.value); setDraft(undefined); setMessage(''); }}>
-            {VOICE_SCRIPT.map((item) => <option key={item.id} value={item.id}>{humanVoice.hasCustom(item.id) ? 'Sua voz · ' : 'Incluída · '}{item.label}</option>)}
+            {VOICE_SCRIPT.map((item) => <option key={item.id} value={item.id}>{humanVoice.hasCustom(item.id) ? 'Sua voz · ' : humanVoice.has(item.id) ? 'Incluída · ' : 'Gravar · '}{item.label}</option>)}
         </select>
         <div className="voice-script"><span>FALE ASSIM</span><strong>{line.text}</strong></div>
         <div className="voice-buttons">
@@ -194,7 +194,7 @@ export function VoiceStudio()
         {recording && <p role="status">Gravando… Fale “{line.text}” e toque em Parar gravação.</p>}
         <p role="status">{busy ? 'Preparando áudio…' : message}</p>
         {draft && <button className="expedition-primary" disabled={busy || recording} onClick={() => save()}>USAR ESTA GRAVAÇÃO</button>}
-        {!draft && humanVoice.hasCustom(selected) && <button className="text-button" disabled={busy || recording} onClick={() => save(true)}>Restaurar voz incluída</button>}
+        {!draft && humanVoice.hasCustom(selected) && <button className="text-button" disabled={busy || recording} onClick={() => save(true)}>{BUNDLED_VOICE[selected] ? 'Restaurar voz incluída' : 'Apagar este trecho'}</button>}
         <h4>Levar as vozes para outro aparelho</h4>
         <p>Baixe o pacote e abra este mesmo jogo no outro aparelho para carregá-lo. Ao carregar, os trechos do pacote substituem as gravações correspondentes; os outros trechos são mantidos.</p>
         <div className="voice-buttons">

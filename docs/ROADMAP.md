@@ -398,3 +398,24 @@ Status: **causa reproduzida e corrigida; build e testes aprovados para preview**
 - [x] Substituição local opcional e restauração da narração incluída.
 - [x] Testes de assets/armazenamento/mixagem e build aprovados.
 - [ ] Conferência auditiva das letras e do equilíbrio com a trilha no aparelho do usuário.
+
+## Oito animais e três exploradores — 2026-09-12
+
+Status: **implementado, com build e testes automatizados aprovados; preparado para atualizar a prévia**.
+
+- [x] Fases de PREGUIÇA, SUCURI, CAPIVARA e ARARA acrescentadas às quatro anteriores.
+- [x] Novos animais em 3D e retratos vetoriais próprios na seleção e conclusão.
+- [x] Habitats das novas fases: Mata Atlântica, Pantanal, Pantanal e Cerrado, respectivamente.
+- [x] Escolha inicial entre Lumi, Unicórnio e Cachorro, persistida no navegador.
+- [x] Três rigs na expedição 3D e na versão leve, com coleta, crescimento e animação.
+- [x] Capacidade ampliada para 24 anéis e enquadramento ajustado para palavras de até oito letras e chifre do unicórnio.
+- [x] Respostas próprias dos novos animais no encontro final, preservando pausa e movimento reduzido.
+- [x] Pisco retirado da expedição principal; protótipo `?mode=explore` e histórico preservados.
+- [x] As 19 gravações já incluídas permanecem disponíveis; roteiro ampliado para 27 trechos.
+- [x] Roteiro complementar das oito falas ausentes em `ROTEIRO_NOVAS_FASES.md`.
+- [x] Build, tipos e testes de regras, controles, geometria, enquadramento e descarte de recursos.
+- [ ] Receber e integrar G, I, R, V e as quatro palavras novas em voz humana.
+- [ ] Conferir aparência, áudio e fluidez no computador/tablet do usuário após atualizar a prévia.
+- [ ] Publicação em produção.
+
+Os testes de geometria e controle não equivalem a inspeção de pixels, medição de FPS ou teste em aparelho físico. O acesso do navegador de verificação à prévia continua pedindo autenticação da Vercel.
