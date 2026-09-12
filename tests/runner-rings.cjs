@@ -29,7 +29,7 @@ function display(x = 0, y = 0, children = []) {
 }
 const scene = { add: { container: display, graphics: () => display(), ellipse: display, circle: display, rectangle: display },
     tweens: { add() {}, chain() {}, killTweensOf() {} }, time: { now: 0 } };
-const { PlayerAvatar } = load('src/game/visuals/PlayerAvatar.ts', { './palette': { ART_COLORS } });
+const { PlayerAvatar } = load('src/game/visuals/PlayerAvatar.ts', { './palette': { ART_COLORS }, '../content/victoryDance': load('src/game/content/victoryDance.ts', {}) });
 const avatar = new PlayerAvatar(scene, 0, 0);
 assert.ok(avatar.rig.children.indexOf(avatar.ringBack) < avatar.rig.children.indexOf(avatar.ringFront));
 assert.ok(avatar.rig.children.indexOf(avatar.ringFront) < avatar.rig.children.indexOf(avatar.upper), 'The face stays in front of the stack');

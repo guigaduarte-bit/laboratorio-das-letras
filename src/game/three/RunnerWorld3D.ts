@@ -255,7 +255,8 @@ export class RunnerWorld3D {
         this.previousLane = frame.lane;
         this.explorer.update({ time: this.time, delta: dt, moving: Math.max(this.velocity / RUNNER_SPEED, phase === 'approach' || phase === 'retry' ? 0.85 : 0), pace: RUNNER_SPEED / 5.8, laneLean,
             ringCount: frame.count * 3, collect: phase === 'collect' ? frame.elapsed / RUNNER_TIMINGS.collect : 0,
-            celebrate: completing * (1 - encounter.greeting * 0.65), greeting: encounter.greeting, greetingTime: encounter.time, reducedMotion });
+            celebrate: completing * (1 - encounter.greeting * 0.65), greeting: encounter.greeting, greetingTime: encounter.time,
+            victoryTime: phase === 'celebrate' ? frame.elapsed / 1000 : undefined, reducedMotion });
 
         const key = `${frame.levelId}:${frame.choices.join('')}`;
         if (key !== this.choiceKey) {

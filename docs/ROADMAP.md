@@ -426,3 +426,11 @@ Os testes de geometria e controle não equivalem a inspeção de pixels, mediç�
 - [x] As 27 falas do roteiro incluídas, com os 19 arquivos anteriores preservados.
 - [x] Testes de disponibilidade, hashes, personalização/restauração e mixagem.
 - [ ] Conferência auditiva final no computador/tablet do usuário.
+
+## Dancinha da vitória — 2026-09-12
+
+- [x] Comemoração original de quatro segundos para os três exploradores em 3D e na versão leve.
+- [x] Transição suave de volta ao cumprimento, mantendo os anéis no corpo e a direção do animal.
+- [x] Relógio da fase respeita pausa, reinício e movimento reduzido, sem atrasar o botão de próxima fase.
+- [x] Testes de poses, enquadramento, controles e descarte de recursos.
+- [ ] Conferência visual da animação no computador/tablet do usuário; navegador de verificação exige autenticação da Vercel.

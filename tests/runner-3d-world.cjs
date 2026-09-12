@@ -312,18 +312,22 @@ async function main() {
         const explorerBefore = world.explorer.root.position.clone();
         tick(50);
         assert.equal(controller.frame.phase, 'celebrate');
+        assert.equal(lastExplorerGreeting.victoryTime, 0, 'Each completed mission starts its own victory dance');
         checkEncounter(animal, 'finish → celebrate');
         assert(Math.abs(lastExplorerGreeting.greetingTime - greetingBefore - 0.05) < 1e-9,
             'Changing phase advances the greeting clock by exactly one frame; it must not restart');
         assert(world.explorer.root.position.distanceTo(explorerBefore) < 0.08, 'Entering celebration cannot teleport the explorer');
         assert.deepEqual(visibleAnimals(), [level.imageKey], 'The 3D reward matches the completed school word');
         assert(animal.scale.x > 0.9 && Number.isFinite(animal.scale.x), 'The reward finishes its appearance at a visible scale');
+        tick(375);
+        assert.equal(lastExplorerGreeting.victoryTime, .375, 'The world drives the dance from the celebration clock');
         const beforeEncounterPause = frozenState();
         const clockBeforePause = lastExplorerGreeting.greetingTime;
         EventBus.emit('runner-pause', true);
         tick(1000);
         assert.deepEqual(frozenState(), beforeEncounterPause, 'Pause freezes greeting, reply, environment, particles and facing');
         assert.equal(lastExplorerGreeting.greetingTime, clockBeforePause);
+        assert.equal(lastExplorerGreeting.victoryTime, .375, 'Pause freezes the dance clock too');
         EventBus.emit('runner-pause', false);
         for (const [width, height, windowWidth] of [[1300, 610, 1380], [836, 610, 912], [768, 320, 820], [360, 320, 390], [1000, 610, 1080]]) {
             resize(width, height, windowWidth);
@@ -340,6 +344,7 @@ async function main() {
         assert.equal(visibleAnimals().length, 0, 'Direct replay hides the previous animal immediately');
         assert.equal(lastExplorerGreeting.greeting, 0, 'Direct replay clears the explorer greeting');
         assert.equal(lastExplorerGreeting.greetingTime, 0, 'Direct replay starts with no stale meeting clock');
+        assert.equal(lastExplorerGreeting.victoryTime, undefined, 'Replay removes the completed mission dance');
     }
     assert.equal(collects, schoolLevels.reduce((sum, level) => sum + level.word.length, 0));
     assert.equal(words, schoolLevels.length, 'Each word completes exactly once');

@@ -49,6 +49,7 @@ class Avatar {
     playCelebrate() {}
     syncPosition(x, y) { this.x = x; this.y = y; }
     setRunnerPose() {}
+    setRunnerVictoryPose() {}
     setRingCount(count) { this.rings = count; }
     getRunnerScale(width, height, approach) { return Math.min(1.4, Math.max(.82, width/740)) * (1-approach*.16); }
 }

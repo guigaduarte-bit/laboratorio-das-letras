@@ -121,3 +121,7 @@ As 19 falas humanas aprovadas continuam incluídas. O roteiro completo agora tem
 ## Narração complementar recebida — 2026-09-12
 
 A segunda gravação completa as oito falas pendentes: G, I, R, V, PREGUIÇA, SUCURI, CAPIVARA e ARARA. As oito fases passam a ter todas as 27 falas humanas incluídas, sem configuração por aparelho. A gravação anterior, a música e os efeitos foram preservados.
+
+## Dancinha da vitória — 2026-09-12
+
+Ao concluir uma fase, Lumi, Unicórnio ou Cachorro faz uma comemoração de quatro segundos: passos alternados, balanço do corpo, braços ou patas animados e um pequeno pulinho. O personagem mantém a direção do animal e depois retoma o cumprimento. A dança acontece uma vez por conclusão, acompanha a pausa e não impede avançar para outra fase. Com movimento reduzido, fica uma pose amistosa estática. A versão leve também recebe a comemoração.

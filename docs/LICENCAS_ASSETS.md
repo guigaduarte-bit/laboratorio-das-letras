@@ -157,3 +157,7 @@ As 19 gravações humanas anteriores continuam com o escopo de uso já registrad
 ## Narração complementar fornecida — 2026-09-12
 
 Os oito MP3 de `public/assets/audio/narration/recorded-v2/` derivam de `Lab letras 2.m4a`, fornecido nesta conversa em resposta ao roteiro complementar para integração à mesma prévia. Uso restrito ao projeto solicitado; direitos da gravação permanecem com seu titular. Não se presume licença geral de reutilização da voz nem autorização de clonagem. A licença MIT do código não amplia esse escopo. Original fora do repositório; somente as oito falas do jogo são distribuídas. Hashes e tratamento registrados em `NARRACAO_COMPLEMENTAR_METRICAS.json`.
+
+## Dancinha da vitória — 2026-09-12
+
+Coreografia original por código em `content/victoryDance.ts`, aplicada aos rigs próprios de Lumi, Unicórnio e Cachorro nos dois renderizadores. Passos, balanço, braços/patas e pulinho criados para esta entrega; sem captura de movimento, animação externa ou reprodução de uma dança licenciada. Coberta pela licença MIT do código do projeto.

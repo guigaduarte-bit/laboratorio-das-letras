@@ -1,5 +1,6 @@
 import type { GameObjects, Physics, Scene } from 'phaser';
 import type { CharacterId } from '../content/characters';
+import { sampleVictoryDance } from '../content/victoryDance';
 import { ART_COLORS } from './palette';
 
 export type PlayerVisualState =
@@ -266,6 +267,21 @@ export class PlayerAvatar
         return Math.min(1.4, Math.max(0.82, width / 740), belowLetters) * (1 - approach * 0.16);
     }
 
+    /** The scene clock owns this short dance, so pause never skips to a later pose. */
+    setRunnerVictoryPose(seconds: number, scale: number, reducedMotion: boolean): void
+    {
+        this.root.setScale(scale).setDepth(70);
+        this.clearTweens();
+        this.resetPose();
+        const dance = sampleVictoryDance(seconds, reducedMotion);
+        this.rig.setPosition(dance.sway * 6, -dance.bounce * 5).setAngle(dance.twist * 2.4);
+        this.leftArm.setAngle(-18 - dance.strength * 36 - dance.sway * 18);
+        this.rightArm.setAngle(18 + dance.strength * 36 - dance.sway * 18);
+        this.leftLeg.setPosition(-10 - dance.leftStep * 2, 20 - dance.leftStep * 4).setAngle(-dance.leftStep * 14);
+        this.rightLeg.setPosition(10 + dance.rightStep * 2, 20 - dance.rightStep * 4).setAngle(dance.rightStep * 14);
+        this.tail.setAngle(dance.sway * 20);
+    }
+
     playCollect(): void
     {
         if (this.celebrationLocked)
@@ -278,10 +294,11 @@ export class PlayerAvatar
         this.emitDiscoveryBurst(this.root.x, this.root.y - 34, 10);
     }
 
-    playCelebrate(): void
+    playCelebrate(runner = false): void
     {
         this.celebrationLocked = true;
-        this.applyState('celebrate');
+        if (runner) { this.clearTweens(); this.resetPose(); }
+        else this.applyState('celebrate');
         this.emitDiscoveryBurst(this.root.x, this.root.y - 28, 20);
     }
 
@@ -471,8 +488,8 @@ export class PlayerAvatar
         this.head.setAngle(0).setScale(1);
         this.leftArm.setAngle(0).setScale(1);
         this.rightArm.setAngle(0).setScale(1);
-        this.leftLeg.setAngle(0).setScale(1);
-        this.rightLeg.setAngle(0).setScale(1);
+        this.leftLeg.setPosition(-10, 20).setAngle(0).setScale(1);
+        this.rightLeg.setPosition(10, 20).setAngle(0).setScale(1);
         this.antennaGlow.setScale(1).setAlpha(0.94);
         this.tail.setAngle(0);
     }

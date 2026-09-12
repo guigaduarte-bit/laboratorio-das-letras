@@ -15,7 +15,8 @@ function load(file, imports = {}) {
     return module.exports;
 }
 const { ART_COLORS } = load('src/game/visuals/palette.ts');
-const { PlayerAvatar } = load('src/game/visuals/PlayerAvatar.ts', { './palette': { ART_COLORS } });
+const victoryDance = load('src/game/content/victoryDance.ts');
+const { PlayerAvatar } = load('src/game/visuals/PlayerAvatar.ts', { './palette': { ART_COLORS }, '../content/victoryDance': victoryDance });
 let allocations = 0;
 const activeTargets = new Set();
 function display(x = 0, y = 0, children = []) {
@@ -98,6 +99,34 @@ assert.equal(avatar.ringCount, 0, 'Non-finite values cannot poison the display c
 avatar.setCharacter('unknown');
 assert.equal(avatar.character, 'lumi', 'An invalid runtime character leaves the current rig intact');
 avatar.setCharacter('dog');
+for (const character of ['lumi', 'unicorn', 'dog']) {
+    avatar.setCharacter(character);
+    avatar.setRingCount(24);
+    const growth = avatar.upper.y;
+    const pose = () => [avatar.rig.x, avatar.rig.y, avatar.rig.angle, avatar.leftArm.angle, avatar.rightArm.angle,
+        avatar.leftLeg.x, avatar.leftLeg.y, avatar.rightLeg.x, avatar.rightLeg.y, avatar.tail.angle];
+    avatar.setRunnerVictoryPose(.375, 1, false);
+    const firstStep = pose();
+    avatar.setRunnerVictoryPose(.875, 1, false);
+    assert.notDeepEqual(pose(), firstStep, `${character} alternates its dance steps`);
+    const paused = pose();
+    avatar.setRunnerVictoryPose(.875, 1, false);
+    assert.deepEqual(pose(), paused, 'A frozen scene clock preserves the exact dance pose');
+    for (let t = 0; t <= 4; t += .025) {
+        avatar.setRunnerVictoryPose(t, 1, false);
+        assert.equal(avatar.upper.y, growth, 'The ring stack and head stay attached during the dance');
+        assert(Math.abs(avatar.rig.x) <= 6 && avatar.rig.y >= -5 && Math.abs(avatar.rig.angle) <= 2.4);
+    }
+    avatar.setRunnerVictoryPose(4, 1, false);
+    const finished = pose();
+    avatar.setRunnerVictoryPose(40, 1, false);
+    assert.deepEqual(pose(), finished, 'The four-second dance does not loop');
+    avatar.setRunnerVictoryPose(.5, 1, true);
+    const reduced = pose();
+    avatar.setRunnerVictoryPose(2.5, 1, true);
+    assert.deepEqual(pose(), reduced, 'Reduced motion keeps a static victory pose');
+    assert.equal(activeTargets.size, 0, 'No old celebration tween competes with the scene-clock dance');
+}
 avatar.destroy();
 assert.equal(activeTargets.size, 0, 'Destroying the rig releases its tail and limb tweens');
 assert.ok(avatar.root.destroyed && avatar.tail.destroyed && avatar.animalFace.destroyed);

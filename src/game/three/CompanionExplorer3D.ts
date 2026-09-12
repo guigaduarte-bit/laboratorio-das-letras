@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { ExplorerFrame } from './Explorer3D';
+import { sampleVictoryDance } from '../content/victoryDance';
 
 const MAX_RINGS = 24;
 const SPACING = 0.055;
@@ -170,13 +171,14 @@ export class CompanionExplorer3D {
         const reduced = frame.reducedMotion;
         const ringCount = clamp(Math.floor(Number.isFinite(frame.ringCount) ? frame.ringCount : 0), 0, MAX_RINGS);
         const moving = clamp(frame.moving || 0, 0, 1);
-        const greeting = clamp(frame.greeting || 0, 0, 1);
+        const dance = sampleVictoryDance(frame.victoryTime, reduced);
+        const greeting = clamp(frame.greeting || 0, 0, 1) * (1 - dance.strength);
         const greetingPhase = Math.max(0, frame.greetingTime || 0) % 6.4;
         const waveEnvelope = THREE.MathUtils.smoothstep(greetingPhase, 0.15, 0.55)
             * (1 - THREE.MathUtils.smoothstep(greetingPhase, 1.9, 2.3));
         const greet = greeting * (reduced ? 0.65 : waveEnvelope);
         const collection = clamp(frame.collect || 0, 0, 1);
-        const celebration = clamp(frame.celebrate || 0, 0, 1) * (1 - greeting);
+        const celebration = Number.isFinite(frame.victoryTime) ? 0 : clamp(frame.celebrate || 0, 0, 1) * (1 - greeting);
         const lean = clamp(frame.laneLean || 0, -1, 1);
         this.clock += dt;
         this.movement = reduced ? moving : THREE.MathUtils.damp(this.movement, moving, 12, dt);
@@ -194,9 +196,11 @@ export class CompanionExplorer3D {
         const bob = reduced ? 0 : Math.abs(Math.sin(this.stride)) * this.movement * 0.038;
         const hop = reduced ? 0 : Math.sin(collection * Math.PI) * 0.18
             + Math.max(0, Math.sin(this.clock * 5)) * celebration * 0.065;
-        this.rig.position.y = bob + hop;
-        this.rig.rotation.z = reduced ? 0 : -lean * 0.055 - Math.sin(this.stride) * this.movement * 0.014;
+        this.rig.position.x = dance.sway * 0.035;
+        this.rig.position.y = bob + hop + dance.bounce * 0.065;
+        this.rig.rotation.z = (reduced ? 0 : -lean * 0.055 - Math.sin(this.stride) * this.movement * 0.014) - dance.sway * 0.035;
         this.rig.rotation.x = reduced ? 0 : this.movement * 0.025;
+        this.rig.rotation.y = dance.twist * 0.075;
         this.torso.scale.y = 0.34 + (this.growth + breath) / 2;
         this.torso.position.y = 0.82 + (this.growth + breath) / 2;
         this.upper.position.y = this.growth + breath;
@@ -205,11 +209,15 @@ export class CompanionExplorer3D {
             + (reduced ? 0 : Math.sin(this.stride) * this.movement * 0.035);
         this.head.rotation.z = greet * (this.kind === 'dog' ? -0.17 : -0.055)
             + (reduced ? 0 : Math.sin(this.clock * 1.3) * 0.025 * (1 - this.movement));
+        this.head.rotation.x -= dance.strength * 0.045;
+        this.head.rotation.z += dance.sway * (this.kind === 'dog' ? 0.12 : 0.065);
         this.tail.rotation.y = reduced ? 0 : Math.sin(this.clock * (this.kind === 'dog' ? 9 : 3)) * (0.11 + greet * 0.35 + this.movement * 0.10);
+        this.tail.rotation.y += dance.twist * (this.kind === 'dog' ? 0.28 : 0.13);
         this.ears.forEach((ear, index) => {
             const side = index === 0 ? -1 : 1;
             ear.rotation.z = side * (this.kind === 'unicorn' ? -0.16 : 0.18)
                 + (reduced ? 0 : Math.sin(this.stride + index) * this.movement * 0.13);
+            ear.rotation.z += dance.sway * side * (this.kind === 'dog' ? 0.14 : 0.06);
         });
         const blinkPhase = this.clock % 5.7;
         const blink = !reduced && blinkPhase > 5.48 ? 1 - Math.sin((blinkPhase - 5.48) / 0.22 * Math.PI) * 0.91 : 1;
@@ -223,6 +231,13 @@ export class CompanionExplorer3D {
                 leg.rotation.x = THREE.MathUtils.lerp(leg.rotation.x, -0.88, greet);
                 leg.position.y += greet * 0.04;
             }
+            // Front paws take turns while the hind paws mark the opposite beat.
+            // The final raised-paw pose keeps the animals facing their new friend.
+            const step = (index === 1 || index === 2) ? dance.leftStep : dance.rightStep;
+            const front = index >= 2;
+            leg.rotation.x -= step * (front ? 0.50 : 0.20) + (front ? dance.strength * 0.20 : 0);
+            leg.rotation.z = (index % 2 ? 1 : -1) * step * 0.085;
+            leg.position.y += step * (front ? 0.09 : 0.045);
         });
         groundExplorerFeet(this.rig, this.legs, companionFoot);
 

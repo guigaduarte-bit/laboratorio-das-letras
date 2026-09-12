@@ -259,7 +259,7 @@ export class RunnerScene extends Scene
         else if (this.phase === 'finish' && this.elapsed >= RUNNER_TIMINGS.finish)
         {
             this.phase = 'celebrate'; this.elapsed = 0;
-            if (!this.reduced) this.avatar.playCelebrate();
+            if (!this.reduced) this.avatar.playCelebrate(true);
             EventBus.emit('celebration-ready', { levelId: this.level.id, word: this.level.word });
             this.publish();
         }
@@ -279,7 +279,8 @@ export class RunnerScene extends Scene
         const finish = this.phase === 'celebrate' ? 1 : this.phase === 'finish' ? Math.min(1, this.elapsed / RUNNER_TIMINGS.finish) : 0;
         this.world.render(this.distance, this.reduced, finish);
         this.avatar.syncPosition(p.x, py);
-        this.avatar.setRunnerPose(moving, playerScale, this.reduced);
+        if (this.phase === 'celebrate') this.avatar.setRunnerVictoryPose(this.elapsed / 1000, playerScale, this.reduced);
+        else this.avatar.setRunnerPose(moving, playerScale, this.reduced);
         this.drawGates();
     }
 

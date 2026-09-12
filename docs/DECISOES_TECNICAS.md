@@ -210,3 +210,11 @@
 O suplemento `recorded-v2` contém oito MP3 mono/48 kHz/96 kbps (~125 KB), derivados do segundo áudio enviado para o jogo. Reutiliza o processamento offline de `prepare-recorded-narration.py --supplement`, com hash de origem, cortes nas pausas, filtro de 70 Hz, ganho constante e fades de borda. A fala intermediária fora do roteiro, antes de CAPIVARA, foi excluída dos assets; o original não foi modificado nem incluído no repositório. Sem alteração de velocidade/altura e sem síntese/clonagem.
 
 `BUNDLED_VOICE` resolve os 19 IDs antigos em `recorded-v1` e os oito novos em `recorded-v2`. Os 27 trechos funcionam sem IndexedDB; personalizações locais continuam prioritárias e sua remoção restaura a gravação incluída. Métricas/hashes em `NARRACAO_COMPLEMENTAR_METRICAS.json`. Transcrição automática local confirma a sequência geral do roteiro, mas não substitui avaliação auditiva/pedagógica no aparelho.
+
+## Dancinha da vitória — 2026-09-12
+
+`content/victoryDance.ts` define uma coreografia original de quatro segundos, com entrada/saída suaves, passos alternados, balanço e pulinho final. É amostrada pelo tempo da fase `celebrate`, sem timers ou loop próprio. `RunnerWorld3D` transmite `victoryTime` aos três rigs; movimentos ficam nas articulações e no corpo interno, preservando a posição e a direção de encontro controladas pelo mundo. O cumprimento cede espaço durante a dança e volta ao final, sem reiniciar o relógio compartilhado com o animal.
+
+`RunnerScene` usa a mesma coreografia em `PlayerAvatar`, removendo os tweens antigos de celebração apenas na expedição; o protótipo de plataformas mantém seu comportamento. Pausa congela a pose, reinício limpa a dança e movimento reduzido mantém a pose amistosa. Nenhum bloqueio adicional para continuar a aventura, asset externo ou dependência nova.
+
+Verificação: poses reais dos três rigs com 24 anéis, passos alternados, limites de geometria, pausa, fim sem repetição, retomada do cumprimento e descarte; integração do mundo nas oito fases e sete proporções; controles e versão leve. Os testes não renderizam pixels nem medem FPS, e o navegador de verificação continua sem acesso à prévia autenticada.

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { getCharacter, type CharacterId } from '../content/characters';
+import { sampleVictoryDance } from '../content/victoryDance';
 import { CompanionExplorer3D, groundExplorerFeet } from './CompanionExplorer3D';
 
 export type ExplorerFrame = {
@@ -19,6 +20,8 @@ export type ExplorerFrame = {
     greeting?: number;
     /** Seconds since this encounter began, shared with the responding animal and frozen on pause. */
     greetingTime?: number;
+    /** Seconds since entering the final celebration; undefined outside it, frozen on pause. */
+    victoryTime?: number;
     reducedMotion: boolean;
 };
 
@@ -122,6 +125,7 @@ class LumiExplorer3D {
             this.ball(hand, dark, 0.048, 0.064, 0.062, -side * 0.082, -0.016, 0.063);
 
             const leg = new THREE.Group();
+            leg.name = side < 0 ? 'explorer-leg-left' : 'explorer-leg-right';
             leg.position.set(side * 0.225, 0.58, 0);
             this.rig.add(leg);
             this.legs.push(leg);
@@ -190,7 +194,8 @@ class LumiExplorer3D {
         const delta = clamp(Number.isFinite(frame.delta) ? frame.delta : 0, 0, 0.05);
         const ringCount = clamp(Math.floor(Number.isFinite(frame.ringCount) ? frame.ringCount : 0), 0, MAX_RINGS);
         const reduced = frame.reducedMotion;
-        const greeting = clamp(Number.isFinite(frame.greeting) ? frame.greeting! : 0, 0, 1);
+        const dance = sampleVictoryDance(frame.victoryTime, reduced);
+        const greeting = clamp(Number.isFinite(frame.greeting) ? frame.greeting! : 0, 0, 1) * (1 - dance.strength);
         // A short call followed by the animal's reply, then a quiet pause. The encounter
         // clock starts at zero rather than joining an arbitrary global animation phase.
         const encounterTime = Math.max(0, Number.isFinite(frame.greetingTime) ? frame.greetingTime! : 0);
@@ -199,7 +204,7 @@ class LumiExplorer3D {
             * (1 - THREE.MathUtils.smoothstep(greetingPhase, 1.9, 2.3));
         const greetingPose = greeting * (reduced ? 0.65 : waveEnvelope);
         const wave = reduced ? 0 : Math.sin(Math.max(0, greetingPhase - 0.55) * Math.PI * 4) * greetingPose;
-        const celebration = clamp(frame.celebrate || 0, 0, 1) * (1 - greeting);
+        const celebration = Number.isFinite(frame.victoryTime) ? 0 : clamp(frame.celebrate || 0, 0, 1) * (1 - greeting);
         const collection = clamp(frame.collect || 0, 0, 1);
         const moving = clamp(frame.moving || 0, 0, 1);
         const lean = clamp(frame.laneLean || 0, -1, 1);
@@ -224,9 +229,11 @@ class LumiExplorer3D {
         const strideBob = reduced ? 0 : Math.abs(Math.sin(this.stride)) * 0.035 * this.movement;
         const collectHop = reduced ? 0 : Math.sin(collection * Math.PI) * 0.20;
         const celebrateHop = reduced ? 0 : Math.max(0, Math.sin(this.clock * 5)) * celebration * 0.085;
-        this.rig.position.y = strideBob + collectHop + celebrateHop;
-        this.rig.rotation.z = reduced ? 0 : -lean * 0.105 - Math.sin(this.stride) * this.movement * 0.025;
+        this.rig.position.x = dance.sway * 0.015;
+        this.rig.position.y = strideBob + collectHop + celebrateHop + dance.bounce * 0.065;
+        this.rig.rotation.z = (reduced ? 0 : -lean * 0.105 - Math.sin(this.stride) * this.movement * 0.025) - dance.sway * 0.042;
         this.rig.rotation.x = (reduced ? 0 : this.movement * 0.07) + greetingPose * 0.035;
+        this.rig.rotation.y = dance.twist * 0.08;
 
         this.torso.position.y = 0.91 + (this.growth + breath) / 2;
         this.torso.scale.y = 1 + (this.growth + breath) / 0.58;
@@ -238,8 +245,10 @@ class LumiExplorer3D {
         this.head.rotation.y = reduced ? 0 : Math.sin(this.clock * 0.87) * 0.025 * (1 - this.movement);
         this.head.rotation.x += greeting * 0.065 + greetingPose * 0.085;
         this.head.rotation.z += greetingPose * -0.06;
+        this.head.rotation.z += dance.sway * 0.055;
+        this.head.rotation.x -= dance.strength * 0.045;
         this.antenna.rotation.z = -0.18 + (reduced ? 0 : Math.sin(this.stride + 0.8) * this.movement * 0.06);
-        this.beacon.emissiveIntensity = 0.70 + Math.sin(collection * Math.PI) * 0.7 + celebration * 0.2;
+        this.beacon.emissiveIntensity = 0.70 + Math.sin(collection * Math.PI) * 0.7 + (celebration + dance.strength) * 0.2;
 
         const blinkPhase = this.clock % 5.7;
         const blink = !reduced && blinkPhase > 5.48 ? 1 - Math.sin((blinkPhase - 5.48) / 0.22 * Math.PI) * 0.91 : 1;
@@ -247,6 +256,9 @@ class LumiExplorer3D {
 
         this.arms.forEach((arm, index) => {
             const side = index === 0 ? -1 : 1;
+            // Bring the shoulders inward a little while lifting the arms so the
+            // swept hands stay inside the encounter's reserved camera envelope.
+            arm.position.x = side * (0.445 - dance.strength * 0.18);
             const swing = reduced ? 0 : Math.sin(this.stride + index * Math.PI) * this.movement * 0.53;
             arm.rotation.x = swing * (1 - celebration) - celebration * 0.35;
             arm.rotation.z = side * (0.09 + celebration * 2.25 + (reduced ? 0 : Math.sin(collection * Math.PI) * 0.33));
@@ -257,13 +269,22 @@ class LumiExplorer3D {
                 arm.rotation.x = THREE.MathUtils.lerp(arm.rotation.x, -1.30, greetingPose);
                 arm.rotation.z = THREE.MathUtils.lerp(arm.rotation.z, 0.72, greetingPose);
             }
+            // Raised arms alternate with the steps, ending in a brief open victory pose.
+            const step = index === 0 ? dance.leftStep : dance.rightStep;
+            arm.rotation.x = arm.rotation.x * (1 - dance.strength) - dance.strength * 0.38 + dance.twist * side * 0.16;
+            arm.rotation.z = arm.rotation.z * (1 - dance.strength) + side * (dance.strength * 2.12 + step * 0.24);
             this.hands[index].rotation.z = index === 1 ? wave * 0.34 : 0;
             this.hands[index].rotation.y = index === 1 ? wave * 0.16 : 0;
+            this.hands[index].rotation.z += side * dance.twist * 0.18;
         });
         this.legs.forEach((leg, index) => {
             const phase = this.stride + index * Math.PI;
             leg.rotation.x = reduced ? 0 : Math.sin(phase) * this.movement * 0.43 * (1 - celebration);
             leg.position.y = 0.58 + (reduced ? 0 : Math.max(0, -Math.sin(phase)) * this.movement * 0.06);
+            const step = index === 0 ? dance.leftStep : dance.rightStep;
+            leg.rotation.x -= step * 0.28;
+            leg.rotation.z = (index === 0 ? -1 : 1) * step * 0.10;
+            leg.position.y += step * 0.10;
         });
         groundExplorerFeet(this.rig, this.legs, lumiFoot);
 
