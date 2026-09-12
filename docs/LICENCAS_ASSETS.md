@@ -132,3 +132,9 @@ Não foram usados modelos, texturas ou personagens do jogo de referência. Áudi
 Os quatro MP3 são assets próprios do projeto, cobertos pela licença MIT do repositório. A referência ao efeito de coleta do Sonic orienta somente o caráter breve, brilhante e metálico: nenhum áudio, sample ou transcrição musical da franquia foi incorporado. Geração local por código, NumPy e FFmpeg; hashes, durações e métricas de amplitude estão em `AUDIO_ASSETS_METRICS.json`.
 
 Nenhuma gravação humana externa foi obtida ou adicionada nesta entrega. O estúdio aceita gravação/upload local e permite exportar/importar os trechos entre aparelhos. Uma narração incorporada ao jogo publicado ainda depende de gravações autorizadas do roteiro; não há substituição automática por síntese de voz.
+
+## Roteiro gravado enviado pelo usuário — 2026-09-12
+
+Os 19 arquivos de `public/assets/audio/narration/recorded-v1/` derivam do áudio fornecido nesta conversa para integrar a narração ao Laboratório das Letras. O envio sucede a solicitação explícita do roteiro para esse fim e autoriza seu processamento e uso nesta prévia do jogo. Não foi presumida uma licença geral de reutilização da voz, nem autorização de clonagem. Os direitos da gravação permanecem com seu titular; a licença MIT do código não amplia esse escopo.
+
+Processamento: divisão em pausas do roteiro, mono, filtro passa-altas em 70 Hz, ganho constante por trecho, fades de borda e MP3 96 kbps. Sem voz sintética, transposição ou mudança de velocidade. Os hashes e intervalos estão em `NARRACAO_GRAVADA_METRICAS.json`. O original não foi incluído no repositório.

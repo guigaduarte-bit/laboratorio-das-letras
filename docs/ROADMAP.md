@@ -389,3 +389,12 @@ Status: **causa reproduzida e corrigida; build e testes aprovados para preview**
 - [x] Testes de mixer, Howler real, importação atômica, regras/controles e build.
 - [ ] Receber ou gravar narração humana completa; ainda não incorporada.
 - [ ] Conferir música, timbres, pronúncia e gravação no computador/tablet físico.
+
+## Narração humana integrada — 2026-09-12
+
+- [x] Roteiro gravado recebido e dividido em 19 falas.
+- [x] Volumes equilibrados, pausas externas reduzidas e MP3 compactos.
+- [x] Voz incluída em computador/tablet sem preparação por aparelho.
+- [x] Substituição local opcional e restauração da narração incluída.
+- [x] Testes de assets/armazenamento/mixagem e build aprovados.
+- [ ] Conferência auditiva das letras e do equilíbrio com a trilha no aparelho do usuário.

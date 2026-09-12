@@ -101,3 +101,7 @@ O final é um encontro: explorador e animal olham um para o outro, o explorador 
 A expedição ganha uma trilha instrumental original alegre, um brilho metálico ao acertar, um som grave breve para orientar outra tentativa e uma fanfarra no encontro final. O erro permanece sem punição. A música baixa enquanto uma pessoa fala as letras ou instruções e os volumes podem ser ajustados separadamente.
 
 O roteiro humano passa a 19 falas, com apresentação, convite, nomes das letras, palavras e reforços. Ainda é necessário receber ou gravar esses trechos: o jogo não apresenta voz sintetizada como humana. O estúdio permite levar as gravações ao tablet em um pacote, mantendo-as sob controle da pessoa que acompanha.
+
+## Narração recebida — 2026-09-12
+
+O roteiro gravado enviado pelo usuário passa a acompanhar a expedição em 19 trechos: apresentação, convite, 11 nomes de letras, quatro palavras e dois reforços. Funciona em um navegador novo, sem importar ou gravar novamente. A pessoa pode substituir falas localmente e restaurar a voz incluída.

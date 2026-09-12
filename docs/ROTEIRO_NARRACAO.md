@@ -1,6 +1,6 @@
 # Roteiro de voz humana — Expedição das Letras
 
-São 19 trechos em português brasileiro para SAPO, ONÇA, TUCANO e MACACO. Ainda é preciso receber ou gravar a voz de uma pessoa: este roteiro não é um pacote de narração pronta.
+São 19 trechos em português brasileiro para SAPO, ONÇA, TUCANO e MACACO. Atualização de 12/09/2026: a gravação enviada foi integrada ao jogo em 19 trechos. As instruções abaixo permanecem como referência para futuras substituições.
 
 Você pode gravar **um único áudio**, lendo a tabela na ordem e deixando **dois segundos de silêncio entre as falas**, e enviá-lo nesta conversa para separarmos os trechos. Não fale os números nem os rótulos. Use uma voz acolhedora e natural, sem música ao fundo; deixe o começo e o fim de cada fala inteiros. As letras são lidas pelo nome, não pelo fonema.
 

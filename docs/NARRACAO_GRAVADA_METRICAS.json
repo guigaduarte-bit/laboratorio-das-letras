@@ -1,0 +1,216 @@
+{
+  "source_sha256": "25f1d4ad1d01f6ae0c4f16bde58317cdf194de9e80a1e4cf02090f91fbb5fba1",
+  "source_duration_seconds": 53.86533333333333,
+  "method": "User-supplied script order; cuts in silent margins; 70 Hz high-pass; constant gain per clip; 10/20 ms edge fades; no TTS or voice cloning.",
+  "clips": [
+    {
+      "id": "introduction",
+      "file": "assets/audio/narration/recorded-v1/introduction.mp3",
+      "source_start": 2.4,
+      "source_end": 5.7,
+      "duration": 3.3,
+      "gain_db": 2.74,
+      "peak_dbfs": -6.82,
+      "bytes": 40365,
+      "sha256": "b2610bb2cca2b12d8f958f00a9256fe8b60a70ec000e16d76080cdcf0d0a5633"
+    },
+    {
+      "id": "prompt",
+      "file": "assets/audio/narration/recorded-v1/prompt.mp3",
+      "source_start": 7.25,
+      "source_end": 9.0,
+      "duration": 1.75,
+      "gain_db": 2.59,
+      "peak_dbfs": -8.07,
+      "bytes": 21645,
+      "sha256": "ab4e9bb5eab09e32d8755ddea1d67878104307e2cdc97e6d84d6a2360a5f722d"
+    },
+    {
+      "id": "letter-A",
+      "file": "assets/audio/narration/recorded-v1/letter-a.mp3",
+      "source_start": 10.62,
+      "source_end": 11.43,
+      "duration": 0.81,
+      "gain_db": 3.26,
+      "peak_dbfs": -8.55,
+      "bytes": 10413,
+      "sha256": "5c7d66d1c6ff10d45c564b61cd410dca3c3fc4f98e28b95d0a2aee1b37a44e6c"
+    },
+    {
+      "id": "letter-C",
+      "file": "assets/audio/narration/recorded-v1/letter-c.mp3",
+      "source_start": 12.5,
+      "source_end": 13.5,
+      "duration": 1.0,
+      "gain_db": 5.83,
+      "peak_dbfs": -6.95,
+      "bytes": 12717,
+      "sha256": "e50084a68358ac5fee33eb1c3675cf893cd3fb73b518458bd60fb650a4994c7d"
+    },
+    {
+      "id": "letter-Ç",
+      "file": "assets/audio/narration/recorded-v1/letter-cedilha.mp3",
+      "source_start": 14.9,
+      "source_end": 16.43,
+      "duration": 1.53,
+      "gain_db": 4.52,
+      "peak_dbfs": -7.46,
+      "bytes": 19053,
+      "sha256": "7386bb0017d326bac69f8c959579d365022512d8cb4bed66a4f584b536f31b44"
+    },
+    {
+      "id": "letter-E",
+      "file": "assets/audio/narration/recorded-v1/letter-e.mp3",
+      "source_start": 17.73,
+      "source_end": 18.5,
+      "duration": 0.77,
+      "gain_db": 2.35,
+      "peak_dbfs": -9.77,
+      "bytes": 10125,
+      "sha256": "25b923b563de39e90babded9d82a66e7ea7ddb747b13c6f4534c27a1df07144b"
+    },
+    {
+      "id": "letter-M",
+      "file": "assets/audio/narration/recorded-v1/letter-m.mp3",
+      "source_start": 19.84,
+      "source_end": 20.78,
+      "duration": 0.94,
+      "gain_db": 2.08,
+      "peak_dbfs": -9.78,
+      "bytes": 12141,
+      "sha256": "a4e36be3972ab3cd0c058d5aa5f6f3e6095232ebf1627eb7e67968c230c53c24"
+    },
+    {
+      "id": "letter-N",
+      "file": "assets/audio/narration/recorded-v1/letter-n.mp3",
+      "source_start": 22.16,
+      "source_end": 23.12,
+      "duration": 0.96,
+      "gain_db": 0.54,
+      "peak_dbfs": -10.22,
+      "bytes": 12141,
+      "sha256": "f5d055e98b5c57accd3d4410c92a5e400f6ff402d0501951545c065ca18741be"
+    },
+    {
+      "id": "letter-O",
+      "file": "assets/audio/narration/recorded-v1/letter-o.mp3",
+      "source_start": 24.46,
+      "source_end": 25.25,
+      "duration": 0.79,
+      "gain_db": 2.16,
+      "peak_dbfs": -8.45,
+      "bytes": 10125,
+      "sha256": "9c5013b7af383697f5b0f9b7e42b198b6237d72054ba1a218bdbf08560e79d7f"
+    },
+    {
+      "id": "letter-P",
+      "file": "assets/audio/narration/recorded-v1/letter-p.mp3",
+      "source_start": 26.79,
+      "source_end": 27.54,
+      "duration": 0.75,
+      "gain_db": 1.59,
+      "peak_dbfs": -8.7,
+      "bytes": 9837,
+      "sha256": "5bf54a9b80a751bb7ada64c123853ab73e3eca27de6ea32c8d460ec4b12752f4"
+    },
+    {
+      "id": "letter-S",
+      "file": "assets/audio/narration/recorded-v1/letter-s.mp3",
+      "source_start": 29.05,
+      "source_end": 30.09,
+      "duration": 1.04,
+      "gain_db": 4.54,
+      "peak_dbfs": -7.31,
+      "bytes": 13293,
+      "sha256": "7606ebdbc1ab1f1976a15015673fbad53a647cad6faac7ffd83bc15aa50363e0"
+    },
+    {
+      "id": "letter-T",
+      "file": "assets/audio/narration/recorded-v1/letter-t.mp3",
+      "source_start": 31.0,
+      "source_end": 32.1,
+      "duration": 1.1,
+      "gain_db": 1.91,
+      "peak_dbfs": -8.47,
+      "bytes": 13869,
+      "sha256": "ca43c5d41c9931df15aa994cadadc120a45c9081c5cf4f0f24dcb4b55838bbc2"
+    },
+    {
+      "id": "letter-U",
+      "file": "assets/audio/narration/recorded-v1/letter-u.mp3",
+      "source_start": 33.56,
+      "source_end": 34.41,
+      "duration": 0.85,
+      "gain_db": 0.62,
+      "peak_dbfs": -10.43,
+      "bytes": 10989,
+      "sha256": "47c4f477569beb23634361f231d64f534dfccd10291bb25a21838493a8d1574d"
+    },
+    {
+      "id": "word-SAPO",
+      "file": "assets/audio/narration/recorded-v1/word-sapo.mp3",
+      "source_start": 36.0,
+      "source_end": 37.15,
+      "duration": 1.15,
+      "gain_db": 3.02,
+      "peak_dbfs": -4.96,
+      "bytes": 14445,
+      "sha256": "7a8d9763ab9ad87a26775919bd042ed702e1d7f5a5605f07f039ed794cca5f10"
+    },
+    {
+      "id": "word-ONÇA",
+      "file": "assets/audio/narration/recorded-v1/word-onca.mp3",
+      "source_start": 38.43,
+      "source_end": 39.45,
+      "duration": 1.02,
+      "gain_db": 4.87,
+      "peak_dbfs": -7.86,
+      "bytes": 13005,
+      "sha256": "95d474074b41950ba570ff6bc6419787191d99e5af814bbed2a911bf0eea9864"
+    },
+    {
+      "id": "word-TUCANO",
+      "file": "assets/audio/narration/recorded-v1/word-tucano.mp3",
+      "source_start": 41.25,
+      "source_end": 42.44,
+      "duration": 1.19,
+      "gain_db": 2.65,
+      "peak_dbfs": -8.45,
+      "bytes": 15021,
+      "sha256": "da7d3a7400bf81350afa6493bb7a1cec1abfea1bb96de073e43fbb92a097658b"
+    },
+    {
+      "id": "word-MACACO",
+      "file": "assets/audio/narration/recorded-v1/word-macaco.mp3",
+      "source_start": 43.83,
+      "source_end": 45.16,
+      "duration": 1.33,
+      "gain_db": 3.95,
+      "peak_dbfs": -6.07,
+      "bytes": 16749,
+      "sha256": "d2861a715521a2de79f7a05f61f2fb7144e7c215a2291795a5711354009c17ec"
+    },
+    {
+      "id": "retry",
+      "file": "assets/audio/narration/recorded-v1/retry.mp3",
+      "source_start": 46.7,
+      "source_end": 49.14,
+      "duration": 2.44,
+      "gain_db": 3.44,
+      "peak_dbfs": -6.7,
+      "bytes": 29997,
+      "sha256": "c4644b74f911ec51cf47666323159ccbde3c8a34892d6157665bf418ab506273"
+    },
+    {
+      "id": "complete",
+      "file": "assets/audio/narration/recorded-v1/complete.mp3",
+      "source_start": 50.56,
+      "source_end": 53.16,
+      "duration": 2.6,
+      "gain_db": 1.86,
+      "peak_dbfs": -7.84,
+      "bytes": 32013,
+      "sha256": "8b1b1273081404dc53b2a044fe10170537ec39adf1be57dbd540ce14d0437304"
+    }
+  ]
+}

@@ -76,7 +76,7 @@ export default function RunnerApp()
         const celebrate = ({ word }: { word: string }) => runnerAudio.celebrate(word);
         const unavailable = () => { setReady(false); startGuard.current = false; runnerAudio.stop(); };
         const available = () => setReady(true);
-        const voiceChanged = () => setVoice(humanVoice.count);
+        const voiceChanged = () => setVoice(humanVoice.availableCount);
         const visibility = () => {
             if (document.hidden) {
                 if (!['ready', 'celebrate'].includes(snapshot.current.phase)) EventBus.emit('runner-pause', true);
@@ -104,7 +104,7 @@ export default function RunnerApp()
         EventBus.emit('runner-state-request');
         voiceChanged();
         const unsubscribeVoice = humanVoice.subscribe(voiceChanged);
-        void humanVoice.init().catch(() => setVoice(0));
+        void humanVoice.init().catch(voiceChanged);
         document.addEventListener('visibilitychange', visibility);
         window.addEventListener('keydown', escape);
         return () => {
@@ -133,7 +133,7 @@ export default function RunnerApp()
         if (!ready || startGuard.current) return;
         startGuard.current = true;
         runnerAudio.unlock(); runnerAudio.setEnabled(soundRef.current);
-        setVoice(humanVoice.count);
+        setVoice(humanVoice.availableCount);
         EventBus.emit('runner-start', levelId);
         document.getElementById('game-container')?.focus({ preventScroll: true });
     };
@@ -289,7 +289,7 @@ export default function RunnerApp()
                         <input type="range" min="0" max="100" step="1" value={Math.round(audioMix[channel] * 100)} aria-label={`Volume: ${label}`} aria-valuetext={`${Math.round(audioMix[channel] * 100)} por cento`} onChange={(event) => changeVolume(channel, Number(event.target.value))} />
                     </label>)}
                 </fieldset>
-                <div className="voice-status"><RunnerIcon name="sound" size={20} /><p>{voice === VOICE_SCRIPT.length ? 'Todos os trechos estão gravados. A aventura usa os áudios que você preparou.' : `${voice} de ${VOICE_SCRIPT.length} trechos gravados. Prepare as falas abaixo para completar a narração humana. Enquanto isso, leia as letras junto com o Ben; a música e os efeitos já estão disponíveis.`}</p></div>
+                <div className="voice-status"><RunnerIcon name="sound" size={20} /><p>{voice === VOICE_SCRIPT.length ? 'A narração humana já está incluída: letras, instruções e as quatro palavras. Você pode personalizar as falas abaixo.' : `${voice} de ${VOICE_SCRIPT.length} trechos gravados. Prepare as falas abaixo para completar a narração humana. Enquanto isso, leia as letras junto com o Ben; a música e os efeitos já estão disponíveis.`}</p></div>
                 {parentOpen && <VoiceStudio />}
                 <button className="expedition-primary" onClick={closeParent}>VOLTAR À AVENTURA</button>
             </dialog>

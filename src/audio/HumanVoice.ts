@@ -9,6 +9,12 @@ export const VOICE_SCRIPT = [
     { id: 'complete', label: 'Comemoração', text: 'Você encontrou todas as letras!' }
 ];
 
+/** Gravação do roteiro enviada para o jogo em 12/09/2026. */
+export const BUNDLED_VOICE: Readonly<Record<string, string>> = Object.fromEntries(VOICE_SCRIPT.map(({ id }) => {
+    const filename = id === 'letter-Ç' ? 'letter-cedilha' : id.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return [id, `/assets/audio/narration/recorded-v1/${filename}.mp3`];
+}));
+
 export function voiceFormat(type: string): string | undefined
 {
     const mime = type.split(';')[0].toLowerCase();
@@ -72,12 +78,14 @@ class HumanVoice
         return () => { this.listeners.delete(listener); };
     }
 
-    has(id: string): boolean { return this.clips.has(id); }
+    hasCustom(id: string): boolean { return this.clips.has(id); }
+    has(id: string): boolean { return this.clips.has(id) || Object.prototype.hasOwnProperty.call(BUNDLED_VOICE, id); }
     get count(): number { return this.clips.size; }
+    get availableCount(): number { return VOICE_SCRIPT.filter(({ id }) => this.has(id)).length; }
     get(id: string): { src: string; format: string } | undefined
     {
         const blob = this.clips.get(id);
-        if (!blob) return undefined;
+        if (!blob) return Object.prototype.hasOwnProperty.call(BUNDLED_VOICE, id) ? { src: BUNDLED_VOICE[id], format: 'mp3' } : undefined;
         if (!this.urls.has(id)) this.urls.set(id, URL.createObjectURL(blob));
         return { src: this.urls.get(id)!, format: voiceFormat(blob.type)! };
     }

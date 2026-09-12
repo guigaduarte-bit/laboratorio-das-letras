@@ -80,6 +80,7 @@ const packFile = (clips) => new Blob([packText(clips)], { type: 'application/jso
     await humanVoice.save('letter-A', new Blob(['old-A'], { type: 'audio/wav' }));
     await humanVoice.save('letter-M', new Blob(['keep-M'], { type: 'audio/wav' }));
     const oldUrl = humanVoice.get('letter-A').src;
+    assert.ok(oldUrl.startsWith('blob:'), 'Custom recording overrides included narration');
     const before = state.writes;
     let checked = 0;
     await assert.rejects(humanVoice.importPack(packFile([clip('letter-A', 'new-A'), clip('letter-E', 'broken')]), async (blob) => {
@@ -90,7 +91,7 @@ const packFile = (clips) => new Blob([packText(clips)], { type: 'application/jso
     assert.equal(checked, 2);
     assert.equal(state.writes, before);
     assert.equal(humanVoice.get('letter-A').src, oldUrl);
-    assert.equal(humanVoice.has('letter-E'), false);
+    assert.equal(humanVoice.hasCustom('letter-E'), false);
 
     state.failNext = true;
     await assert.rejects(humanVoice.importPack(packFile([clip('letter-A', 'new-A'), clip('letter-E')]), async () => {}), /salvar neste navegador/);
@@ -110,7 +111,7 @@ const packFile = (clips) => new Blob([packText(clips)], { type: 'application/jso
     assert.equal(count, 2);
     assert.equal(notifications, 1, 'Expose the imported set together, once');
     assert.equal(humanVoice.count, 3);
-    assert.equal(humanVoice.has('letter-M'), true, 'A partial pack preserves unrelated recordings');
+    assert.equal(humanVoice.hasCustom('letter-M'), true, 'A partial pack preserves unrelated recordings');
     assert.notEqual(humanVoice.get('letter-A').src, oldUrl);
     assert.equal(await state.records.get('letter-A').blob.text(), 'new-A');
 
@@ -122,5 +123,8 @@ const packFile = (clips) => new Blob([packText(clips)], { type: 'application/jso
     const roundTrip = parseVoicePack(await (await fresh.exportPack()).text());
     assert.equal(await roundTrip.find(({ id }) => id === 'letter-M').blob.text(), 'keep-M');
     assert.equal(await roundTrip.find(({ id }) => id === 'letter-A').blob.text(), 'new-A');
+    await humanVoice.save('letter-A');
+    assert.ok(humanVoice.get('letter-A').src.endsWith('/letter-a.mp3'), 'Deleting a personal recording restores the included voice');
+    assert.equal(humanVoice.availableCount, 19);
     console.log('PASS: 19-line script, strict pack schema/base64/limits, decode-before-write, atomic transaction failure, preserved clips, single notification and portable export/import round trip.');
 })().catch((error) => { console.error(error); process.exitCode = 1; });

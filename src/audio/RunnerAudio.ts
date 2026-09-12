@@ -33,7 +33,7 @@ export class RunnerAudio
         complete: new Howl({ src: ['/assets/audio/expedition/discovery-fanfare.mp3'], volume: 0 })
     };
 
-    hasVoice(letter?: string): boolean { return letter ? humanVoice.has(`letter-${letter}`) : humanVoice.count > 0; }
+    hasVoice(letter?: string): boolean { return letter ? humanVoice.has(`letter-${letter}`) : humanVoice.availableCount > 0; }
     hasWord(word: string): boolean { return humanVoice.has(`word-${word}`); }
     getMix(): AudioMix { return { ...this.mix }; }
     loadMix(): AudioMix
