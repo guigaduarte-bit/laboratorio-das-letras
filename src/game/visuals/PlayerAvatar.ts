@@ -20,6 +20,8 @@ export class PlayerAvatar
     private readonly rightArm: GameObjects.Graphics;
     private readonly leftLeg: GameObjects.Graphics;
     private readonly rightLeg: GameObjects.Graphics;
+    private readonly leftFoot: GameObjects.Ellipse;
+    private readonly rightFoot: GameObjects.Ellipse;
     private readonly antennaGlow: GameObjects.Arc;
     private readonly upper: GameObjects.Container;
     private readonly ringBack: GameObjects.Graphics;
@@ -60,8 +62,8 @@ export class PlayerAvatar
         const visor = this.makeRoundedPart(0, -27, 35, 20, 9, ART_COLORS.ink);
         const leftEye = scene.add.circle(-8, -27, 3.5, ART_COLORS.sun);
         const rightEye = scene.add.circle(8, -27, 3.5, ART_COLORS.sun);
-        const footLeft = scene.add.ellipse(-11, 32, 18, 8, ART_COLORS.ink);
-        const footRight = scene.add.ellipse(11, 32, 18, 8, ART_COLORS.ink);
+        this.leftFoot = scene.add.ellipse(-11, 32, 18, 8, ART_COLORS.ink);
+        this.rightFoot = scene.add.ellipse(11, 32, 18, 8, ART_COLORS.ink);
 
         this.ringBack = scene.add.graphics();
         this.ringFront = scene.add.graphics();
@@ -69,7 +71,7 @@ export class PlayerAvatar
         this.animalBody = scene.add.graphics();
         this.animalFace = scene.add.graphics();
         this.tail = scene.add.graphics({ x: 20, y: 12 });
-        this.robotParts = [body, bodyPanel, badge, footLeft, footRight,
+        this.robotParts = [body, bodyPanel, badge,
             antennaStem, this.antennaGlow, this.head, visor, leftEye, rightEye];
         this.upper = scene.add.container(0, 0, [antennaStem, this.antennaGlow, this.head, visor, leftEye, rightEye, this.animalFace]);
 
@@ -78,8 +80,8 @@ export class PlayerAvatar
             this.tail,
             this.leftLeg,
             this.rightLeg,
-            footLeft,
-            footRight,
+            this.leftFoot,
+            this.rightFoot,
             this.ringBack,
             this.neck,
             this.leftArm,
@@ -153,6 +155,9 @@ export class PlayerAvatar
         for (const part of this.robotParts) part.setVisible(robot);
         this.animalBody.clear(); this.animalFace.clear(); this.tail.clear();
         const fur = character === 'unicorn' ? 0xfff6ec : 0xc68b56;
+        const footColor = robot ? ART_COLORS.ink : character === 'unicorn' ? 0xb8a5df : 0x73503b;
+        this.leftFoot.fillColor = footColor;
+        this.rightFoot.fillColor = footColor;
         for (const [part, width, height, color] of [
             [this.leftArm, 11, 31, robot ? ART_COLORS.clay : fur],
             [this.rightArm, 11, 31, robot ? ART_COLORS.clay : fur],
@@ -177,7 +182,6 @@ export class PlayerAvatar
         const accent = character === 'unicorn' ? 0xb8a5df : 0x73503b;
         body.fillStyle(fur, 1).fillEllipse(0, 3, 42, 44);
         body.fillStyle(0xfff6ec, 1).fillEllipse(0, 8, 26, 27);
-        body.fillStyle(accent, 1).fillEllipse(-11, 32, 18, 8).fillEllipse(11, 32, 18, 8);
         // Small field scarf preserves the explorer identity without hiding animal anatomy.
         body.fillStyle(ART_COLORS.lagoon, 1).fillRoundedRect(-18, -16, 36, 9, 4);
         body.fillTriangle(9, -9, 18, -9, 20, 5);
@@ -275,10 +279,19 @@ export class PlayerAvatar
         this.resetPose();
         const dance = sampleVictoryDance(seconds, reducedMotion);
         this.rig.setPosition(dance.sway * 6, -dance.bounce * 5).setAngle(dance.twist * 2.4);
-        this.leftArm.setAngle(-18 - dance.strength * 36 - dance.sway * 18);
-        this.rightArm.setAngle(18 + dance.strength * 36 - dance.sway * 18);
-        this.leftLeg.setPosition(-10 - dance.leftStep * 2, 20 - dance.leftStep * 4).setAngle(-dance.leftStep * 14);
-        this.rightLeg.setPosition(10 + dance.rightStep * 2, 20 - dance.rightStep * 4).setAngle(dance.rightStep * 14);
+        this.leftArm.setAngle(-18 - dance.leftArm * 70 - dance.open * 26 + dance.crouch * 12);
+        this.rightArm.setAngle(18 + dance.rightArm * 70 + dance.open * 26 - dance.crouch * 12);
+        this.leftLeg.setPosition(-10 - dance.leftStep * 4 - dance.open * 2, 20 - dance.leftStep * 4 - dance.leftTap * 2)
+            .setAngle(-dance.leftStep * 14 - dance.leftTap * 25 - dance.open * 7);
+        this.rightLeg.setPosition(10 + dance.rightStep * 4 + dance.open * 2, 20 - dance.rightStep * 4 - dance.rightTap * 2)
+            .setAngle(dance.rightStep * 14 + dance.rightTap * 25 + dance.open * 7);
+        // Match the foot to its leg joint while keeping the prototype's existing walk intact.
+        for (const [leg, foot, side] of [[this.leftLeg, this.leftFoot, -1], [this.rightLeg, this.rightFoot, 1]] as const)
+        {
+            const angle = leg.angle * Math.PI / 180;
+            foot.setPosition(leg.x + side * Math.cos(angle) - 12 * Math.sin(angle),
+                leg.y + side * Math.sin(angle) + 12 * Math.cos(angle)).setAngle(leg.angle);
+        }
         this.tail.setAngle(dance.sway * 20);
     }
 
@@ -490,6 +503,8 @@ export class PlayerAvatar
         this.rightArm.setAngle(0).setScale(1);
         this.leftLeg.setPosition(-10, 20).setAngle(0).setScale(1);
         this.rightLeg.setPosition(10, 20).setAngle(0).setScale(1);
+        this.leftFoot.setPosition(-11, 32).setAngle(0);
+        this.rightFoot.setPosition(11, 32).setAngle(0);
         this.antennaGlow.setScale(1).setAlpha(0.94);
         this.tail.setAngle(0);
     }

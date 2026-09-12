@@ -161,3 +161,7 @@ Os oito MP3 de `public/assets/audio/narration/recorded-v2/` derivam de `Lab letr
 ## Dancinha da vitória — 2026-09-12
 
 Coreografia original por código em `content/victoryDance.ts`, aplicada aos rigs próprios de Lumi, Unicórnio e Cachorro nos dois renderizadores. Passos, balanço, braços/patas e pulinho criados para esta entrega; sem captura de movimento, animação externa ou reprodução de uma dança licenciada. Coberta pela licença MIT do código do projeto.
+
+## Coreografia frontal — 2026-09-12
+
+A comemoração foi refeita com uma sequência original de poses-chave em `content/victoryDance.ts`, aplicada aos modelos próprios do projeto. Não usa captura de movimento, dança de terceiros, modelo externo ou nova mídia. Permanece coberta pela licença MIT do código.

@@ -54,6 +54,10 @@ for (const character of ['unicorn', 'dog', 'lumi', 'dog', 'unicorn', 'lumi']) {
     assert.equal(allocations, allocatedRig, 'Switches reuse rig parts without accumulating display objects');
     assert.equal(avatar.character, character);
     assert.ok(avatar.robotParts.every((part) => part.visible === (character === 'lumi')));
+    assert.ok(avatar.leftFoot.visible && avatar.rightFoot.visible, 'Each character has two visible articulated feet');
+    assert.equal(avatar.leftFoot.fillColor, character === 'lumi' ? ART_COLORS.ink : character === 'unicorn' ? 0xb8a5df : 0x73503b);
+    assert.ok(!avatar.animalBody.commands.some(([name, x, y, w, h]) => name === 'fillEllipse' && y === 32 && w === 18 && h === 8),
+        'Animal bodies contain no duplicate feet fixed to the ground');
     if (character === 'unicorn') {
         assert.ok(avatar.animalFace.commands.some(([name, ...p]) => name === 'fillTriangle' && p.includes(-68)), 'The unicorn includes a raised horn');
         assert.ok(avatar.tail.commands.some(([name]) => name === 'fillEllipse'), 'The unicorn includes a mane-colored tail');
@@ -104,28 +108,50 @@ for (const character of ['lumi', 'unicorn', 'dog']) {
     avatar.setRingCount(24);
     const growth = avatar.upper.y;
     const pose = () => [avatar.rig.x, avatar.rig.y, avatar.rig.angle, avatar.leftArm.angle, avatar.rightArm.angle,
-        avatar.leftLeg.x, avatar.leftLeg.y, avatar.rightLeg.x, avatar.rightLeg.y, avatar.tail.angle];
-    avatar.setRunnerVictoryPose(.375, 1, false);
+        avatar.leftLeg.x, avatar.leftLeg.y, avatar.rightLeg.x, avatar.rightLeg.y, avatar.tail.angle,
+        avatar.leftFoot.x, avatar.leftFoot.y, avatar.leftFoot.angle, avatar.rightFoot.x, avatar.rightFoot.y, avatar.rightFoot.angle];
+    avatar.setRunnerVictoryPose(1.1, 1, false);
     const firstStep = pose();
-    avatar.setRunnerVictoryPose(.875, 1, false);
+    avatar.setRunnerVictoryPose(1.85, 1, false);
     assert.notDeepEqual(pose(), firstStep, `${character} alternates its dance steps`);
     const paused = pose();
-    avatar.setRunnerVictoryPose(.875, 1, false);
+    avatar.setRunnerVictoryPose(1.85, 1, false);
     assert.deepEqual(pose(), paused, 'A frozen scene clock preserves the exact dance pose');
-    for (let t = 0; t <= 4; t += .025) {
+    avatar.setRunnerVictoryPose(2.65, 1, false);
+    const leftGesture = pose();
+    assert(Math.hypot(avatar.leftFoot.x + 11, avatar.leftFoot.y - 32) > 2,
+        'The visible left foot moves during its tap, instead of remaining at its resting position');
+    avatar.setRunnerVictoryPose(3.4, 1, false);
+    assert.notDeepEqual(pose(), leftGesture, 'Foot taps and arm gestures switch sides after the lateral steps');
+    const gestures = [1.1, 1.85, 2.65, 3.4, 4.4, 5.1].map((time) => {
+        avatar.setRunnerVictoryPose(time, 1, false);
+        return JSON.stringify(pose());
+    });
+    assert.equal(new Set(gestures).size, 6, 'The choreography contains six distinct readable poses');
+    for (let t = 0; t <= victoryDance.VICTORY_DANCE_DURATION; t += .025) {
         avatar.setRunnerVictoryPose(t, 1, false);
         assert.equal(avatar.upper.y, growth, 'The ring stack and head stay attached during the dance');
         assert(Math.abs(avatar.rig.x) <= 6 && avatar.rig.y >= -5 && Math.abs(avatar.rig.angle) <= 2.4);
+        for (const [leg, foot, side] of [[avatar.leftLeg, avatar.leftFoot, -1], [avatar.rightLeg, avatar.rightFoot, 1]]) {
+            const angle = leg.angle * Math.PI / 180;
+            const dx = foot.x - leg.x, dy = foot.y - leg.y;
+            assert(Math.abs(dx * Math.cos(angle) + dy * Math.sin(angle) - side) < 1e-9
+                && Math.abs(-dx * Math.sin(angle) + dy * Math.cos(angle) - 12) < 1e-9,
+                `${character}: the visible foot stays attached to the rotating leg through every step`);
+            assert.equal(foot.angle, leg.angle);
+        }
     }
-    avatar.setRunnerVictoryPose(4, 1, false);
+    avatar.setRunnerVictoryPose(victoryDance.VICTORY_DANCE_DURATION, 1, false);
     const finished = pose();
     avatar.setRunnerVictoryPose(40, 1, false);
-    assert.deepEqual(pose(), finished, 'The four-second dance does not loop');
+    assert.deepEqual(pose(), finished, 'The completed choreography does not loop');
     avatar.setRunnerVictoryPose(.5, 1, true);
     const reduced = pose();
     avatar.setRunnerVictoryPose(2.5, 1, true);
     assert.deepEqual(pose(), reduced, 'Reduced motion keeps a static victory pose');
     assert.equal(activeTargets.size, 0, 'No old celebration tween competes with the scene-clock dance');
+    assert.deepEqual([avatar.leftFoot.x, avatar.leftFoot.y, avatar.rightFoot.x, avatar.rightFoot.y], [-11, 32, 11, 32],
+        'A settled or reduced pose restores the existing resting feet');
 }
 avatar.destroy();
 assert.equal(activeTargets.size, 0, 'Destroying the rig releases its tail and limb tweens');

@@ -125,3 +125,7 @@ A segunda gravação completa as oito falas pendentes: G, I, R, V, PREGUIÇA, SU
 ## Dancinha da vitória — 2026-09-12
 
 Ao concluir uma fase, Lumi, Unicórnio ou Cachorro faz uma comemoração de quatro segundos: passos alternados, balanço do corpo, braços ou patas animados e um pequeno pulinho. O personagem mantém a direção do animal e depois retoma o cumprimento. A dança acontece uma vez por conclusão, acompanha a pausa e não impede avançar para outra fase. Com movimento reduzido, fica uma pose amistosa estática. A versão leve também recebe a comemoração.
+
+## Comemoração de frente e passos definidos — 2026-09-12
+
+Depois do encontro, explorador e animal se voltam para o jogador e permanecem de frente na conclusão. A dança do explorador agora tem seis segundos com uma sequência definida: virar, passo-junta de um lado e do outro, toques alternados dos pés com gestos de braços/patas, preparação, pulinho e pose aberta de vitória. A sequência termina sem repetir e respeita pausa e movimento reduzido. O botão para continuar permanece disponível.

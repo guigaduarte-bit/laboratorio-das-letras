@@ -229,9 +229,9 @@ class LumiExplorer3D {
         const strideBob = reduced ? 0 : Math.abs(Math.sin(this.stride)) * 0.035 * this.movement;
         const collectHop = reduced ? 0 : Math.sin(collection * Math.PI) * 0.20;
         const celebrateHop = reduced ? 0 : Math.max(0, Math.sin(this.clock * 5)) * celebration * 0.085;
-        this.rig.position.x = dance.sway * 0.015;
-        this.rig.position.y = strideBob + collectHop + celebrateHop + dance.bounce * 0.065;
-        this.rig.rotation.z = (reduced ? 0 : -lean * 0.105 - Math.sin(this.stride) * this.movement * 0.025) - dance.sway * 0.042;
+        this.rig.position.x = dance.sway * 0.045;
+        this.rig.position.y = strideBob + collectHop + celebrateHop + dance.bounce * 0.065 - dance.crouch * 0.055;
+        this.rig.rotation.z = (reduced ? 0 : -lean * 0.105 - Math.sin(this.stride) * this.movement * 0.025) - dance.sway * 0.025;
         this.rig.rotation.x = (reduced ? 0 : this.movement * 0.07) + greetingPose * 0.035;
         this.rig.rotation.y = dance.twist * 0.08;
 
@@ -246,7 +246,7 @@ class LumiExplorer3D {
         this.head.rotation.x += greeting * 0.065 + greetingPose * 0.085;
         this.head.rotation.z += greetingPose * -0.06;
         this.head.rotation.z += dance.sway * 0.055;
-        this.head.rotation.x -= dance.strength * 0.045;
+        this.head.rotation.x += dance.crouch * 0.09 - dance.open * 0.045;
         this.antenna.rotation.z = -0.18 + (reduced ? 0 : Math.sin(this.stride + 0.8) * this.movement * 0.06);
         this.beacon.emissiveIntensity = 0.70 + Math.sin(collection * Math.PI) * 0.7 + (celebration + dance.strength) * 0.2;
 
@@ -258,7 +258,7 @@ class LumiExplorer3D {
             const side = index === 0 ? -1 : 1;
             // Bring the shoulders inward a little while lifting the arms so the
             // swept hands stay inside the encounter's reserved camera envelope.
-            arm.position.x = side * (0.445 - dance.strength * 0.18);
+            arm.position.x = side * (0.445 - dance.strength * 0.205);
             const swing = reduced ? 0 : Math.sin(this.stride + index * Math.PI) * this.movement * 0.53;
             arm.rotation.x = swing * (1 - celebration) - celebration * 0.35;
             arm.rotation.z = side * (0.09 + celebration * 2.25 + (reduced ? 0 : Math.sin(collection * Math.PI) * 0.33));
@@ -269,10 +269,12 @@ class LumiExplorer3D {
                 arm.rotation.x = THREE.MathUtils.lerp(arm.rotation.x, -1.30, greetingPose);
                 arm.rotation.z = THREE.MathUtils.lerp(arm.rotation.z, 0.72, greetingPose);
             }
-            // Raised arms alternate with the steps, ending in a brief open victory pose.
-            const step = index === 0 ? dance.leftStep : dance.rightStep;
-            arm.rotation.x = arm.rotation.x * (1 - dance.strength) - dance.strength * 0.38 + dance.twist * side * 0.16;
-            arm.rotation.z = arm.rotation.z * (1 - dance.strength) + side * (dance.strength * 2.12 + step * 0.24);
+            // Separate salutes distinguish the forward taps from the side steps;
+            // both arms open together only for the hop and held final pose.
+            const raise = index === 0 ? dance.leftArm : dance.rightArm;
+            const tap = index === 0 ? dance.leftTap : dance.rightTap;
+            arm.rotation.x = arm.rotation.x * (1 - dance.strength) - raise * 0.20 - tap * 0.22;
+            arm.rotation.z = arm.rotation.z * (1 - dance.strength) + side * (dance.strength * 0.22 + raise * 1.90 + dance.open * 0.20);
             this.hands[index].rotation.z = index === 1 ? wave * 0.34 : 0;
             this.hands[index].rotation.y = index === 1 ? wave * 0.16 : 0;
             this.hands[index].rotation.z += side * dance.twist * 0.18;
@@ -282,9 +284,13 @@ class LumiExplorer3D {
             leg.rotation.x = reduced ? 0 : Math.sin(phase) * this.movement * 0.43 * (1 - celebration);
             leg.position.y = 0.58 + (reduced ? 0 : Math.max(0, -Math.sin(phase)) * this.movement * 0.06);
             const step = index === 0 ? dance.leftStep : dance.rightStep;
-            leg.rotation.x -= step * 0.28;
-            leg.rotation.z = (index === 0 ? -1 : 1) * step * 0.10;
-            leg.position.y += step * 0.10;
+            const tap = index === 0 ? dance.leftTap : dance.rightTap;
+            const side = index === 0 ? -1 : 1;
+            leg.position.x = side * (0.225 + step * 0.075 + dance.open * 0.055);
+            leg.position.z = tap * 0.14;
+            leg.rotation.x -= step * 0.20 + tap * 0.30 - dance.crouch * 0.13;
+            leg.rotation.z = side * (step * 0.10 + dance.open * 0.075);
+            leg.position.y += step * 0.10 + tap * 0.025;
         });
         groundExplorerFeet(this.rig, this.legs, lumiFoot);
 

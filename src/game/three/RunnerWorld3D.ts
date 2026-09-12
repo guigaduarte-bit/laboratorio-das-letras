@@ -10,7 +10,7 @@ import { Explorer3D } from './Explorer3D';
 import { createAnimal3D, animateAnimal3D } from './Animals3D';
 import { configureRunnerCamera } from './RunnerCamera3D';
 import { BiomeWorld3D } from './BiomeWorld3D';
-import { dampFacing, facingPartner, sampleAnimalEncounter } from './AnimalEncounter3D';
+import { celebrationFacing, dampFacing, facingPartner, sampleAnimalEncounter } from './AnimalEncounter3D';
 
 const C = { sky: 0xc7e0d4, moss: 0x355f4b, sand: 0xe8dcc7, ochre: 0xe3bd57, clay: 0xc66b48, water: 0x79b7ac };
 const ease = (x: number) => { const t = THREE.MathUtils.clamp(x, 0, 1); return t * t * (3 - 2 * t); };
@@ -249,8 +249,10 @@ export class RunnerWorld3D {
         this.explorer.root.position.z = THREE.MathUtils.damp(this.explorer.root.position.z, targetZ, 16, dt);
         this.explorer.root.scale.setScalar(phase === 'ready' ? 1.25 : 1);
         const towardAnimal = facingPartner(this.explorer.root.position.x, this.explorer.root.position.z, encounter.animalX, encounter.animalZ);
-        const yaw = phase === 'ready' ? -0.25 : completing > 0.34 ? towardAnimal : Math.PI;
-        this.explorer.root.rotation.y = dampFacing(this.explorer.root.rotation.y, yaw, dt);
+        const towardAudience = facingPartner(this.explorer.root.position.x, this.explorer.root.position.z, this.camera.position.x, this.camera.position.z);
+        const yaw = phase === 'celebrate' ? celebrationFacing(towardAnimal, towardAudience, frame.elapsed, reducedMotion)
+            : phase === 'ready' ? -0.25 : completing > 0.34 ? towardAnimal : Math.PI;
+        this.explorer.root.rotation.y = phase === 'celebrate' && reducedMotion ? yaw : dampFacing(this.explorer.root.rotation.y, yaw, dt);
         const laneLean = dt > 0 ? THREE.MathUtils.clamp((frame.lane - this.previousLane) / dt * -0.09, -0.2, 0.2) : 0;
         this.previousLane = frame.lane;
         this.explorer.update({ time: this.time, delta: dt, moving: Math.max(this.velocity / RUNNER_SPEED, phase === 'approach' || phase === 'retry' ? 0.85 : 0), pace: RUNNER_SPEED / 5.8, laneLean,
@@ -296,8 +298,10 @@ export class RunnerWorld3D {
             if (!animal.visible) return;
             animal.position.set(encounter.animalX, 0.05, encounter.animalZ);
             animal.scale.setScalar(encounter.reveal * 1.15);
-            const animalYaw = facingPartner(animal.position.x, animal.position.z, this.explorer.root.position.x, this.explorer.root.position.z);
-            animal.rotation.y = wasVisible ? dampFacing(animal.rotation.y, animalYaw, dt) : animalYaw;
+            const towardExplorer = facingPartner(animal.position.x, animal.position.z, this.explorer.root.position.x, this.explorer.root.position.z);
+            const towardViewer = facingPartner(animal.position.x, animal.position.z, this.camera.position.x, this.camera.position.z);
+            const animalYaw = phase === 'celebrate' ? celebrationFacing(towardExplorer, towardViewer, frame.elapsed, reducedMotion) : towardExplorer;
+            animal.rotation.y = wasVisible && !(phase === 'celebrate' && reducedMotion) ? dampFacing(animal.rotation.y, animalYaw, dt) : animalYaw;
             animateAnimal3D(animal, this.time, reducedMotion, { strength: encounter.greeting, time: encounter.time });
         });
         this.updateParticles(frame, reducedMotion);

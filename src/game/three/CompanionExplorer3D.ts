@@ -196,8 +196,8 @@ export class CompanionExplorer3D {
         const bob = reduced ? 0 : Math.abs(Math.sin(this.stride)) * this.movement * 0.038;
         const hop = reduced ? 0 : Math.sin(collection * Math.PI) * 0.18
             + Math.max(0, Math.sin(this.clock * 5)) * celebration * 0.065;
-        this.rig.position.x = dance.sway * 0.035;
-        this.rig.position.y = bob + hop + dance.bounce * 0.065;
+        this.rig.position.x = dance.sway * 0.045;
+        this.rig.position.y = bob + hop + dance.bounce * 0.065 - dance.crouch * 0.055;
         this.rig.rotation.z = (reduced ? 0 : -lean * 0.055 - Math.sin(this.stride) * this.movement * 0.014) - dance.sway * 0.035;
         this.rig.rotation.x = reduced ? 0 : this.movement * 0.025;
         this.rig.rotation.y = dance.twist * 0.075;
@@ -209,7 +209,7 @@ export class CompanionExplorer3D {
             + (reduced ? 0 : Math.sin(this.stride) * this.movement * 0.035);
         this.head.rotation.z = greet * (this.kind === 'dog' ? -0.17 : -0.055)
             + (reduced ? 0 : Math.sin(this.clock * 1.3) * 0.025 * (1 - this.movement));
-        this.head.rotation.x -= dance.strength * 0.045;
+        this.head.rotation.x += dance.crouch * 0.09 - dance.open * 0.045;
         this.head.rotation.z += dance.sway * (this.kind === 'dog' ? 0.12 : 0.065);
         this.tail.rotation.y = reduced ? 0 : Math.sin(this.clock * (this.kind === 'dog' ? 9 : 3)) * (0.11 + greet * 0.35 + this.movement * 0.10);
         this.tail.rotation.y += dance.twist * (this.kind === 'dog' ? 0.28 : 0.13);
@@ -231,13 +231,19 @@ export class CompanionExplorer3D {
                 leg.rotation.x = THREE.MathUtils.lerp(leg.rotation.x, -0.88, greet);
                 leg.position.y += greet * 0.04;
             }
-            // Front paws take turns while the hind paws mark the opposite beat.
-            // The final raised-paw pose keeps the animals facing their new friend.
-            const step = (index === 1 || index === 2) ? dance.leftStep : dance.rightStep;
             const front = index >= 2;
-            leg.rotation.x -= step * (front ? 0.50 : 0.20) + (front ? dance.strength * 0.20 : 0);
-            leg.rotation.z = (index % 2 ? 1 : -1) * step * 0.085;
-            leg.position.y += step * (front ? 0.09 : 0.045);
+            const side = index % 2 ? 1 : -1;
+            const step = side < 0 ? dance.leftStep : dance.rightStep;
+            const tap = side < 0 ? dance.leftTap : dance.rightTap;
+            const salute = side < 0 ? dance.leftArm : dance.rightArm;
+            // Four feet share each step–touch; only the front paws reach forward
+            // for the two salutes, then open together on the finishing hop.
+            leg.position.x = side * (0.23 + step * 0.065 + dance.open * 0.085);
+            leg.position.z = (front ? 0.23 : -0.23) + (front ? tap * 0.07 : 0);
+            leg.rotation.x -= step * (front ? 0.30 : 0.20)
+                + (front ? tap * 0.28 + salute * 0.50 + dance.open * 0.12 : 0) - dance.crouch * 0.12;
+            leg.rotation.z = side * (step * 0.085 + dance.open * 0.12);
+            leg.position.y += step * (front ? 0.09 : 0.045) + (front ? salute * 0.055 : 0);
         });
         groundExplorerFeet(this.rig, this.legs, companionFoot);
 

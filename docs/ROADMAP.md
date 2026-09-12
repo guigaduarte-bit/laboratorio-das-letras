@@ -434,3 +434,11 @@ Os testes de geometria e controle não equivalem a inspeção de pixels, mediç�
 - [x] Relógio da fase respeita pausa, reinício e movimento reduzido, sem atrasar o botão de próxima fase.
 - [x] Testes de poses, enquadramento, controles e descarte de recursos.
 - [ ] Conferência visual da animação no computador/tablet do usuário; navegador de verificação exige autenticação da Vercel.
+
+## Coreografia frontal — 2026-09-12
+
+- [x] Explorador e animal viram para o jogador depois do encontro e mantêm a vista frontal.
+- [x] Sequência de seis segundos com passo-junta, toques alternados, gestos de braços/patas, preparação, pulinho e pose de vitória.
+- [x] Mesma sequência nos três exploradores e na versão leve, respeitando pausa e movimento reduzido.
+- [x] Pés da versão leve acompanham as pernas; testes de coreografia, orientação, enquadramento e controles, tipos, lint e build aprovados.
+- [ ] Conferência visual da nova coreografia no aparelho do usuário.

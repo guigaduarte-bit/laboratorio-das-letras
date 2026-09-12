@@ -1,5 +1,6 @@
 import { RUNNER_TIMINGS } from '../content/runnerPace';
 import type { RunnerPhase } from '../content/runner';
+import { VICTORY_DANCE_LEAD_IN } from '../content/victoryDance';
 
 type Encounter = {
     progress: number;
@@ -42,4 +43,11 @@ export function dampFacing(current: number, target: number, deltaSeconds: number
 
 export function facingPartner(fromX: number, fromZ: number, toX: number, toZ: number): number {
     return Math.atan2(toX - fromX, toZ - fromZ);
+}
+
+/** Turn from the meeting toward the audience before the first choreographed step. */
+export function celebrationFacing(partnerYaw: number, audienceYaw: number, elapsedMs: number, reducedMotion: boolean): number {
+    const amount = reducedMotion ? 1 : smooth(elapsedMs / (VICTORY_DANCE_LEAD_IN * 1000));
+    const arc = Math.atan2(Math.sin(audienceYaw - partnerYaw), Math.cos(audienceYaw - partnerYaw));
+    return partnerYaw + arc * amount;
 }

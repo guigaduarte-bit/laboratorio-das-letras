@@ -218,3 +218,13 @@ O suplemento `recorded-v2` contém oito MP3 mono/48 kHz/96 kbps (~125 KB), deriv
 `RunnerScene` usa a mesma coreografia em `PlayerAvatar`, removendo os tweens antigos de celebração apenas na expedição; o protótipo de plataformas mantém seu comportamento. Pausa congela a pose, reinício limpa a dança e movimento reduzido mantém a pose amistosa. Nenhum bloqueio adicional para continuar a aventura, asset externo ou dependência nova.
 
 Verificação: poses reais dos três rigs com 24 anéis, passos alternados, limites de geometria, pausa, fim sem repetição, retomada do cumprimento e descarte; integração do mundo nas oito fases e sete proporções; controles e versão leve. Os testes não renderizam pixels nem medem FPS, e o navegador de verificação continua sem acesso à prévia autenticada.
+
+## Coreografia frontal — 2026-09-12
+
+`celebrationFacing` interpola pelo menor arco entre a direção do parceiro e a posição real da câmera, usando os primeiros 750 ms da fase. O amortecimento existente suaviza a rotação; em movimento reduzido, a pose frontal é imediata. Explorador e animal mantêm a interação durante a chegada e ficam voltados para a câmera durante toda a conclusão, inclusive depois da dança. O relógio e as posições continuam sob responsabilidade de `RunnerWorld3D`.
+
+`victoryDance.ts` substitui o balanço periódico por poses-chave de uma sequência finita de seis segundos. Canais próprios para braços, toques dos pés, preparação e abertura final distinguem cada trecho. Os três rigs 3D e a versão leve usam a mesma sequência, com amplitudes adaptadas à anatomia. Sem novos assets, timers, bloqueios de progressão ou dependências.
+
+Na versão leve, os pés são formas separadas que acompanham a posição e a rotação das pernas durante a coreografia. Os pés fixos pintados no corpo dos animais foram removidos, e a pose de repouso é restaurada ao sair da comemoração.
+
+Verificação específica: orientação frontal em relação à câmera, preservação do encontro inicial e da pausa, poses-chave fora do cartão em diferentes tamanhos de tela e geometria dos personagens com 24 anéis. A prévia continua exigindo autenticação no navegador de verificação; testes geométricos não equivalem a inspeção visual ou medição de FPS.

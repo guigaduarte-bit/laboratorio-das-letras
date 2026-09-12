@@ -180,8 +180,13 @@ async function main() {
     }
 
     function checkEncounter(animal, label) {
-        assert(facingDot(world.explorer.root, animal) > 0.9, `${label}: the explorer's actual +Z front must face the animal`);
-        assert(facingDot(animal, world.explorer.root) > 0.9, `${label}: the animal must face the explorer in return`);
+        if (controller.frame.phase === 'celebrate' && controller.frame.elapsed >= 1100) {
+            assert(facingDot(world.explorer.root, world.camera) > 0.98, `${label}: the explorer faces the actual camera for the dance`);
+            assert(facingDot(animal, world.camera) > 0.98, `${label}: the animal also turns toward the player`);
+        } else {
+            assert(facingDot(world.explorer.root, animal) > 0.9, `${label}: the explorer's actual +Z front must face the animal during arrival`);
+            assert(facingDot(animal, world.explorer.root) > 0.9, `${label}: the animal must face the explorer during arrival`);
+        }
         assert.equal(lastExplorerGreeting.greetingTime, lastAnimalGreeting.time, 'Both rigs must receive the same greeting clock');
         assert(lastExplorerGreeting.greeting > 0.9 && lastAnimalGreeting.strength > 0.9, 'The final meeting drives both actual greeting rigs');
         encounters++;
@@ -334,8 +339,16 @@ async function main() {
             tick(1000);
             checkEncounter(animal, `${width}×${height} after resize`);
             checkEncounterBounds(animal, width, height, windowWidth);
+            // Sample the actual key poses in each layout after the audience turn has settled.
+            for (const time of [1.1, 1.85, 2.65, 3.4, 4.4, 5.1, 6.5]) {
+                world.update({ ...controller.frame, elapsed: time * 1000 }, 0, false);
+                world.render();
+                checkEncounterBounds(animal, width, height, windowWidth);
+            }
         }
         render(0, true);
+        assert(facingDot(world.explorer.root, world.camera) > 0.999, 'Reduced motion keeps the friendly pose facing the player');
+        assert(facingDot(animal, world.camera) > 0.999, 'Reduced motion also presents the animal from the front');
         assert.equal(world.dust.visible, false);
         assert.equal(world.fireflies.visible, false);
         EventBus.emit('runner-start', level.id);
@@ -380,7 +393,7 @@ async function main() {
     assert.equal(world.pick(200, 200), null);
     controller.destroy();
     assert.equal(regressions.size, 0, [...regressions].join('\n'));
-    console.log(`PASS: real Three world, ${schoolLevels.length} animals, three explorers, selection before RAF, ${picks} face picks, ${encounters} mutual-facing meetings, shared-clock transition/pause/replay, viewport/card framing, four active biomes, ${replacedResources} replaced + ${resources.size} final disposed resources (no pixel rendering).`);
+    console.log(`PASS: real Three world, ${schoolLevels.length} animals, three explorers, selection before RAF, ${picks} face picks, ${encounters} meetings/audience-facing celebrations, shared-clock transition/pause/replay, choreographed poses clear of viewport/card, four active biomes, ${replacedResources} replaced + ${resources.size} final disposed resources (no pixel rendering).`);
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; });
